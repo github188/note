@@ -101,7 +101,7 @@ iptables:
 		SNAT:源地址转换
 		DNAT：目标地址转换
 		RETURN
-		REDIRECT
+		REDIRECT：端口重定向
 		LOG
 
 	INPUT:
@@ -304,8 +304,8 @@ iptables:
 
         	--state
 
-        		NEW
-        		ESTABLISHED
+        		NEW  新请求的
+        		ESTABLISHED  已建立的研究
         		RELATED
         		INVALID
 
@@ -460,20 +460,21 @@ iptables:
 								echo-request: 8
 								echo-reply: 0
 					显式扩展：
-						-m state
+						-m state  状态
 							--state
 
-						-m multiport
+						-m multiport  多端口
 							--sports, --dports, --ports
 
-						-m iprange
+						-m iprange  ip地址范围
 							--src-range, --dst-range
 
 						-m string
 							--algo {bm|kmp}, --string, --hex-string
 
-						-m connlimit
-							--connlimit-above 
+						-m connlimit 连接数限定
+							--connlimit-above   n
+							  最多使用几个链接
 
 						-m limit
 							--limit n(/second|/minute|/hour|/day), --limit-burst 
