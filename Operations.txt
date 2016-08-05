@@ -1,0 +1,1100 @@
+
+
+
+CentOS6 PXE的实现：
+1、依赖的服务：dhcp, tftp, fileserver(http,ftp,nfs);
+2、kickstart;
+
+
+# yum install tftp-server dhcp vsftpd syslinux
+
+
+
+
+next-server 172.16.100.1;    //指向tftp服务器
+filename="pxelinux.0";  //tftp根目录的相对路径
+
+
+# mount /dev/cdrom /var/ftp/pub
+
+# cp /var/ftp/pub/images/pxeboot/{vmlinuz,initrd.img}  /var/lib/tftpboot/
+# cp /var/ftp/pub/isolinux/{boot.msg,vesamenu.c32,splash.jpg}  /var/lib/tftpboot/
+# cp /usr/share/syslinux/pxelinux.0  /var/lib/tftpboot/
+
+# mkdir /var/lib/tftpboot/pxelinux.cfg
+# cp /var/ftp/pub/isolinux/isolinux.cfg  /var/lib/tftpboot/pxelinux.cfg/default
+
+
+
+
+
+
+
+
+
+
+Cobbler:
+
+一、安装
+
+前提：cobbler由epel源提供，故此需要事先配置指向epel的yum源方可进行类似下面的安装过程。
+
+# yum install cobbler cobbler-web pykickstart debmirror
+
+# service httpd start
+# service cobblerd start
+
+执行“cobbler check命令检查存的问题，而后逐一按提示解决之。常见的问题如下所示：
+1 : The 'server' field in /etc/cobbler/settings must be set to something other than localhost, or kickstarting features will not work.  This should be a resolvable hostname or IP for the boot server as reachable by all machines that will use it.
+2 : For PXE to be functional, the 'next_server' field in /etc/cobbler/settings must be set to something other than 127.0.0.1, and should match the IP of the boot server on the PXE network.
+3 : some network boot-loaders are missing from /var/lib/cobbler/loaders, you may run 'cobbler get-loaders' to download them, or, if you only want to handle x86/x86_64 netbooting, you may ensure that you have installed a *recent* version of the syslinux package installed and can ignore this message entirely.  Files in this directory, should you want to support all architectures, should include pxelinux.0, menu.c32, elilo.efi, and yaboot. The 'cobbler get-loaders' command is the easiest way to resolve these requirements.
+4 : change 'disable' to 'no' in /etc/xinetd.d/rsync
+5 : comment 'dists' on /etc/debmirror.conf for proper debian support
+6 : comment 'arches' on /etc/debmirror.conf for proper debian support
+7 : The default password used by the sample templates for newly installed machines (default_password_crypted in /etc/cobbler/settings) is still set to 'cobbler' and should be changed, try: "openssl passwd -1 -salt 'random-phrase-here' 'your-password-here'" to generate new one
+8 : fencing tools were not found, and are required to use the (optional) power management features. install cman or fence-agents to use them
+
+Restart cobblerd and then run 'cobbler sync' to apply changes.
+
+如上各问题的解决方法如下所示：
+1、修改/etc/cobbler/settings文件中的server参数的值为提供cobbler服务的主机相应的IP地址或主机名，如172.16.100.15；
+2、修改/etc/cobbler/settings文件中的next_server参数的值为提供PXE服务的主机相应的IP地址，如172.16.100.16；
+3、如果当前节点可以访问互联网，执行“cobbler get-loaders”命令即可；否则，需要安装syslinux程序包，而后复制/usr/share/syslinux/{pxelinux.0,memu.c32}等文件至/var/lib/cobbler/loaders/目录中；
+4、执行“chkconfig rsync on”命令即可；
+5、注释/etc/debmirror.conf文件中的“@dists="sid";”一行；
+6、注释/etc/debmirror.conf文件中的“@arches="i386";”一行；
+7、执行“openssl passwd -1 -salt $(openssl rand -hex 4)”生成密码，并用其替换/etc/cobbler/settings文件中default_password_crypted参数的值；
+8、执行“yum install cman fence-agents”命令安装相应的程序包即可；
+
+接着重启cobblerd，而后执行“cobbler sync”同步新的配置至cobbler。
+
+二、配置及启动cobbler所依赖的各服务
+
+cobbler的运行依赖于dhcp、tftp、rsync及dns服务。其中dhcp可由dhcpd(isc)提供，也可由dnsmasq提供；tftp可由tftp-server程序包提供，也可由cobbler自带的tftp功能提供；rsync由rsync程序包提供；dns可由bind提供，也可由dnsmasq提供。
+
+cobbler可自行管理这些服务中的部分甚至是全部，但需要配置/etc/cobbler/settings文件中的“manage_dhcp”、“manage_tftpd”、“manage_rsync”和“manage_dns”分别进行定义。另外，由于每种服务都有着不同的实现方式，如若需要进行自定义，需要通过修改/etc/cobbler/modules.conf配置文件中各服务的模块参数的值来实现。
+
+本文采用了独立管理的方式，即不通过cobbler来管理这些服务。
+
+2.1 配置dhcp服务
+
+定义好所需的“subnet”及其它参数或选项，而后启动dhcpd守护进程即可。本示例中所用的dhcpd的配置如下所示：
+
+option domain-name "magedu.com";
+option domain-name-servers 192.168.10.254,172.16.0.1;
+
+default-lease-time 43200;
+max-lease-time 86400;
+
+log-facility local7;
+
+subnet 192.168.10.0 netmask 255.255.255.0 {
+    range 192.168.10.21 192.168.10.100;
+    option routers 192.168.10.254;
+}
+
+next-server 192.168.10.254;
+filename="pxelinux.0";
+
+接着使用“service dhcpd start”启动服务即可。
+
+
+2.2 配置tftp服务
+
+# chkconfig tftp on
+# service xinetd restart
+
+三、配置cobbler
+
+cobbler的各主要组件间的关系如下图所示。
+
+
+
+3.1 管理distro
+
+使cobbler变得可用的第一步为定义distro，其可以通过为其指定外部的安装引导内核及ramdisk文件的方式实现。而如果已经有完整的系统安装树（如CentOS6的安装镜像）则推荐使用import直接导入的方式进行。
+
+例如，对于已经挂载至/media/cdrom目录的CentOS 6.4 x86_64的安装镜像，则可以使用类似如下命令进行导入。
+# cobbler import --name=centos-6.4-x86_64 --path=/media/cdrom
+
+可使用“cobbler distro list”列出所有的distro。
+
+如果有kickstart文件，也可以使用“--kickstart=/path/to/kickstart_file”进行导入，因此import会自动为导入的distro生成一个profile。
+
+3.2 管理profile
+
+cobbler使用profile来为特定的需求类别提供所需要安装配置，即在distro的基础上通过提供kickstart文件来生成一个特定的系统安装配置。distro的profile可以出现在PXE的引导菜单中作为安装的选择之一。
+
+因此，如果需要为前面创建的centos-6.4-x86_64这个distro提供一个可引导安装条目，其用到的kickstart文件为/tmp/centos-6.4-x86_64.cfg(只提供了最基本的程序包)，则可通过如下命令实现。
+# cobbler profile add --name=centos-6.4-x86_64-basic --distro=centos-6.4-x86_64 --kickstart=/tmp/centos-6.4-x86_64.cfg
+
+可使用“cobbler profile list”查看已经创建的profile。
+
+
+四、使用cobbler_web
+
+4.1 cobbler_web的bug修复
+
+当前epel源中提供的cobbler_web(程序包为cobbler-2.2.3-2.el6.noarch)存在bug，其/usr/share/cobbler/web/settings.py文件的内容需要修改为如下内容。
+
+# Django settings for cobbler-web project.
+import django
+
+DEBUG = True
+TEMPLATE_DEBUG = DEBUG
+
+ADMINS = (
+    # ('Your Name', 'your_email@domain.com'),
+)
+
+MANAGERS = ADMINS
+
+DATABASE_ENGINE = ''     # cobbler-web does not use a database
+DATABASE_NAME = ''       
+DATABASE_USER = ''       
+DATABASE_PASSWORD = ''   
+DATABASE_HOST = ''       
+DATABASE_PORT = ''       
+
+# Force Django to use the systems timezone
+TIME_ZONE = None
+
+# Language section
+# TBD.
+LANGUAGE_CODE = 'en-us'
+USE_I18N = False
+
+SITE_ID = 1
+
+# not used
+MEDIA_ROOT = ''
+MEDIA_URL = ''
+ADMIN_MEDIA_PREFIX = '/media/'
+
+SECRET_KEY = ''
+
+# code config
+
+if django.VERSION[0] == 1 and django.VERSION[1] < 4:
+    TEMPLATE_LOADERS = (
+        'django.template.loaders.filesystem.load_template_source',
+        'django.template.loaders.app_directories.load_template_source',
+    )
+else:
+    TEMPLATE_LOADERS = (
+        'django.template.loaders.filesystem.Loader',
+        'django.template.loaders.app_directories.Loader',
+    )
+
+if django.VERSION[0] == 1 and django.VERSION[1] < 2:
+    # Legacy django had a different CSRF method, which also had 
+    # different middleware. We check the vesion here so we bring in 
+    # the correct one.
+    MIDDLEWARE_CLASSES = (
+        'django.middleware.common.CommonMiddleware',
+        'django.contrib.csrf.middleware.CsrfMiddleware',
+        'django.contrib.sessions.middleware.SessionMiddleware',
+        'django.contrib.auth.middleware.AuthenticationMiddleware',
+    )
+else:
+    MIDDLEWARE_CLASSES = (
+        'django.middleware.common.CommonMiddleware',
+        'django.middleware.csrf.CsrfViewMiddleware',
+        'django.contrib.sessions.middleware.SessionMiddleware',
+        'django.contrib.auth.middleware.AuthenticationMiddleware',
+    )
+
+ROOT_URLCONF = 'urls'
+
+TEMPLATE_DIRS = (
+    '/usr/share/cobbler/web/templates',
+)
+INSTALLED_APPS = (
+    'django.contrib.auth',
+    'django.contrib.contenttypes',
+    'django.contrib.sessions',
+    'django.contrib.sites',
+    'cobbler_web',
+)
+
+from django.conf.global_settings import TEMPLATE_CONTEXT_PROCESSORS
+
+TEMPLATE_CONTEXT_PROCESSORS += (
+     'django.core.context_processors.request',
+) 
+     
+SESSION_ENGINE = 'django.contrib.sessions.backends.file'
+SESSION_FILE_PATH = '/var/lib/cobbler/webui_sessions'
+
+4.2 配置cobbler_web的认证功能
+
+cobbler_web支持多种认证方式，如authn_configfile、authn_ldap或authn_pam等，默认为authn_denyall，即拒绝所有用户登录。下面说明两种能认证用户登录cobbler_web的方式。
+
+4.2.1 使用authn_pam模块认证cobbler_web用户
+
+首先修改modules中[authentication]段的module参数的值为authn_pam。
+
+接着添加系统用户，用户名和密码按需设定即可，例如下面的命令所示。
+# useradd cblradmin
+# echo 'cblrpass' | passwd --stdin cblradmin
+
+而后将cblradmin用户添加至cobbler_web的admin组中。修改/etc/cobbler/users.conf文件，将cblradmin用户名添加为admin参数的值即可，如下所示。
+[admins]
+admin = "cblradmin"
+
+最后重启cobblerd服务，通过http://YOUR_COBBLERD_IP/cobbler_web访问即可。
+
+4.2.2 使用authn_configfile模块认证cobbler_web用户
+
+首先修改modules中[authentication]段的module参数的值为authn_configfile。
+
+接着创建其认证文件/etc/cobbler/users.digest，并添加所需的用户即可。需要注意的是，添加第一个用户时，需要为htdigest命令使用“-c”选项，后续添加其他用户时不能再使用；另外，cobbler_web的realm只能为Cobbler。如下所示。
+
+# htdigest -c /etc/cobbler/users.digest Cobbler cblradmin  
+
+最后重启cobblerd服务，通过http://YOUR_COBBLERD_IP/cobbler_web访问即可。
+
+
+
+
+
+
+
+zabbix:
+    源码:
+    rpm包：
+        2.0.9
+        rpm: 2.0.8
+
+
+zabbix-server: 监听的端口10051
+
+zabbix-agent: 10050
+
+
+
+Zabbix: Item, Key(键)
+
+ethercard.traffic[eth0]
+
+
+
+action: 
+    item: 数据项() --> data store --> Web GUI
+    key: server, agent
+        用户参数：UserParameter=<key[*]>,<command>
+            $1, $2, nginx
+            作业：自写UserParameter去监控varnish服务的连接数、命中率; 
+    trigger: 定义某个item的阈值, key
+    动作：condition, operation（remote command, send message）
+
+
+定义一次完整的监控：添加主机(主机组) --> 添加item (内置的简单图形) --> trigger (event：OK-->Problem，Recovery) --> action (通知信息(通知信息大量使用宏)condition（自定义触发条件），operation(step))
+
+
+多个主机：监控同一个指标时，
+
+媒介类型：
+    Email, External Script, Jabber, SMS,
+
+媒介：Email
+    google_mail: 
+    our_mail: 
+
+信息的发送目标：zabbix用户，每个用户联系方式
+
+
+自定义图形：将同一类的item数据项展示在同一图形中; 
+screen: 
+
+map: 设备地图
+
+
+
+定义模板：
+
+discovery: 发现有个前提
+    agent
+    agentless
+    SNMP
+
+添加主机：定义接口，关联模板
+
+发现的两个阶段：发现，action
+
+    action: condition, operation
+
+
+
+
+
+0,1,2,3
+
+0x00000003
+11
+
+-p 0,3
+
+
+zabbix
+catci+nagios
+
+API: 
+
+varnish, 
+
+目标状态：
+
+bootstrap --> configuration (目标状态) --> command and control 
+
+    bootstrap: pxe, cobbler, 虚拟化环境下的部署方式(xen, kvm)
+    configuration: puppet, saltstack, chef, cfengine
+    command and control: ansible, fabric, func
+
+
+Puppet: 集中式的配置管理工具，通过自有配置语言对节点进行目标状态定义，并能够基于网络实现目标状态的维护。
+    master: 中心配置库
+    agent: 读取并应用配置的节点
+
+    定义目标状态的核心组件：资源
+
+    Luke Kanies， Puppet Labs
+
+    版本：0.24, 0.25, 2.6, 
+        2.7, 3.x
+
+    OpenStack: 云栈
+
+    twitter, Citrix, 
+
+    管理目标：
+
+    manifest:　清单
+        用于定义并保存资源，是一个资源组织工具
+
+    清单还可以互相调用：
+        import：导入
+
+
+    puppet的管理视角：
+        模块：mod1, mod2
+        节点: node node1 {
+
+            }
+
+    类：
+        层次型组织组件一种方式
+
+            类：继承
+
+            200: 
+                testuser
+
+                50: mysql
+
+                    20: memcached
+
+                    20 {
+                        testuser
+                        mysql
+                        memcached
+                    }
+
+                    30 {
+                        testuser
+                        mysql
+                    }
+
+                    150 {
+                        testuser
+                    }
+
+            200 {
+                testuser
+            }
+
+            50 inherits 200 {
+                mysql
+            }
+
+            20 inherits 50 {
+                memcached
+            }
+
+    调用类的方式之一：
+        include
+
+    模板配置语言：
+
+    ruby: 
+        nginx配置文件模板
+            work_processes <%= @processcount %>;
+
+        facter
+
+    配置语言：
+        变量（自定义变量、puppet内置变量、facter变量）、条件语句、正则表达式
+
+
+    版本管理系统：cvs --> svn --> git
+
+
+    安装配置：
+
+        gem, source, yum epel源
+
+        下载：https://yum.puppetlabs.com/el/
+
+        https://yum.puppetlabs.com/el/6.5/products/x86_64/   
+
+    核心资源：
+        notify, package, user, group, file, exec, cron, service
+
+        package:
+            puppet支持使用的软件包管理器：
+                yum, rpm, apt, ports, gem, msi, dpkg, pkg
+
+            package的常用属性：
+                ensure: 程序包的目标状态；
+                name: 资源的名称，即软件包的名字；
+                provider: 软件包管理器
+                source: 指定程序包文件路径
+                install_options: 安装选项，最常用的是通过INSTALLDIR来指定安装目录
+
+            package {'mysql':
+                ensure      => installed,
+                provider    => 'msi',
+                source      => 'D:\software\mysql-5.5.36.msi',
+                install_options     => { 'INSTALLDIR' => 'C:\mysql' },
+            }
+
+
+        service: 
+            常用属性：
+                ensure: 服务的目标状态，true和false；
+                enable: 是否开机自动启动，true和false;
+                name: 服务名称；
+                path: 服务脚本路径；
+
+                start: 启动命令
+                stop:
+                restart:
+                status:
+
+        file: 
+            管理文件、目录、符号链接；
+            生成文件内容
+            管理文件权限、属性
+            通过source属性到指定位置下载文件
+            通过recurse属性来获取目录
+
+            常用属性：
+                ensure：目标状态，present, absent, file, directory
+                backup: 通过filebucket资源来备份文件；值通常为filebucket资源的名称；
+                content: 文件内容；生成方式有三种（content, source, target），彼此互斥；
+                source: 通过指定的url下载文件至本地；获取方式通常为puppet url, 格式：puppet:///modules/MODULE_NAME/file_names;
+                target: 为符号链接指定目标；
+                links: 文件为符号链接；{follow|manage}
+                path: 文件路径，必须使用双引号；
+                mode: 定义权限；
+                owner: 属主
+                group: 属组
+
+                force: 强制执行删除文件、链接或目录；仅用于ensure为absent时；
+                purge: 清空指定目录中存在的，但未在资源中定义的文件；
+
+                recurse: 目录递归，值true, false, inf, remote
+                replace: 替换；本地存在的文件与资源中指定的文件内容不同时是否执行替换，默认为否；
+
+        exec: 
+            执行命令，通常在不得不用时才使用；通常用于完成puppet自身无法完成的功能；
+
+            常用属性：
+                command: 要执行的命令，通常为命令文件的完整路径；
+                path: 命令搜索路径；
+                group: 
+                user:
+
+                onlyif: 0，表示仅在命令的状态返回值为0时才执行此命令；
+                refresh: 接收到其它资源的通知时，重新执行此命令；
+                refreshonly: 仅当被依赖的资源发生改变时才被触发；
+
+                tries: 尝试的次数，默认为1；
+                try_sleep：多次尝试之间的时间间隔；
+
+    puppet资源：
+        资源申报的语法
+            type {'title':
+                attribute   => value,                
+            }
+
+            file {'/tmp/a.txt': ensure => present}
+
+            puppet describe -l
+            puppet describe TYPE
+
+        package, file, service, exec
+
+    
+    资源引用：
+        Type['title']
+            例如：Package['nginx']
+
+    元参数：用于定义资源间的依赖关系，及应用次序；通知机制；
+        特殊属性：
+            require:
+
+                package {'nginx':
+                    ensure  =>  present,
+                }
+
+                service {'nginx':
+                    ensure  => true,
+                    enable  => true,
+                    require => Package['nginx'],  
+                }
+
+            before
+                package {'nginx':
+                    ensure  =>  present,
+                    before  =>  Service['nginx'],
+                }
+
+                service {'nginx':
+                    ensure  => true,
+                    enable  => true, 
+                }
+
+        notify和subscribe：
+                package {'nginx':
+                    ensure  =>  present,
+                } ->
+
+                service {'nginx':
+                    ensure  => true,
+                    enable  => true, 
+                    restart => '/etc/rc.d/init.d/nginx reload'
+                }
+
+
+
+
+            package{'nginx': } -> 
+            file {'nginx.conf':} ~>
+            service {'nginx':}
+
+            Package['nginx'] -> File['nginx.conf'] ~> Service['nginx']
+
+        资源类型：
+            group: 管理系统上用户组
+
+            常用属性：
+                ensure: 目标状态，present, absent
+                name: 组名
+                gid: GID
+                system: 系统组
+
+            user: 管理用户
+
+                常用属性：
+                    ensure: 目标状态
+                    name: 
+                    uid:
+                    system:
+                    home:
+                    shell:
+                    gid: 
+                    password:
+                    managehome: true or false 
+
+            cron: 管理cron
+                常用属性：
+                    ensure: 目标状态
+                    command: 命令或脚本
+                    environment: 运行时的环境变量
+                    hour
+                    minute
+                    month
+                    monthday
+                    weekday
+                    name
+                    user
+
+                cron {'ntpdate':
+                    ensure  => present,
+                    command => '/usr/sbin/ntpdate 172.16.0.1 &> /dev/null',
+                    miniute => '*/3',
+                }
+
+            notify: 调试输出
+                常用参数
+                    message: 信息
+                    name: 信息名称
+
+                notify {'notice': message => ''}
+
+        puppet的变量类型：
+            自定义变量
+            facter变量
+            内置变量
+                agent: $environment, $clientcert, $clientversion
+                masger: $serverip, $servername, $serverversion
+
+        变量作用域：
+            puppet模块：
+                模块A：
+                    $test=hello
+                模块B：
+
+    puppet表达式：
+
+    puppet的条件表达式：
+
+        case $1 in
+            start|run)
+            restart)
+
+
+
+    case 和 selector实现同一种功能的示例:
+
+        $webserver = $operatingsystem ? {
+                /^(?i-mx:centos|fedora|redhat)/ => 'httpd',
+                /^(?i-mx:ubuntu|debian)/        => 'apache2',
+        }
+        $webprovider = $operatingsystem ? {
+                /^(?i-mx:centos|fedora|redhat)/ => 'yum',
+                /^(?i-mx:ubuntu|debian)/        => 'apt',
+        }
+
+        package {"$webserver":
+                ensure  => present,
+                provider => $webprovider,
+        }
+
+
+        case $operatingsystem {
+            /^(?i-mx:redhat|centos|fedora)/: { package {'httpd': ensure => present, provider => yum, } }
+            /^(?i-mx:ubuntu|debian)/: { package {'apache2': ensure => present, provider => apt, } }
+            default: { notify {'notice': message => "unknown system.", }}
+        }
+
+
+    资源申报：8种常用类型
+    资源的特殊属性：
+    变量及数据类型
+    正则表达式
+    表达式
+    条件语句
+
+    nginx, tomcat, mysql
+
+    清单：manifest
+        *.pp
+
+        导入：import
+
+        node1.pp
+        import nginx.pp
+        import tomcat.pp
+        import mysql.pp
+
+        node2.pp
+        import nginx.pp
+        import tomcat.pp
+
+            nginx.pp
+            tomcat.pp
+            mysql.pp
+
+            nginx服务：
+                nginx.pp
+                    依赖于外部资源：文件、模板文件（生成适用于目标节点的文件）
+
+            为了实现某种完备功能而组织成一个独立的，自我包含的目录结构：模块
+
+                模块：目录结构，目录名称即为模块名
+                    /tmp/modules/
+                        nginx/
+                             /
+                                files/     : 文件存储目录
+                                manifests/ : 清单存储目录
+                                templates/ : 模板存储目录
+                                lib/       : ruby插件存储目录，用于实现一些自定义的功能
+
+                一个示例：
+                    /tmp/modules/
+                        nginx/
+                             /
+                                files/     : 文件存储目录
+                                    nginx.conf
+                                manifests/ : 清单存储目录
+                                    init.pp
+                                        必须包含且只能包含一个与模块同名的类
+                                    nginx.pp
+                                        每个清单文件通常只包含一个类
+                                    ...
+                                templates/ : 模板存储目录 
+                                    *.erb    
+
+    puppet类：为了通用目标或目的组织在一起的一个或多个资源；
+
+    只有被调用才会执行，调用称作：声明一个类
+        include CLASS_NAME
+
+
+    使用带参数的类：
+        $webserver = $operatingsystem ? {
+                /^(?i-mx:redhat|centos|fedora)/  => 'httpd',
+                /^(?i-mx:ubuntu|debian)/         => 'apache2',
+        }
+
+        class httpd ($pkgname = 'apache2') {
+                package {"$pkgname":
+                        ensure  => present,
+                }
+
+                service {"$pkgname":
+                        ensure  => true,
+                        require => Package["$pkgname"],
+                }
+        }
+
+        class {'httpd':
+                pkgname => $webserver,
+        }
+
+
+        类继承：
+            class C_NAME inherits PARENT_CLASS_NAME {
+
+            }
+
+            子类的命名方式：nginx::rproxy
+
+        基类：安装nginx
+        子类1：提供web配置的配置文件
+        子类2: 提供反向代理专用的配置文件
+
+    模块：目录结构
+        module_name/
+            manifests/
+                init.pp: 包含一个与模块名称同名的类
+                *.pp: 一个清单通常只包含一个类，而且建立清单文件名与类名相同；nginx::web, 文件名为web.pp；
+                web/
+                    *.pp
+                访问路径：module_name::mainfest_file_name, module_name::subdir_name::manifest_file_name
+            files/
+                访问路径：puppet:///modules/module_name/file_name
+                nginx_web/
+                    puppet:///modules/module_name/subdir/file_name
+            templates/
+                *.erb：使用模块函数template()装载并运行其中模块语言，运行后会生成静态文件；
+                访问路径及方式：template('module_name/template_name')
+            lib/
+                插件
+            tests/
+                当前模块的使用说明和样例；
+            spec/
+                为lib目录中的插件提供使用说明和样例；
+
+            在模块根目录下，通常还应该具几个文档：
+                LICENSE
+                Modulefile
+                README
+
+    类：命名的代码块；可以继承；
+        class class_name {
+            ... puppet code ...
+        }
+
+        class parent_name::subclass_name inherits parent_name {
+
+        }
+
+        class grand_name::parent_name::subclass_name inherits grand_name::parent_name {
+
+        }
+
+        =>: 在子类覆盖父类中的资源
+        +>：在子类中为父类中的资源新增额外的属性
+
+        带参数类：建议参数要有默认值
+
+        声明类：
+            include 
+            require
+            class {'class_name':
+                para1 => value1,
+                para2 => value2,
+            }
+
+    nginx模块：
+        nginx 
+            nginx包
+        nginx::web
+            file
+            service
+        nginx::rproxy
+            file
+            service
+
+    定义节点：也需要在清单文件，文件名后缀为.pp；在master/agent，所有节点清单文件入口文件为site.pp
+        node 'node_name' {
+            节点专用变量
+            类声明
+        }
+
+        建议一类节点使用一个清单文件，所有的清单文件都在site.pp中使用import包含进来；
+
+    模板：
+        语法：
+            <%= Ruby Expression %>: 替换为表达式的值;
+                <%= @processorcount %>
+
+            <% ruby code %>: 仅执行代码，不做任何替换；常用于条件判断或循环语句、设定变量以及在输出之前对数据进行处理；
+
+            <%# commit %>：注释
+
+            <%%: 输出<%
+            %%>: 显示%>
+
+            调用模块变量：变量完全限定名称
+
+            迭代和条件判断
+
+        注意：使用模板生成文件时，使用的文件属性为content
+                content     => template('module_name/template_file_name')
+
+    master/agent
+
+        主机命名方式：
+            角色名-运营商-机房名-机器IP.域名
+
+            web-cnc-sh-1.1.1.1.magedu.com
+
+        总结：
+            puppet master: 
+                1、安装puppet-master
+                2、# puppet master --genconfig >> /etc/puppet/puppet.conf
+                3、启动puppetmaster服务
+
+            puppet agent:
+                1、安装puppet
+                2、编辑配置文件/etc/puppet/puppet.conf，在[agent]添加
+                    server=puppetmaster.magedu.com
+                3、启动puppet服务
+
+            签署证书：
+                master:
+                    # puppet cert list
+                    # puppet cert sign NODE_NAME
+                    # puppet cert sign --all
+
+            注意：master端的任何修改，都要重新装载puppetmaster服务；
+
+        ntp服务，iptables法则, zabbix agent
+        nginx, tomcat
+
+        nginx: ntp, iptables, zabbix agent, nginx
+        tomcat: ntp, iptables zabbix 
+
+        节点的定义和使用方式相似类的使用：
+            支持继承
+
+        1、定义通用目的节点
+        node 'base' {
+            include ntp
+            include iptables
+            include zabbix_agent
+        }
+
+        node 'node1.magedu.com' inherits base {
+            include nginx
+        }
+
+        2、节点名称支持使用正则表达式
+        node /^node[1234]\.magedu\.com$/ {
+
+        }
+
+        3、关于节点的定义：
+            /etc/puppet/manifests/
+                site.pp
+                base.pp
+                    import "nginx/*.pp"
+                    import "tomcat/*.pp"
+                    import "varnish/*.pp"
+
+                nginx/
+                    node1.magedu.com.pp
+                    nginx.pp
+                tomcat/
+                varnish/
+
+        4、使用外部的节点分类器ENC
+            使用yaml语法，PyYAML
+
+            ldap: 
+
+
+    如何检查清单文件中的语法错误？
+        # puppet parser validate /path/to/some/manifest_file.pp
+
+    puppet的配置文件：
+        puppet.conf: 主配置文件
+            [main]
+            [agent]
+            [master]
+        manifests/site.pp: 站点清单
+        namespaceauth.conf: 名称空间认证，实现名称空间访问控制
+            kick模式依赖于此配置文件
+
+            [puppetmaster]
+            allow *.magedu.com
+
+            [resource]
+            allow *.magedu.com
+
+        auth.conf：实现了Puppet的ACL功能：
+            RESTful风格的API：根据https://master:8140/{environment}/{resource}/{key}路径，做访问控制
+            path /
+            auth any
+            environment production
+            allow *.magedu.com
+
+        autosign.conf: 客户端自动认证的配置文件
+
+        fileserver.conf: 文件系统配置文件
+
+    puppet命令总结：
+        apply, agent, master, cert, describe
+
+        agent: 客户端进程
+        master: 服务端进程
+        apply: 应用本地清单文件
+        cert: 证书管理
+        describe: 资源帮助信息
+
+        module: 模块管理
+        kick: master触发模式
+
+        帮助类命令：
+            describe
+            doc: 生成puppet文档
+            help: 查看帮助
+            resource: 查看资源帮助
+            status: 查看puppet状态
+
+        master命令的选项：
+            --no-daemonize
+            --daemonize, -D
+            --debug, -d
+            --verbose, -v
+            --genconfig
+
+        agent命令的常用选项：
+            --daemonize, -D
+            --no-daemonize
+            --debug, -d
+            --verbose, -v
+            --noop: no operation模式，不真正应用catalog
+            --test: 测试
+            --waitforcert: 等待证书签署成功
+
+        apply命令的常用选项：
+            --debug, -d
+            --verbose, -v
+            --execute, -e
+            --modulepath
+
+        cert命令的常用操作：
+            list: 
+            sign: 签署
+            clean: 清除证书
+            revoke: 吊销证书
+            verify: 验正本地指定的证书
+            generate: 为客户端生成证书
+
+    puppet的模块管理：
+        https://forge.puppetlabs.com
+
+        puppet module
+            list
+            search
+            install
+
+    puppet运行环境定制：
+        开发：development
+        测试：testing
+        线上：production
+
+        puppet.conf
+        [master]
+        environment = production, testing, development
+
+        [production]
+        manifest = /etc/puppet/manifests/production/site.pp
+        modulepath = /etc/puppet/modules/production
+        fileserverconfig = /etc/puppet/fileserver.conf.production
+
+        [testing]
+        manifest = /etc/puppet/manifests/testing/site.pp
+        modulepath = /etc/puppet/modules/testing
+        fileserverconfig = /etc/puppet/fileserver.conf.testing
+
+        [development]
+        manifest = /etc/puppet/manifests/development/site.pp
+        modulepath = /etc/puppet/modules/development
+        fileserverconfig = /etc/puppet/fileserver.conf.development
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

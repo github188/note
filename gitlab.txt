@@ -1,0 +1,6 @@
+sudo -u git -H git config --global user.name "boss"
+ sudo -u git -H git config --global user.email "1073707152@qq.com"
+ sudo -u git -H git config --global core.autocrlf input
+
+login.........root
+password......5iveL!fe

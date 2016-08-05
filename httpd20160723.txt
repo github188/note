@@ -1,0 +1,5 @@
+20160723
+MPM Multi Path Moudles 多通道处理模块
+		prefork （一个请求处理一个线程）
+		work（一个请求处理一个线程）
+		event（一个线程处理多个请求）

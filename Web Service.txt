@@ -1,0 +1,1938 @@
+﻿
+web service:
+	nginx: web server(static contents), web reverse proxy (http), cache
+	varnish, squid: cache, http headers
+	haproxy: tcp reverse proxy, http reverse proxy
+	keepalived: HA 
+	ats: apache traffic server
+
+
+	MogileFS, NoSQL(MongoDB)
+
+Nginx: engine x
+	apache: MPM (prefork, event)
+	c10k, lighttpd, nginx
+	Igor 
+
+	http protocol: 
+		request --> response
+		请求报文：
+			<method> <URL> <version>
+			<headers>
+
+			<body>
+
+		响应报文：
+			<version> <status code> <reason phrase>
+			<headers>
+
+			<body>
+
+		响应码：
+			1xx: 
+			2xx: 成功响应码
+				200
+			3xx: 重定向
+				301
+				302
+				304
+			4xx: 客户错误
+			5xx: 服务器错误
+
+	stateless: 无状态
+		web page: web object
+		http: 80/tcp
+			tcp 三次握手，四次断开
+
+			keepalive: 
+				时间: timeout
+				数量: 
+
+			cookie: 
+				session保持：
+					session绑定
+						反均衡
+						session无可用
+					session复制
+						服务器资源消耗过大
+						网络资源
+					session服务器
+						服务器自身的HA
+
+				lvs session绑定:
+					sh算法：基于源IP做绑定
+					persistent connection: 基于源IP做绑定
+					cookie：Tengine
+
+	IO模型：
+		同步阻塞
+		同步非阻塞
+		IO复用：	
+			select(), poll()
+			prefork: select()
+		事件通知:
+
+		异步
+
+		mmap: 数据由磁盘直接以页面形式映射进行内存中；
+
+	（并发编程）处理并发用户请求：
+		单进程模型：串行方式响应
+		多进程模型：prefork, 一个进程响应一个用户请求，并发使用多个进程实现；
+		多线程模型：worker, 一个进程生成多个线程，一个线程响应一个用户请求；并发使用多个线程实现；n进程，n*m个线程；
+		事件模型：event, 一个线程响应多个用户请求，基于事件驱动机制来维持多个用户请求；
+
+	nginx特性：
+		基本功能：
+			静态资源的web服务器，能缓存打开的文件描述符；
+			反向代理服务器，缓存、负载均衡；
+			支持FastCGI
+			模块化，非DSO机制，过滤器gzip，SSI和图像大小调整等
+			支持SSL
+
+		扩展功能：
+			基于名称和IP做虚拟主机
+			支持keepalive
+			支持平滑配置更新或程序版本升级
+			定制访问日志，支持使用日志缓存以提高性能
+			支持url rewrite
+			支持路径别名
+			支持基于IP及用户的认证；
+			支持速率限制，并发限制等；
+
+		nginx的基本架构：
+			一个master, 生成一个或多个worker
+			事件驱动：kqueue, epoll, /dev/poll
+				消息通知：select, poll, rt signals
+			支持sendfile, sendfile64
+			文件AIO
+			支持mmap
+
+		nginx: 非阻塞、事件驱动、一个master多个worker，一个worker响应多个用户请求
+
+	nginx的模块类别：
+		核心模块
+		标准http模块
+		可选的http模块
+		邮件模块
+		第三方扩展模块
+
+
+	安装方法：
+		编译安装
+		rpm包安装：
+			epel源
+
+	Nginx的配置文件：
+		main配置段
+		http {
+
+		}
+
+		配置参数需要以分号结尾，语法格式：
+			参数名  值1 [值2 ...]; 
+
+			还支持使用变量：
+				模块内置变量
+				用户自定义变量
+					set var_name value
+
+	Nginx基本核心配置的类别：
+		用于调试、定位问题
+		正常运行的必备配置
+		优化性能的配置
+		事件类的配置
+
+	worker进程应该以普通用户身份运行：nginx用户、nginx组；
+
+		HTTP的方法：GET, HEAD, POST, PUT, DELETE, OPTIONS, TRACE
+
+	nginx的配置：
+		正常运行的必备配置：
+			1、user username [groupname];
+				指定运行worker进程的用户和组
+
+			2、pid /path/to/pidfile_name;
+				指定nginx的pid文件
+
+			3、worker_rlimit_nofile #;
+				指定一个worker进程所能够打开的最大文件句柄数；
+
+			4、worker_rlimit_sigpending #;
+				设定每个用户能够发往worker进程的信号的数量；
+
+		优化性能相关的配置：
+			1、worker_processes #;
+				worker进程的个数；通常其数值应该为CPU的物理核心数减1；
+
+			2、worker_cpu_affinity cpumask ...;
+				0000
+				0001
+				0010
+				0100
+				1000
+
+				worker_processes 6; 
+				worker_cpu_affinity 00000001 00000010 00000100 00001000 00010000 00100000; 
+
+			3、ssl_engine device;
+				在存在ssl硬件加速器的服务器上，指定所使用的ssl硬件加速设备；
+
+			4、timer_resolution t;
+				每次内核事件调用返回时，都会使用gettimeofday()来更新nginx缓存时钟；timer_resolution用于定义每隔多久才会由gettimeofday()更新一次缓存时钟；x86-64系统上，gettimeofday()代价已经很小，可以忽略此配置；
+
+			5、worker_priority nice;
+				-20,19之间的值；
+
+		事件相关的配置
+			1、accept_mutex [on|off]
+				是否打开Ningx的负载均衡锁；此锁能够让多个worker进轮流地、序列化地与新的客户端建立连接；而通常当一个worker进程的负载达到其上限的7/8，master就尽可能不再将请求调度此worker；
+
+			2、lock_file /path/to/lock_file; 
+				lock文件
+
+			3、accept_mutex_delay #ms;
+				accept锁模式中，一个worker进程为取得accept锁的等待时长；如果某worker进程在某次试图取得锁时失败了，至少要等待#ms才能再一次请求锁；
+
+			4、multi_accept on|off;
+				是否允许一次性地响应多个用户请求；默认为Off; 
+
+			5、use [epoll|rtsig|select|poll];
+				定义使用的事件模型，建议让nginx自动选择；
+
+			6、worker_connections #;
+				每个worker能够并发响应最大请求数；
+
+		用于调试、定位问题: 只调试nginx时使用
+			1、daemon on|off;
+				是否让ningx运行后台；默认为on，调试时可以设置为off，使得所有信息去接输出控制台；
+
+			2、master_process on|off
+				是否以master/worker模式运行nginx；默认为on；调试时可设置off以方便追踪；
+
+			3、error_log /path/to/error_log level;
+				错误日志文件及其级别；默认为error级别；调试时可以使用debug级别，但要求在编译时必须使用--with-debug启用debug功能；
+
+	nginx的http web功能：
+		必须使用虚拟机来配置站点；每个虚拟主机使用一个server {}段配置；
+			server {
+
+			}
+
+		非虚拟主机的配置或公共配置，需要定义在server之外，http之内；
+			http {
+				directive value;
+				...
+
+				server {
+
+				}
+				server {
+
+				}
+				...
+			}
+
+
+		虚拟主机相关的配置：	
+			1、server {}
+				定义一个虚拟主机；nginx支持使用基于主机名或IP的虚拟主机；
+
+			2、listen 
+				listen address[:port];
+				listen port 
+
+				default_server：定义此server为http中默认的server；如果所有的server中没有任何一个listen使用此参数，那么第一个server即为默认server; 
+				rcvbuf=SIZE: 接收缓冲大小；
+				sndbuf=SIZE: 发送缓冲大小；
+				ssl: https server；
+
+			3、server_name [...];
+				server_name可以跟多个主机名，名称中可以使用通配符和正则表达式(通常以~开头)；当nginx收到一个请求时，会取出其首部的server的值，而后跟众server_name进行比较；比较方式：
+					(1) 先做精确匹配；www.magedu.com 
+					(2) 左侧通配符匹配；*.magedu.com
+					(3) 右侧通配符匹配；www.abc.com, www.*
+					(4) 正则表达式匹配: ~^.*\.magedu\.com$
+
+			4、server_name_hash_bucket_size 32|64|128;
+				为了实现快速主机查找，nginx使用hash表来保存主机名；
+
+			5、location [ = | ~ | ~* | ^~ ] uri { ... }
+			   location @name { ... }
+			   功能：允许根据用户请求的URI来匹配指定的各location以进行访问配置；匹配到时，将被location块中的配置所处理；比如：http://www.magedu.com/images/logo.gif
+
+			   =：精确匹配；
+			   ~：正则表达式模式匹配，匹配时区分字符大小写
+			   ~*：正则表达式模式匹配，匹配时忽略字符大小写
+			   ^~: URI前半部分匹配，不检查正则表达式
+
+				   http://www.magedu.com/index.html
+				   http://www.magedu.com/
+				   http://www.magedu.com/documents/index.html
+				   http://www.magedu.com/images/index.html
+				   http://www.magedu.com/images/a.png
+
+				 匹配优先级：
+				 	字符字面量最精确匹配、正则表达式检索（由第一个匹配到所处理）、按字符字面量
+
+		文件路径定义：
+			1、root path
+				设置web资源路径；用于指定请求的根文档目录；
+				location / {
+					root /www/htdocs;
+				}
+
+				location ^~ /images/ {
+					root /web;
+				}
+
+				root: root/URI/
+
+					http://www.magedu.com/images/b.html
+
+			2、alias path
+				只能用于location中，用于路径别名；
+				location / {
+					root /www/htdocs;
+				}
+
+				location ^~ /images/ {
+					alias /web;
+				}
+
+				alias: alias/
+
+					http://www.magedu.com/images/b.html
+
+			3、index file ...;
+				定义默认页面，可参跟多个值；
+
+			4、error_page code ... [=[response]] uri;
+				当对于某个请求返回错误时，如果匹配上了error_page指令中设定的code，则重定向到新的URI中。
+				错误页面重定向；
+
+			5、try_files path1 [path2 ...] uri;
+				自左至右尝试读取由path所指定路径，在第一次找到即停止并返回；如果所有path均不存在，则返回最后一个uri; 
+
+		        location ~* ^/documents/(.*)$ {
+		            root /www/htdocs;
+		            try_files $uri /docu/$1 /temp.html;
+		        }
+
+				http://www.magedu.com/documents/a.html
+				http://www.magedu.com/docu/a.html
+				http://www.magedu.com/temp.html
+
+		网络连接相关的设置：
+			1、keepalive_timeout time;
+				保持连接的超时时长；默认为75秒；
+
+			2、keepalive_requests n;
+				在一次长连接上允许承载的最大请求数；
+
+			3、keepalive_disable [msie6 | safari | none ]
+				对指定的浏览器禁止使用长连接；
+
+			4、tcp_nodelay on|off
+				对keepalive连接是否使用TCP_NODELAY选项；
+
+			5、client_header_timeout time; 
+				读取http请求首部的超时时长；
+
+			6、client_body_timeout time;
+				读取http请求包体的超时时长；
+
+			7、send_timeout time;
+				发送响应的超时时长；
+
+		对客户端请求的限制：
+			1、limit_except method ... { ... }
+				指定对范围之外的其它方法的访问控制；
+
+				limit_except GET {
+					allow 172.16.0.0/16;
+					deny all; 
+				}
+
+			2、client_max_body_size SIZE;
+				http请求包体的最大值；常用于限定客户所能够请求的最大包体；根据请求首部中的Content-Length来检测，以避免无用的传输；
+
+			3、limit_rate speed;
+				限制客户端每秒钟传输的字节数；默认为0，表示没有限制；
+
+			4、limit_rate_after time;
+				nginx向客户发送响应报文时，如果时长超出了此处指定的时长，则后续的发送过程开始限速；
+
+		文件操作的优化：
+			1、sendfile on|off
+				是否启用sendfile功能；
+
+			2、aio on|off
+				是否启用aio功能；
+
+			3、open_file_cache max=N [inactive=time]|off
+				是否打开文件缓存功能；
+					max: 缓存条目的最大值；当满了以后将根据LRU算法进行置换；
+					inactive: 某缓存条目在指定时长时没有被访问过时，将自动被删除；默认为60s; 
+
+				缓存的信息包括：
+					文件句柄、文件大小和上次修改时间；
+					已经打开的目录结构；
+					没有找到或没有访问权限的信息；
+
+			4、open_file_cache_errors on|off
+				是否缓存文件找不到或没有权限访问等相关信息；
+
+			5、open_file_cache_valid time;
+				多长时间检查一次缓存中的条目是否超出非活动时长，默认为60s; 
+
+			6、open_file_cache_min_use #;
+				在inactive指定的时长内被访问超此处指定的次数地，才不会被删除；
+
+		对客户端请求的特殊处理：
+			1、ignore_invalid_headers on|off
+				是否忽略不合法的http首部；默认为on; off意味着请求首部中出现不合规的首部将拒绝响应；只能用于server和http; 
+
+			2、log_not_found on|off
+				是否将文件找不到的信息也记录进错误日志中；
+
+			3、resolver address;
+				指定nginx使用的dns服务器地址；
+
+			4、resover_timeout time;
+				指定DNS解析超时时长，默认为30s; 
+
+			5、server_tokens on|off;
+				是否在错误页面中显示nginx的版本号；
+
+		内存及磁盘资源分配：
+			1、client_body_in_file_only on|clean|off
+				HTTP的包体是否存储在磁盘文件中；非off表示存储，即使包体大小为0也会创建一个磁盘文件；on表示请求结束后包体文件不会被删除，clean表示会被删除；
+
+			2、client_body_in_single_buffer on|off;
+				HTTP的包体是否存储在内存buffer当中；默认为off；
+
+			3、cleint_body_buffer_size size;
+				nginx接收HTTP包体的内存缓冲区大小；
+
+			4、client_body_temp_path dir-path [level1 [level2 [level3]]];
+				HTTP包体存放的临时目录；
+				client_body_temp_path /var/tmp/client/  1 2
+
+			5、client_header_buffer_size size;
+				正常情况下接收用户请求的http报文header部分时分配的buffer大小；默认为1k;
+
+			6、large_client_header_buffers number size; 
+				存储超大Http请求首部的内存buffer大小及个数；
+
+			7、connection_pool_size size;
+				nginx对于每个建立成功的tcp连接都会预先分配一个内存池，此处即用于设定此内存池的初始大小；默认为256；
+
+			8、request_pool_size size;
+				nginx在处理每个http请求时会预先分配一个内存池，此处即用于设定此内存池的初始大小；默认为4k; 
+
+
+		http核心模块的内置变量：
+			$uri: 当前请求的uri，不带参数；
+			$request_uri: 请求的uri，带完整参数；
+			$host: http请求报文中host首部；如果请求中没有host首部，则以处理此请求的虚拟主机的主机名代替；
+			$hostname: nginx服务运行在的主机的主机名；
+			$remote_addr: 客户端IP
+			$remote_port: 客户端Port
+			$remote_user: 使用用户认证时客户端用户输入的用户名；
+			$request_filename: 用户请求中的URI经过本地root或alias转换后映射的本地的文件路径；
+			$request_method: 请求方法
+			$server_addr: 服务器地址
+			$server_name: 服务器名称
+			$server_port: 服务器端口
+			$server_protocol: 服务器向客户端发送响应时的协议，如http/1.1, http/1.0
+			$scheme: 在请求中使用scheme, 如https://www.magedu.com/中的https；
+			$http_HEADER: 匹配请求报文中指定的HEADER，$http_host匹配请求报文中的host首部
+			$sent_http_HEADER: 匹配响应报文中指定的HEADER，例如$http_content_type匹配响应报文中的content-type首部；
+			$document_root：当前请求映射到的root配置；
+
+	配置使用nginx:
+		1、nginx虚拟主机
+			server {
+				listen
+				server_name
+				root
+			}
+
+		2、访问控制access模块
+			allow 
+			deny
+
+		3、用户认证示例
+		location /admin/ {
+            root /www/b.org;
+            auth_basic "admin area";
+            auth_basic_user_file /etc/nginx/.htpasswd;
+        }
+
+        4、建立下载站点autoindex模块
+
+        5、防盗链
+        	(1) 定义合规的引用
+        	valid_referers none | blocked | server_names | string ...;
+
+        	(2) 拒绝不合规的引用
+        	if  ($invalid_referer) {
+        		rewrite ^/.*$ http://www.b.org/403.html 
+        	} 
+
+        6、URL rewrite
+        	rewrite regex replacement [flag];
+
+
+	        	location / {
+	        		root /www/b.org;
+	        		rewrite ^/images/(.*)$ /imgs/$1 last; 
+	        		rewirte ^/imgs/(.*)$ /images/$1;
+	        	}
+
+	        	http://www.b.org/images/a.jpg --> http://www.b.org/imgs/a.jpg
+
+	        	last: 一旦被当前规则匹配并重写后立即停止检查后续的其它rewrite的规则，而后通过重写后的规则重新发起请求；
+	        	break: 一旦被当前规则匹配并重写后立即停止后续的其它rewrite的规则，而后继续由nginx进行后续操作；
+	        	redirect: 返回302临时重定向；
+	        	permanent: 返回301永久重定向；
+
+	        	location /download/ {
+	        		rewrite ^(/download/.*)/media/(.*)\..*$ $1/media/$2.mp3 break;
+	        	}
+
+	        	nginx最多循环10次，超出之后会返回500错误；
+	        	注意：一般将rewrite写在location中时都使用break标志，或者将rewrite写在if上下文中；
+
+	        rewrite_log on|off
+	        	是否把重写过程记录在错误日志中；默认为notice级别；默认为off；
+
+	        return code: 
+	        	用于结束rewrite规则，并且为客户返回状态码；可以使用的状态码有204, 400, 402-406, 500-504等；
+
+	        if (condition) {
+
+	        }
+
+	    client --> proxy --> server
+
+	    proxy_pass http://upstream_name
+
+	upstream使用注意：
+		1、只能用于http上下文；
+		2、各server只能直接使用IP或主机名，不要加协议；
+
+		server address [parameters];
+			weight=#: 设定权重
+			max_fails=#: 最大失败尝试次数，默认为1；
+			fail_timeout=time: 失败尝试超时时长；默认为10秒；
+
+		health_check [interval=time] [fails=number] [passes=number] [uri=uri] [match=name];
+			用于location中; 
+
+		match name { ... }
+			用于http中；
+
+	proxy, upstream
+		rr, lc, ip_hash
+
+		1、proxy指令：
+			proxy_pass URL;
+
+		2、proxy_set_header
+		3、proxy_hide_header
+		4、proxy_pass_header
+		5、proxy_pass_request_body: 是否将http请求报文的包体部分发往上游服务器；
+		6、proxy_pass_request_header: 是否将Http首部发往上游服务器；
+		7、proxy_redirect [default|off|redirect|replacement]
+			当上游服务器返回的响应是重定向或刷新请求时，proxy_redirect会重新设定http首部的location或refresh；
+				http://www.magedu.com/images/some/path, http://localhost:8080/imgs/some/path, 
+				proxy_redirect http://localhost:8080/imgs http://www.magedu.com/images
+
+		jpg, jpeg, png, gif等代理至172.16.100.9
+		其它内容代理至172.16.100.10
+
+		动静分离：
+
+	LNMMP：
+		Nginx服务器自己提供静态内容服务；
+		对php的请求通过FastCGI模块代理至php-fpm服务器；
+
+
+
+		libcurl-devel bzip2-devel gd-devel libxml2-devel mhash-devel libmcrypt-devel
+
+	fastcgi模块的常用指令：
+		fastcgi_pass: 指定fastcgi服务监听端口、地址；也支持使用Unix sock；
+		fastcgi_bind: 指定联系fpm服务时使用的地址；
+		fastcgi_param: 定义传递给fpm服务器的参数；
+		fastcgi_index: php的主页面文件；
+
+
+		结果可以缓存，缓存空间使用fastcgi_cache_path定义，使用fastcgi_cache来调用；
+		fastcgi_cache_path
+		fastcgi_cache
+		fastcgi_cache_valid
+
+		fastcgi_connect_timeout: 连接fastcgi服务器的超时时长；
+		fastcgi_send_timeout: 向fastcgi服务传输数据的超时时长 ；
+
+		http://www.magedu.com/
+
+	获取php-fpm的状态的信息：
+	    location ~* /(status|ping) {
+            root           /www/a.com;
+            fastcgi_pass   127.0.0.1:9000;
+            fastcgi_param  SCRIPT_FILENAME  $fastcgi_script_name;
+            include        fastcgi_params;
+        }
+
+		pool	www
+			进程池的名称；
+		process manager	dynamic
+			进程管理器，有两种类型static和dynamic;
+		start time	25/Apr/2014:15:28:07 +0800
+			起动时间
+		start since	2150
+			运行时长
+		accepted conn	4021
+			已经接受的请求数；
+		listen queue	0
+			等待队列中的请求的个数；
+		max listen queue	90
+			fpm启动以来等待队列中的请求的总数；
+		listen queue len	128
+			等待队列长度
+		idle processes	4
+			空闲的进程数
+		active processes	1
+			活动进程数
+		total processes	5
+			总进程数
+		max active processes	8
+			ftp启动以来最大活动进程数
+		max children reached	0
+			达到最大子进程的次数
+		slow requests	0
+			慢速请求的个数
+
+	Linux: malloc(), free()
+		slab allocator
+
+		Page: 分配给slab用于切割的内存空间，默认大小1MB；
+		Chunk: 用户缓存记录的内存空间；
+		slab class: 特定大小的chunk组；
+
+		自定义增长因子
+
+		memcached协议：文本格式，二进制格式
+
+			hash/3
+				0,1,2
+
+			一致性hash算法：consistent hashing
+
+		libevent库：epoll, poll, select
+
+		memcached
+			-l IP：监听的地址；
+			-d: 运行为守护进程；
+			-u: 以指定的身份运行；
+			-m #: 缓存服务使用的内存空间；默认为64MB
+			-c #：最大并发连接数，默认为1024；
+			-p #: 监听的TCP端口，默认11211；
+			-U #：监听的UDP端口，0表示禁用；
+			-M：内存耗尽时返回错误而非删除缓存对象；
+			-f: 指定增长因子；默认为1.25；
+			-n: chuck起始大小，key+value+flags，默认为48；
+
+		程序员在开发时，自行调用了memcached的API，memcached的功能才能生效；
+			Memcached: 服务器
+			memcached: php 连接memcached服务可以使用扩展；
+			memcache: php连接memcached服务可以使用另一个扩展；
+			libmemcached: C库
+
+		LNMMP
+
+20140429
+	
+	vrrp + lvs (virtual_server)
+	vrrp_script {
+
+	}	
+
+	vrrp_instance {
+		track_interface {
+
+		}
+		track_script {
+
+		}
+	}	
+
+haproxy: 
+
+	LB:
+		4 layer:
+			lvs
+		7 layer:
+			nginx (web, http reverse proxy, cache)
+			haproxy (http reverse proxy, tcp-based proxy)
+			ats (apache traffic server)
+			perlbal
+			pound
+			squid
+			varnish
+
+	http://www.magedu.com/index.php
+		主页面
+
+	ip_hash
+	sticky session
+
+  	配置由两部分组成：
+  		global settings: 对haproxy进程自身属性的设定；
+  		porxies: 对代理的设定
+  			defaults
+  			frontend
+  			backend
+  			listen
+
+  	定义一个完整的代理的方式：
+  		frontend, backend
+  		listen
+
+  		混合使用两方式
+
+  	URL
+  		http://host:port/path?queries#fragment
+
+  	会话保持机制：
+  		IP层：source
+  			位于同一个NAT服务器背后的多个请求都会定向至同一个upstream server；不利于均衡；
+  		应用层：cookie
+  			有更好的负载均衡效果
+
+  		source: 
+
+  		uri: 用于后端服务器是cache server的场景，保证缓存命中率的；
+
+  		url-params: 常用于后端服务器需要对用户进行认证的场景中；
+
+  		hdr(host)
+  			host: www.magedu.com
+  			host: web.magedu.com
+
+  				use_domain_only：在计算hash值时，仅使用域名，如上面的magedu.com；
+
+  			常用于hdr(host)实现将对同一个虚拟主机的访问始终定向至同一个upstream server；
+
+
+
+  		/a/b/c/d/index.php;user=tom?a1=hello&a2=world#a-4
+
+  	调度算法：
+  		roundrobin
+  		static-rr
+  		leastconn
+  		source
+  		uri
+  		url-param
+  		hdr(<header>)
+  		rdp-cookie
+
+
+
+  	cookie SERVERID insert indirect nocache
+
+  	haproxy 将WEB服务端发送给客户端的cookie中插入(或添加加前缀)haproxy定义的后端的服务器COOKIE ID。
+    配置指令例举 cookie SESSION_COOKIE insert indirect nocache
+
+  	<?php
+		session_start();
+		$_SESSION['time'] =date("Y:m:d:H:s",time());
+		echo "Access time"."<font color=red>".$_SESSION['time']."</font>"."<br>";
+		echo "Server IP"."<font color=red>".$_SERVER['SERVER_ADDR']."</font>"."<br>";
+		echo "Server Name"."<font color=red>".$_SERVER['SERVER_NAME']."</font>"."<br>";
+		echo "SESSIONNAME："."<font color=red>".session_name()."</font>"."<br>";
+		echo "SESSIONID："."<font color=red>".session_id()."</font>"."<br>";
+	?>
+
+
+		1、调度众多的MySQL从服务器，用什么调度方法？
+			leastconn
+
+		2、调度web图片服务器组，用什么调度方法？
+			roundrobin
+
+		3、调度web应用程序服务器组，用什么调度方法？
+			source
+
+			session保持的方式：
+				session绑定
+					源IP绑定：
+						nginx: ip_hash
+						haproxy: source
+						ipvs: sh
+					cookie绑定：
+						cookie
+				session复制
+				session服务器
+
+		4、调度web缓存服务器组，用什么调度方法？
+			uri
+				hash-type
+					map-based
+					consistent
+
+		余下的方法：
+			url-param
+			hdr(<header>)
+			rdp-cookie
+			static-rr
+
+	指定HAProxy工作模式：使用mode参数；
+		http
+			http协议
+			对应用层数据做深入分析，因此支持7层的过滤、处理、转换等机制；			
+		tcp
+			默认模式；
+			haproxy在客户端和upstream server之间建立一个全双工的连接；
+			不会对应用层协议做任何检查；
+			SSL、MySQL、SSL等都应该使用此模式；
+
+	指定日志：
+		log global: 使用全局配置中定义的日志服务器；
+		log <address> <facility> [<level> [<minlevel>]] 
+
+		capture request header <HEADER> len <LENGTH>
+		capture response header <HEADER> len <LENGTH>
+
+	在listen或frontend中指定使用的默认后端：
+		default_backend <backend_name>
+
+	在listen或frontend中指定使用的条件式后端：
+		use_backend <backend> if <condition>
+		use_backend <backend> unless <condition>
+
+	为backend或listen定义各服务器：
+		server <name> <address>[:port] [param*]
+
+		有众多参数：
+			其中包括check，实现对server做健康状态检测;
+
+	option httpchk：用于指定对http协议的server的检测方法
+		option httpchk
+		option httpchk <uri>
+		option httpchk <method> <uri>
+		option httpchk <method> <uri> <version>
+
+	统计页面输出：
+		stats enable
+		stats uri
+		stats realm
+		stats auth
+		stats admin
+
+		使用单独输出
+		listen statspage
+			bind *:8009
+			stats enable
+			stats auth admin:password
+			stats admin if TRUE
+			stats uri /admin?stats
+
+	自定义错误页面：
+		errorfile
+		errorloc
+		errorloc302
+		errorloc303
+
+	当用户通过80端口访问/haproxy?stats时，重定向至8009端口上服务来提供此功能；
+
+	超时时长：
+		timeout http request
+		timeout queue
+
+	实现访问控制：
+		http-request: 7层过滤
+		tcp-request content: tcp层过滤
+
+
+	acl vhmagedu hdr_reg(Host) -i .*\.magedu.com
+
+	scheme://user:password@host:port/path;params?query#fragment
+
+
+
+	acl index path -i /index.html
+
+	acl admin_page path_beg /admin
+
+	acl dynamic_content path_end .php
+
+	acl host_static .css .js
+
+	博客作业：
+		1、haproxy统计页面的输出机制；
+		2、haproxy动静分离机制；
+		3、基于keepalived的高可用实现；
+
+缓存：
+	命中率
+		文档命中率
+		字节命中率
+
+	缓存类型：
+		私有缓存
+		公共缓存
+
+	内容路由：
+		ICP: Internet Cache Protocol
+		HTCP: HyperText Caching Protocol
+		Cache Digest
+		Cache Pre-filling
+		CARP: Cache Array Routing Protocol
+
+	缓存处理的具体步骤：
+		接收请求
+		解析请求 (代理的功能)
+		查询缓存 (检查本地缓存中是否存在对方请求的内容的副本)
+		副本的新鲜度检测 (检查本地缓存的副本是否为最新版本)
+		构建响应 (代理的功能)
+		发送
+		日志
+
+	保证副本的新鲜度？
+		文档过期机制：
+			HTTP/1.0: Expires (过期时间)
+				绝对时间
+			HTTP/1.1：Cache-Control (max-age=)
+				相对时长
+
+		条件式请求：
+			mtime: If-Modified-Since
+				基于时间的条件式请求
+			ETag: If-None-Match
+				基于扩展标签条件式请求
+
+	原始服务器或缓存服务器控制缓存的能力：
+		由原始服务器定义：
+			Cache-Control
+				max-age=
+				s-maxage=
+				no-store: 不能缓存
+				no-cache: 能缓存，但不能直接使用此缓存对象；缓存对象在使用之间必须做新鲜度验正；
+				must-revalidate: 必须进行新鲜度验正
+				private
+				public
+			Expires: 
+		原始服务器不添加任何控制机制，而由缓存服务器自己决定缓存时长；
+
+	客户端控制是否使用缓存：
+		Cache-Control: 
+			max-stale: 告知缓存机制可以使用过期的文档；
+			no-cache: 告知缓存机制必须进行验正，否则不会接受任何缓存文档；
+			no-store: 告知级存机制必须尽快删除缓存中的文档
+
+		HTTP/1.0
+			Pragma: no-cache
+
+	http协议：
+		request:
+			method url version
+			HEADERS
+
+			BODY
+
+		response:
+			version status reason
+			HEADERS
+
+			BODY
+
+		首部：
+			通用
+				Connection: close|keep-alive
+				Date:日期时间
+				Host: 请求的主机
+				Pragma: no-cache
+				Via: 请求或响应在客户端和服务器之间传递时所经过的代理
+				Transfer-Encoding: 消息主体的传输编码方式，chunked表示采用块编码的方式
+			请求
+				If-Modified-Since
+				If-None-Match
+				Referer
+				User-Agent
+
+				Host: 请求的主机
+				Accept-Encoding: 接受的编码方式
+				Accept-Language: 接受的自然语言
+				Accep-Charset: 接受字符集
+				Authorization: 服务端发送www-authenticate时，客户通过此首部提供认证信息；
+
+			响应
+				ETag: 内容的标签
+				Location: 重定向后的新位置
+				Server: 服务器软件信息
+				WWW-Authenticate: 要求对客户端进行认证
+
+			实体
+				Content-Encoding
+				Content-Language
+				Content-Lenth
+				Content-Type: 内容的MIME格式
+				Expires: 
+				Last-Modified: 
+
+Varnish: 
+	web缓存、代理服务器；
+
+	状态引擎：子例程，函数，可以使用return()函数返回状态给varnish进程
+		vcl_recv, vcl_pass, vcl_hash, vcl_pipe
+		vcl_hash: vcl_hit, vcl_miss
+		vcl_pass: vcl_fetch
+		vcl_hit: vcl_deliver, vcl_pass
+		vcl_miss: vcl_fetch, vcl_pass
+		vcl_fetch: vcl_deliver
+
+
+	VCL: 基于域
+		state engine
+
+		backend BKNAME {
+			.host
+			.port
+			.probe
+		}
+
+		director DRNAME scheduler {
+			backend
+		}
+
+	beresp.ttl
+
+	内置变量：
+		操作
+			set
+			unset
+
+		变量：
+			client
+			server
+
+			req.*
+			req.http.HEADER
+
+			bereq.*
+
+			resp.*
+			beresp.*
+
+			obj.*
+
+			client.ip, server.ip, server.hostname
+			obj.hits, beresp.ttl, req.url, req.request, req.http.cookie, resp.http.set-cookie
+
+		清理缓存：
+			purge, ban(expression), ban_url(regexp)
+
+			acl purgers {
+				"127.0.0.1";
+				"172.16.0.0"/16;
+			}
+
+			sub vcl_recv {
+				if (req.request == "PURGE") {
+					if (!client.ip ~ purgers) {
+						error 503 "Not allowed.";
+					}
+				}
+
+				if (req.http.X-Forward-For) {
+					set req.http.X-Forward-For = req.http.X-Forward-For + "," + client.ip;
+				} else {
+					set req.http.X-Forward-For = client.ip;
+				}				
+			}
+
+			sub vcl_hit {
+				if (req.request == "PURGE") {
+					purge;
+					error 200 "Purged";
+				}				
+			}
+
+			sub vcl_miss {
+				if (req.request == "PURGE") {
+					purge;
+					error 404 "Not in cache.";
+				}
+			}
+
+			# curl -X PURGE http://
+
+	如何防盗链？
+
+	varnishstat中应该关注几个参数：
+		client_conn
+		client_req
+		cache_hit
+		cache_miss
+		backend_conn
+		n_wrk
+		n_wrk_create
+		n_backend
+		n_expired
+		n_lru_moved
+		s_hdrbytes
+		s_bodybytes
+
+	命令率：
+		文档命中率
+		字节命中率
+
+	命中率低的原因？
+		缓存空间太小
+		不存在明显的热点数据
+		缓存服务器的可用性
+		源文件更新过于频繁
+
+	varnishstat 
+		-1: 
+		-l: 列出所有参数；
+		-f f1,f2,...: 仅列出指定的参数；
+
+	varnishtop：实时显示日志中的信息
+		-i tag: 仅显示指定的tag，如RxHeader
+		-I regexp: 以模式匹配tag对应值；
+		-C：正则表达式匹配时不区分字符大小写；
+
+	varnishreplay: 日志重放工具，用于实现缓存预热；
+
+	www.magedu.com 	IN  	CNAME   c1-haun-cache.com
+
+	20 CNAME
+
+Tomcat
+	
+	动态站点：
+		运行程序
+			服务端：
+			客户端：
+
+		一次编译，到处运行
+
+	java技术的组成部分：
+		java程序设计语言
+		java class文件格式
+		java API
+		java vm
+
+	java的编译时环境：
+		源代码：.java
+
+		a.java, b.java, c.java --> Java编译器(javac) --> a.class, b.class, c.class
+
+	java的运行时环境：
+		a.class, b.class, c.class --> JVM <-- Object.class, String.class, ...
+
+	java VM的组成部分：
+		java class loader（Java类加载器）
+		java执行引擎
+
+	java语言的特性：
+		面向过程：
+			以指令为核心 
+		面向对象：以数据为核心
+			类：int
+				int A=3
+				int B=5
+
+				A + B
+				B + A
+
+				对象：数据+方法
+		多线程：适应于并行架构，实现程序的高效执行
+		垃圾收集：GC
+		动态链接：
+		动态扩展
+
+
+
+
+	android: java + jvm + Linux
+	ios: Object-C + FreeBSD
+
+	.java --> javac --> .class
+		JRE: Java Running Environment
+			由JVM(Hotspot)+JavaSE API
+		JDK：
+			Java程序设计语言
+			工具及工具API
+			JRE
+
+	Java SE: Standard Edition, J2SE
+		支持面向桌面级应用，提供了完整的Java核心API
+
+	Java EE: Enterprise Edition, J2EE
+		支持使用多层架构的企业应用(如EJB,CRM等)，包含了Java SE，并额外提供了大量企业级类库；
+
+	Java ME：Micro Edition, J2ME
+
+
+	servlet container
+	web container
+
+	JDK:
+		Oracle： JDK
+		Oracle: JRockit
+		Open: OpenJDK
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+public class Test{
+	public static void main(String[] args){
+		System.out.println("Hello，Welcome to MageEdu Linux Learning Center!");
+	}
+}
+
+
+	发展历史
+
+		1995年5月23日，Java语言诞生
+		1996年1月，第一个JDK-JDK1.0诞生
+		1996年4月，10个最主要的操作系统供应商申明将在其产品中嵌入JAVA技术
+		1996年9月，约8.3万个网页应用了JAVA技术来制作
+		1997年2月18日，JDK1.1发布
+		1997年4月2日，JavaOne会议召开，参与者逾一万人，创当时全球同类会议规模之纪录
+		1997年9月，JavaDeveloperConnection社区成员超过十万
+		1998年2月，JDK1.1被下载超过2,000,000次
+		1998年12月8日，JAVA2企业平台J2EE发布
+		1999年6月，SUN公司发布Java的三个版本：标准版（JavaSE,以前是J2SE）、企业版（JavaEE以前是J2EE）和微型版（JavaME，以前是J2ME）
+		2000年5月8日，JDK1.3发布
+		2000年5月29日，JDK1.4发布
+		2001年6月5日，NOKIA宣布，到2003年将出售1亿部支持Java的手机
+		2001年9月24日，J2EE1.3发布
+		2002年2月26日，J2SE1.4发布，自此Java的计算能力有了大幅提升
+		2004年9月30日18:00PM，J2SE1.5发布，成为Java语言发展史上的又一里程碑。为了表示该版本的重要性，J2SE1.5更名为Java SE 5.0
+		2005年6月，JavaOne大会召开，SUN公司公开Java SE 6。此时，Java的各种版本已经更名，以取消其中的数字“2”：J2EE更名为Java EE，J2SE更名为Java SE，J2ME更名为Java ME
+		2006年12月，SUN公司发布JRE6.0
+		2009年4月7日Google App Engine开始支持Java
+		2009年04月20日，甲骨文74亿美元收购Sun。取得java的版权。
+		2010年11月，由于甲骨文对于Java社区的不友善，因此Apache扬言将退出JCP。
+		2011年7月28日，甲骨文发布java7.0的正式版。
+		2014年3月19日，甲骨文公司发布java8.0的正式版。
+
+	主要服务
+
+		1．JDBC（Java Database Connectivity）提供连接各种关系数据库的统一接口，作为数据源，可以为多种关系数据库提供统一访问，它由一组用Java语言编写的类和接口组成。JDBC为工具/数据库开发人员提供了一个标准的API，据此可以构建更高级的工具和接口，使数据库开发人员能够用纯Java API 编写数据库应用程序，同时，JDBC也是个商标名。
+		2．EJB(Enterprise JavaBeans）使得开发者方便地创建、部署和管理跨平台的基于组件的企业应用。
+		3．Java RMI(Java Remote Method Invocation）用来开发分布式Java应用程序。一个Java对象的方法能被远程Java虚拟机调用。这样，远程方法激活可以发生在对等的两端，也可以发生在客户端和服务器之间，只要双方的应用程序都是用Java写的。
+		4．Java IDL(Java Interface Definition Language) 提供与CORBA(Common Object Request Broker Architecture）的无缝的互操作性。这使得Java能集成异构的商务信息资源。
+		5．JNDI(Java Naming and Directory Interface）提供从Java平台到的统一的无缝的连接。这个接口屏蔽了企业网络所使用的各种命名和目录服务。
+		6．JMAPI(Java Management API）为异构网络上系统、网络和服务管理的开发提供一整套丰富的对象和方法。
+		7．JMS(Java Message Service）提供企业消息服务，如可靠的消息队列、发布和订阅通信、以及有关推拉（Push/Pull）技术的各个方面。
+		8．JTS(Java transaction Service）提供存取事务处理资源的开放标准，这些事务处理资源包括事务处理应用程序、事务处理管理及监控。
+		9．JMF(Java Media Framework API），她可以帮助开发者把音频、视频和其他一些基于时间的媒体放到Java应用程序或applet小程序中去，为多媒体开发者提供了捕捉、回放、编解码等工具，是一个弹性的、跨平台的多媒体解决方案。
+		10．Annotation(Java Annotation），在已经发布的JDK1.5(tiger）中增加新的特色叫Annotation。Annotation提供一种机制，将程序的元素如：类，方法，属性，参数，本地变量，包和元数据联系起来。这样编译器可以将元数据存储在Class文件中。这样虚拟机和其它对象可以根据这些元数据来决定如何使用这些程序元素或改变它们的行为。
+		在Java技术中，值得关注的还有JavaBeans，它是一个开放的标准的组件体系结构，它独立于平台，但使用Java语言。一个JavaBean是一个满足JavaBeans规范的Java类，通常定义了一个现实世界的事物或概念。一个JavaBean的主要特征包括属性、方法和事件。通常，在一个支持JavaBeans规范的开发环境（如Sun Java Studio 和IBM VisualAge for Java）中，可以可视地操作JavaBean，也可以使用JavaBean构造出新的JavaBean。JavaBean的优势还在于Java带来的可移植性。EJB (Enterprise JavaBeans) 将JavaBean概念扩展到Java服务端组件体系结构，这个模型支持多层的分布式对象应用。除了JavaBeans，典型的组件体系结构还有DCOM和CORBA，关于这些组件体系结构的深入讨论超出了本书的范围。
+		11．javaFX　Sun刚刚发布了JavaFX技术的正式版，它使您能利用JavaFX 编程语言开发富互联网应用程序（RIA）。JavaFX Script编程语言（以下称为JavaFX）是Sun微系统公司开发的一种declarative,staticallytyped（声明性的、静态类型）脚本语言。JavaFX技术有着良好的前景，包括可以直接调用Java API的能力。因为JavaFXScript是静态类型，它同样具有结构化代码、重用性和封装性，如包、类、继承和单独编译和发布单元，这些特性使得使用Java技术创建和管理大型程序变为可能。
+		JavaFX从它2007年发布以来，表现一直差强人意。Oracle收购了Sun之后，在JavaFX中投入了大量的精力进行推广和更新。JavaFX比较出名的应用应该是在2010年温哥华冬奥会上，调整了JavaFX中的很多概念，以及重新设计和实现了很多重要组件之后，得到的就是现在的JavaFX 2.0。JavaFX 2.0的beta版已经发布，正式版则定于2010年第3季度发布。JavaFX 2.0的新特性使得开发人员应该需要重新审视它在RIA开发领域中的位置。在很多情况下，JavaFX 2.0也会是不错的选择。
+		12．JMX（Java Management Extensions，即Java管理扩展）是一个为应用程序、设备、系统等植入
+		管理功能的框架。JMX可以跨越一系列异构操作系统平台、系统体系结构和网络传输协议，灵活的开发无缝
+		集成的系统、网络和服务管理应用。
+		13．JPA(Java Persistence API),JPA通过JDK 5.0注解或XML（标准通用标记语言的子集）描述对象－关系表的映射关系，并将运行期的实体对象持久化到数据库中。
+		14．JSP（Java Server Pages)是由Sun Microsystems公司倡导、许多公司参与一起建立的一种动态网页技术标准。JSP技术有点类似ASP技术，它是在传统的网页HTML文件(*.htm,*.html)中插入Java程序段(Scriptlet)和JSP标记(tag)，从而形成JSP文件(*.jsp)。 用JSP开发的Web应用是跨平台的，既能在Linux下运行，也能在其他操作系统上运行。
+
+
+	Sun: Servlet, 
+		参考实现：Java Web Server, JWS
+		
+	ASF： JServ
+
+	tomcat 3.X, 
+	tomcat 4.0, Catalina
+
+
+
+	Tomcat 的配置层次
+
+		<server>
+			<service>
+				<connector />
+				<engine>
+					<host>
+						<context>
+						</context>
+					</host>
+					<host>
+					</host>
+				</engine>
+			</service>
+		</server>
+
+	顶级组件：位于整个配置的顶层；
+	容器类：可以包含其它组件的组件；
+	连接器组件：连接用户请求至tomcat；
+	被嵌套类的组件：位于一个容器当中，不能包含其它组件；
+
+	容器类：
+		engine: 核心容器，catalina引擎，负责通过connector接收用户请求
+		host: 类似于httpd中的虚拟主机；支持基于FQDN的虚拟主机
+		context: 最内层的容器类组件，一个context代表一个web应用程序；配置context的主要目的，指定对应的webapp的根目录；还能为webapp指定额外的属性，如部署方式等；
+
+	服务：
+		service: 将连接器关联至engine；
+			因此一个service内部可以有多个connector，但只能有一个engine；
+
+	顶级组件：server，表示一个运行于JVM中的tomcat实例；
+
+	嵌套类组件：
+		valve: 拦截请求并在将其转至对应的webapp之前进行某种处理操作；可以用于任何容器中；
+			access log valve: 
+			remote address filter value: 基于IP做访问控制
+
+		logger: 日志记录器，用于记录组件 内部的状态信息；
+			可用于除context之外的任何容器中
+
+		realm: 可以用于任何容器类的组件中，关联一个用户认证库，实现认证和授权；
+			UserDatabaseRealm: 使用JNDI自定义的用户认证库；
+			MemoryRealm: tomcat-users.xml中 
+			JDBCRealm: 基于JDBC连接至数据库中查找用户；
+
+
+	apache jserv protocal
+		二进制协议，使用httpd反向代理用户请求至tomcat时，在httpd和tomcat之间使用；
+
+	LAMT, LNMT
+
+
+
+	www.magedu.com/bbs
+
+	/www/htdocs/
+		index.php
+		/bbs/
+			phpwind
+		/wp/
+			wordpress
+		/test/
+			test.php
+
+	部署：使用类加载器，为webapp准备好其依赖所有类；
+
+	tomcat自带两个管理类的app
+		server status:
+			获取状态信息
+			部署应用程序
+		host manager
+			管理虚拟主机
+
+
+	java：servlet, jsp, jvm, java编程语言、tomcat彼此间是什么关系？
+
+	java体系：
+		java程序设计语言
+		java API
+		Java class文件格式
+		Java VM
+
+	JDK：Java Development Kit
+
+	Java SE: JDK + 额外类库，面向桌面级应用；
+	Java EE: Java SE + 企业级类库
+		servlet, jsp, jmx, jms, javamail, ejb
+			servlet: 类库
+				servlet container
+			jsp: 类库
+				<% %>
+
+	Tomcat: JDK + servlet, jsp
+		Java EE: 不完整实现
+
+		web container
+			Jetty, Resin
+			Websphere, weblogic, JBoss, Glassfish
+
+	Tomcat:
+		server.xml
+			顶级类：server
+			容器类：engine, host, context
+			服务类：service
+			连接器：connector
+				http, ssl, ajp(apache jserv protocol)
+			被嵌套类：valve, logger, realm
+
+			<servrer>
+				<service>
+					<connector />
+					<connector />
+					<engine>
+						<host>
+							<context />
+							<context />
+						</host>
+						<host>
+						</host>
+					</engine>
+				</service>
+			</server>
+
+		自带app:
+			server status:
+				状态查看
+				app部署
+			host manager:
+				虚拟主机管理
+
+		安装方式：
+			yum os vendor
+			官方的二进制格式包
+			源码包 (自行完成)
+
+		安装目录：
+			bin: 
+			conf: 
+				server.xml, tomcat-users.xml, web.xml
+			logs: 
+			lib: 
+			temp: 
+			webapps: 
+			work: 工作目录
+
+	Tomcat的配置文件：
+		server.xml
+		context.xml: 为部署于此Tomcat实例上的所有web应用程序提供的默认配置文件；每个webapp都可以使用独有的context.xml，通常放置于webapp目录的META-INF子目录中；常用于定义会话管理器、Realm以及JDBC等；
+		web.xml: 为部署于此Tomcat实例上的所有web应用程序提供默认部署描述符；通常用于为webapp提供基本的servlet定义和MIME映射表等；
+		tomcat-users.xml: 
+		catalina.policy: 当基于—security选项启动tomcat实例时会读取此配置文件；此文件是JAVA的安全策略配置文件，配置访问codebase或某此Java类的权限；
+		catalina.properties: Java属性定义文件, 设定类加载器路径、安全包列表和一些调整性能的参数信息；
+		logging.properties: 定义日志相关的配置信息，如日志级别、文件路径等
+
+	Tomcat 应用程序“部署”
+		部署是指将webapp及其所依赖类库等装载进tomcat实例上，以便接受用户请求；部署方式：
+			静态方式：在Tomcat启动之前进行的webapp部署
+			动态方式：在打断tomcat运行的前提下，通过tomcat manager或其它的命令行工具进行的部署；
+				TCD: Tomcat Client Deployer
+
+			部署是由一类“操作”组成：
+				Deploy: 将webapp的源文件放置于目标目录、配置tomcat服务器能够基于某contcxt路径访问此webapp，并将其特有的类由类加载器进行装载等；
+				Redeploy: 重新部署，主要用于升级时；
+				Undeploy: 取消部署，停止应用程序并从tomcat实例上移除其部分文件和部署名；
+				stop: 停止；
+				start: 将停止的webapp启动起来；
+
+			部署方式：
+				Tomcat Manager
+				ANT 脚本
+				TCD
+
+				war类归档程序的部署：将归档文件复制到$CATALINA_BASE/webapps/目录中，并重启tomcat即可；tomcat会自动展开war归档；也可以使用Tomcat Manager进行热部署；
+
+
+	webapp体系结构：
+		webapp有特定的组织格式，是一种层次型目录结构；通常包含了servlet代码文件、jsp页面文件、类文件、部署描述符文件等等，一般会打包成归档格式；
+
+			/: web应用程序的根目录
+			/WEB-INF: 此webapp的私有资源目录，通常web.xml和context.xml均放置于此目录；
+			/WEB-INF/classes: 此webapp自有的类；
+			/WEB-INF/lib: 此webapp自有能够被打包为jar格式的类；
+
+	webapp的归档格式：
+		EJB类归档的扩展名为.jar
+		web应用程序的归档扩展名为.war
+		资源适配器的扩展名.rar
+		企业级应用程序的扩展名.ear
+		web服务的扩展名为.ear或.war
+
+		<%@ page language="java" %>
+		<%@ page import="java.util.*" %>
+		<html>
+		  <head>
+		    <title>JSP test Page</title>
+		  </head>
+		  <body>
+		    <%
+		       out.println("Hello world!");
+		       out.println("Hello MageEdu!");
+		    %>
+		  </body>
+		</html>
+
+	Tomcat的运行方式：
+		standalone configure: 
+			request --> web server(tomcat) --> servlet container
+
+		apache与tomcat连接器通信的模块有两个：
+			mod_jk: apache/1.3, apache/2.0
+			mod_proxy: apache/2.2+
+
+		tomcat的连接器协议有两种：
+			http
+			ajp
+
+		mod_jk:
+			ajp
+		mod_proxy:
+			http, ajp
+
+	mod_jk V.S. mod_proxy:
+		负载均衡
+		管理接口
+		兼容性
+		配置
+		协议：mod_jk (ajp), mod_proxy(http/https/ajp)
+
+	Tomcat的http连接器：
+		类型有三种：
+			基于java的http/1.1连接器：
+			基于java的高性能NIO HTTP/1.1连接器
+			基于C/C++研发的Native APR HTTP/1.1连接器
+
+			<connector port="8080" protocol="org.apache.coyote.http11.Http11AprProtocol"
+
+	LAMT:
+		apache(mod_jk, ajp) + tomcat(ajp connector)
+		apache(mod_proxy, (http, https, ajp)) + tomcat(http, https, ajp)
+	LNMT:
+		nginx + tomcat(http, https)
+
+		nginx + tomcat,...
+
+		http {
+			upstream tomcat {
+				server 192.168.10.6:8080;
+				server 192.168.10.7:8080;
+			}
+
+			server {
+				location ~* \.(jsp|do)$ {
+					proxy_pass http://tomcat;
+				}
+			}
+		}
+
+	LAMT:
+		mod_proxy(http, https, ajp): 
+
+		mod_proxy.conf
+			ProxyVia on
+			ProxyRequests off
+			ProxyPreserveHost on
+
+			ProxyPass / ajp://192.168.10.6:8009/
+			ProxyPassReverse / ajp://192.168.10.6:8009/
+
+			<Location />
+			  Order Allow,Deny
+			  Allow from all
+			</Location>	
+
+	session复制：
+		tomcat支持session集群
+	session服务器：
+		tomcat支持将会话保存了memcached
+
+	Tomcat会话管理：
+
+		12、Manager
+		Manger对象用于实现HTTP会话管理的功能，Tomcat6中有5种Manger的实现：
+		1) StandardManager
+		Tomcat7的默认会话管理器，用于非集群环境中对单个处于运行状态的Tomcat实例会话进行管理。当Tomcat关闭时，这些会话相关的数据会被写入磁盘上的一个名叫SESSION.ser的文件，并在Tomcat下次启动时读取此文件。
+		2) PersistentManager
+		当一个会话长时间处于空闲状态时会被写入到swap会话对象，这对于内存资源比较吃紧的应用环境来说比较有用。
+		3) DeltaManager
+		用于Tomcat集群的会话管理器，它通过将改变了的会话数据同步给集群中的其它节点实现会话复制。这种实现会将所有会话的改变同步给集群中的每一个节点，也是在集群环境中用得最多的一种实现方式。
+		4) BackupManager
+		用于Tomcat集群的会话管理器，与DeltaManager不同的是，某节点会话的改变只会同步给集群中的另一个而非所有节点。
+		5)SimpleTcpReplicationManager
+		Tomcat4时用到的版本，过于老旧了。
+
+		标准会话管理器和持久会话管理器
+
+		标准会话管理器(StandardManager)：
+		<Manager className="org.apache.catalina.session.StandardManager"
+		         maxInactiveInterval="7200"/>
+
+		默认保存于$CATALINA_HOME/work/Catalina/<hostname>/<webapp-name>/下的SESSIONS.ser文件中。
+
+		maxActiveSessions：最多允许的活动会话数量，默认为-1，表示不限制； 
+		maxInactiveInterval：非活动的会话超时时长，默认为60s；
+		pathname：会话文件的保存目录；
+
+
+
+		持久会话管理器(PersistentManager)：
+		将会话数据保存至持久存储中，并且能在服务器意外中止后重新启动时重新加载这些会话信息。持久会话管理器支持将会话保存至文件存储(FileStore)或JDBC存储(JDBCStore)中。
+
+		保存至文件中的示例：
+		<Manager className="org.apache.catalina.session.PersistentManager"
+		  saveOnRestart="true">
+		  <Store className="org.apache.catalina.session.FileStore"
+		    directory="/data/tomcat-sessions"/>
+		</Manager>
+
+		每个用户的会话会被保存至directory指定的目录中的文件中，文件名为<session id>.session，并通过后台线程每隔一段时间(checkInterval参数定义，默认为60秒)检查一次超时会话。
+
+
+		保存至JDBCStore中的示例：
+		<Manager className="org.apache.catalina.session.PersistentManager"
+		  saveOnRestart="true">
+		  <Store className="org.apache.catalina.session.JDBCStore"
+		    driverName="com.mysql.jdbc.Driver"
+		    connectionURL="jdbc:mysql://localhost:3306/mydb?user=jb;password=pw"/>
+		</Manager>
+
+
+
+
+
+	负载均衡，且实现会话绑定要注意给每个tomcat实例的egine容器一个jvmRoute属性！此名称要跟前端调度模块使用名称保持一致！
+	另外，在mod_proxy实现负载均衡的会话绑定时，还要使用sticksession=JSESSIONID（字符要大写）！
+
+
+
+	MSM: http://code.google.com/p/memcached-session-manager/
+	
+		http://repo1.maven.org/maven2/de/javakaffee/msm/
+
+
+	Tomcat Cluster配置：
+
+	<Cluster className="org.apache.catalina.ha.tcp.SimpleTcpCluster"
+                 channelSendOptions="8">
+
+          <Manager className="org.apache.catalina.ha.session.DeltaManager"
+                   expireSessionsOnShutdown="false"
+                   notifyListenersOnReplication="true"/>
+
+          <Channel className="org.apache.catalina.tribes.group.GroupChannel">
+            <Membership className="org.apache.catalina.tribes.membership.McastService"
+                        address="228.0.0.4"
+                        port="45564"
+                        frequency="500"
+                        dropTime="3000"/>
+            <Receiver className="org.apache.catalina.tribes.transport.nio.NioReceiver"
+                      address="auto"
+                      port="4000"
+                      autoBind="100"
+                      selectorTimeout="5000"
+                      maxThreads="6"/>
+
+            <Sender className="org.apache.catalina.tribes.transport.ReplicationTransmitter">
+              <Transport className="org.apache.catalina.tribes.transport.nio.PooledParallelSender"/>
+            </Sender>
+            <Interceptor className="org.apache.catalina.tribes.group.interceptors.TcpFailureDetector"/>
+            <Interceptor className="org.apache.catalina.tribes.group.interceptors.MessageDispatch15Interceptor"/>
+          </Channel>
+
+          <Valve className="org.apache.catalina.ha.tcp.ReplicationValve"
+                 filter=""/>
+          <Valve className="org.apache.catalina.ha.session.JvmRouteBinderValve"/>
+
+          <Deployer className="org.apache.catalina.ha.deploy.FarmWarDeployer"
+                    tempDir="/tmp/war-temp/"
+                    deployDir="/tmp/war-deploy/"
+                    watchDir="/tmp/war-listen/"
+                    watchEnabled="false"/>
+
+          <ClusterListener className="org.apache.catalina.ha.session.JvmRouteSessionIDBinderListener"/>
+          <ClusterListener className="org.apache.catalina.ha.session.ClusterSessionListener"/>
+        </Cluster>
+			
+
+
+	route add -net 228.0.0.4 netmask 255.255.255.255 dev eth0  
+
+	总结：构建DeltaManager集群步骤：
+	1、在各节点的server.xml的engine或host容器添加如上内容；注意修改MemberShip组件中的多播地址address="228.0.0.4"，建议修改Receiver中的address为本机能够传递心跳信息的地址；
+	2、在各节点为使用组播地址添加组播路由，格式：
+		route add -net $MCAST_ADDRESS netmask 255.255.255.255 dev eth0
+	3、在相应应用程序的web.xml中添加<distributable\>; 
+
+	www.sourceforge.org, www.slideshare.net, www.wordpress.com, http://code.google.com, http://www.github.com
+
+	-Xmx
+	-Xms: 定义堆内存空间
+
+	-XX:Newsize
+	-XX:Maxnewsize
+		在堆内存内部如何分配使用的空间
+
+	-XX:PermSize
+	-XX:MaxPermSize
+
+	java性能查看工具：
+		jconsole, visualvm, jprofiler, janalyzer
+
+	-Xmx, -Xms, -XX:NewSize, -XX:MaxNewSize, -XX:SurvivorRatio, -XX:PermSize, -XX:MaxPermSize
+
+
+
+
+
+
+
+
+补充材料：GSLB (摘自百度百科)
+
+GSLB 是英文Global Server Load Balance的缩写，意思是全局负载均衡。作用：实现在广域网（包括互联网）上不同地域的服务器间的流量调配，保证使用最佳的服务器服务离自己最近的客户，从而确保访问质量。
+
+	分类
+		基于DNS实现、基于重定向实现、基于路由协议实现。
+
+	特点
+		能通过判断服务器的负载，包括CPU占用、带宽占用等数据，决定服务器的可用性，同时能判断用户（访问者）与服务器间的链路状况，选择链路状况最好的服务器。因此GSLB是对服务器和链路进行综合判断来决定由哪个地点的服务器来提供服务，实现异地服务器群服务质量的保证。
+
+	使用范围
+		所有有多个站点的系统，最常见的是在CDN系统中作为核心的流量调度系统。
+
+
+tomcat:
+	Java EE, Servlet, JSP(Java Server Page), JS(JavaScript)
+	JSP-->Servlet-->class-->jvm
+	Linux+jvm+java
+
+
+多线程与进程的执行执行模式：
+	互不通信的多线模式
+	基于共享容器协同的多线程模式
+	通过事件协同的多线程模型
+	A：1-->2-->3
+	B: 1-->2-->3
+
+	输入设备的变化
+	控制器的变化：
+		透明代理
+		旁路模式
+		名称服务
+		规则服务器
+	运算器的变化：
+
+	存储器的变化：
+		代理模型
+		名称服务
+		规则服务器
+		Master
+
+	分布式系统的难点：
+		缺乏全局时钟
+		面对故障的独立性
+		处理单点故障
+			冗余
+			降低单点故障的影响范围
+		事务的挑战
+			ACID
+			2PC(两段式提交)、最终一致、BASE、CAP、Paxos
+
+	分布式事务的模型及规范
+		X/Open: XA
+		DTP: Distributed Transaction Processing Reference Model
+			定义了三个组件：
+				AP：Application Program, 应用程序
+				RM：Resource Manager, 资源管理器
+				TM: Transaction Manager, 事务管理器
+
+	两段式提交
+	CAP
+	BASE：
+		BA：Basically Available, 基本可用
+		S：Soft state, 软状态，接受一段时间内的状态不同步
+		E：Eventually consistent: 最终一致性
+
+	Paxos: 
+		比2PC提交更轻量级的分布式事务的协调方式
+
+	集群内数据一致性算法实施过程案例：
+		Quorum, Vector Clock
+
+		Quorum:
+			N: 数据复制的节点量
+			R：成功读操作所依赖的最少节点数
+			W：成功写操作所依赖的最少节点数
+
+			W+R>N: 强一致性；
+			假设，W=N，R=1，
+			W+R<=N: 可以保证最终一致性
+
+	分布式应用：
+		分布式计算
+			MapReduce: 分布式运算框架
+				MapReduce
+		分布式存储
+			GFS，Google File System
+				HDFS:
+		BigTable: 列式数据库
+			HBase
+
+			NoSQL:
+
+		HADOOP:
+
+
+	分布式存储
+		不能mount, 基于API进行存取
+	分布式文件系统
+		mount，VFS
+
+		GFS
+		HDFS：适合存储大文件；
+		TFS：在名称节点上将元数据存储于关系型数据中，文件数量不再受限于名称节点的内存空间；可以存储海量小文件；
+		Lustre: 企业级应用，重量级；
+		GlusterFS: 
+		MooseFS: 
+		Mogilefs: 使用Perl语言，FastDFS
+
+	MogileFS的特性：
+		应用层：
+		无单点：（tracker, mogstore, database(MySQL)）
+		自动文件复制：复制的最小单位不是文件，而class；
+		传输中立，无特殊协议：可以通过NFS或HTTP进行通信；
+		简单的命名空间：
+		不共享任何数据：
+
+	Tracker：
+		MogileFS的核心，是一个调度器；服务进程为mogilefsd; 职责：删除、复制、监控、查询等；
+
+	Database:
+
+	mogstored: 数据存储的位置，通常是一个HTTP（WebDAV）服务器，用来数据的创建、删除、获取;
+
+
+
+
+	回顾：CAP
+		C, A, P
+		AP:
+			C:
+
+			N, R, W
+
+		MogileFS: tracker, mogstored, database
+			master, slave
+			tracker, mogstored
+
+	Perl
+		cpan> install module::name
+
+	# make Makefile.PL
+	# make
+	# make test
+	# make install
+
+
+	安装过程：
+		tracker:
+			1、安装
+			2、设定数据库
+				(1) GRANT ALL ON mogilefs.* TO 'moguser'@'HOSTNAME' IDENTIFIED BY 'mogpass';
+				(2) mogdbsetup --dbrootuser= --dbhost= --dbport= --dbrootpass= --dbuser=moguser --dbpass=mogpass
+			3、配置mogilefsd.conf
+			4、# chown -R mogilefs.mogilefs /var/run/mogilefsd/
+
+		mogstored:
+			1、安装
+			2、安装perl-IO-AIO
+			3、配置
+
+		
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

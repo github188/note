@@ -1,0 +1,360 @@
+安装前的准备工作
+
+
+(1)解决安装Nagios的依赖关系：
+
+
+Nagios基本组件的运行依赖于httpd、gcc和gd。可以通过以下命令来检查nagios所依赖的rpm包是否已经完全安装：
+# yum -y install httpd gcc glibc glibc-common *gd* php php-mysql mysql mysql-server mysql-devel
+
+
+（2）所需要安装组件：
+
+服务端所用的安装包为 nagios nagios-plugins ndoutils(非必须)
+linux客户端 nrpe
+windows客户端 NSClient++
+
+（3）
+进行selinux设置，或者关闭selinux
+
+开始搭建：
+(1)添加nagios运行所需要的用户和组：
+
+
+# groupadd nagcmd
+# useradd -m nagios
+# usermod -a -G nagcmd nagios
+
+
+把apache加入到nagcmd组，以便于在通过web Interface操作nagios时能够具有足够的权限：
+# usermod -a -G nagcmd apache
+
+
+2、编译安装nagios：
+
+
+# tar zxf nagios-3.1.2.tar.gz 
+# cd nagios-3.1.2
+# ./configure --with-command-group=nagcmd --enable-event-broker 
+
+# make all
+# make install
+# make install-init
+# make install-config
+# make install-commandmode
+
+
+为email指定您想用来接收nagios警告信息的邮件地址，默认是本机的nagios用户:
+# vi /usr/local/nagios/etc/objects/contacts.cfg 
+email        nagios@localhost       #这个是默认设置
+
+执行如下命令，实现在httpd的配置文件目录(conf.d)中创建Nagios的Web程序配置文件：
+# make install-webconf
+
+创建一个登录nagios web程序的用户，这个用户帐号在以后通过web登录nagios认证时所用：
+# htpasswd -c /var/www/nagios/etc/htpasswd.users nagiosadmin
+
+
+以上过程配置结束以后需要重新启动httpd：
+# service httpd restart
+
+
+3、编译、安装nagios-plugins
+
+Nagios的所有监控工作都是通过插件完成的，因此，在启动nagios之前还需要为其安装官方提供的插件。
+
+# tar zxf nagios-plugins-1.4.15.tar.gz 
+# cd nagios-plugins-1.4.15
+# ./configure --with-nagios-user=nagios --with-nagios-group=nagios --with-mysql --enable-perl-modules
+
+# make
+# make install
+
+4、配置并启动Nagios
+
+(1)把nagios添加为系统服务并将之加入到自动启动服务队列：
+# chkconfig --add nagios
+# chkconfig nagios on
+
+(2)检查其主配置文件的语法是否正确：
+# /usr/local/nagios/bin/nagios -v /usr/local/nagios/etc/nagios.cfg
+
+(3)如果上面的语法检查没有问题，接下来就可以正式启动nagios服务了：
+# service nagios start
+
+(4)配置selinux
+如果您的系统开启了selinux服务，则默认为拒绝nagios web cgi程序的运行。您可以通过下面的命令来检查您的系统是否开启了selinux：
+#getenforce
+
+如果上面命令的结果显示开启了selinux服务，您可以通过下面的命令暂时性的将其关闭：
+#setenforce 0
+
+如果您想在以后完全关闭selinux，可以通过编辑/etc/sysconfig/selinux文件，将其中的selinux后面的值“force”修改为“disable”即可。
+
+当然，您也可以通过以下方式将nagios的CGI程序运行于SELinux/targeted模式而不用关闭selinux：
+# chcon -R -t httpd_sys_content_t /usr/local/nagios/sbin
+# chcon -R -t httpd_sys_content_t /usr/local/nagios/share
+
+(5)通过web界面查看nagios：
+http://your_nagios_IP/nagios
+
+
+登录时需要指定前面设定的web认证帐号和密码。
+
+##################################################################
+
+windos端
+1.被监控端安装NSClient++-0.3.8-Win32.msi
+2.安装完成后修改配置文件NSC.ini把需要的库都打开
+
+
+3.在监控服务器上修改nagios配置文件nagios.cfg
+去掉注释cfg_file=/usr/local/nagios/etc/objects/windows.cfg
+定义windows.cfg
+define host{
+        use             windows-server  ; Inherit default values from a template
+        host_name       winserver       ; The name we're giving to this host
+        alias           My Windows Server       ; A longer name associated with the host
+        address         192.168.0.191   ; 你主机的IP
+        }
+
+#################################################################
+linux端
+
+被监控端
+先添加nagios用户
+useradd nagios
+为了安装nrpe，先安装nagios-plugins-1.4.15.tar.gz 插件
+# tar zxf nagios-plugins-1.4.15.tar.gz 
+# cd nagios-plugins-1.4.15
+# ./configure --with-nagios-user=nagios --with-nagios-group=nagios
+# make all
+# make install
+
+tar -zxvf nrpe-2.12.tar.gz
+cd nrpe-2.12.tar.gz
+./configure  (会自动加载SSL)
+#如果后面make报错,加如下参数
+./configure --enable-ssl --with-ssl-lib=/usr/lib/(当然前提要有openssl)
+如果仍然无法正常进行，需安装openssl-devel包
+make all
+make install-plugin
+make install-daemon
+make install-daemon-config
+
+4.配置nrpe信息
+vim /usr/local/nagios/etc/nrpe.cfg
+allowed_hosts=127.0.0.1  //允许监控的IP
+server_address=192.168.0.186 //修改为外网网卡监听的IP
+/usr/local/nagios/bin/nrpe -c /usr/local/nagios/etc/nrpe.cfg –d
+
+
+
+服务端
+3.安装NRPE
+cd nagios-nrpe_2.8.1
+./configure   #默认自动添加了openssl
+#因为传送过程要加密,如果后面make报错,加如下参数
+rpm -qa| grep ssl
+openssl-devel-0.9.7a-43.17.el4_6.1
+rpm -ql openssl-devel-0.9.7a-43.17.el4_6.1 | more
+./configure --enable-ssl --with-ssl-lib=/lib/(当然前提要有openssl)
+make all
+make install-plugin
+---安装check_nrpe脚本
+
+4.commands.cfg定义外部构件nrpe
+vi /usr/local/nagios/etc/objects/commands.cfg
+#添加
+#check nrpe
+define command{
+        command_name check_nrpe
+        command_line $USER1$/check_nrpe -H $HOSTADDRESS$ -c $ARG1$
+        }
+定义 mylinux.cfg
+define host{
+           use             linux-server
+          host_name     mylinux
+          alias            mylinux
+          address        192.168.0.27(客户端IP既被监控的IP)
+               }
+define service{
+        use                      generic-service
+        host_name             mylinux
+        service_description     check-load
+       check_command         check_nrpe!check_load
+               }
+
+define service{
+        use                      generic-service
+        host_name             mylinux
+       service_description     check-users
+       check_command        check_nrpe!check_users
+               }
+define service{
+        use                    generic-service
+        host_name           mylinux
+        service_description  otal_procs
+        check_command     check_nrpe!check_total_procs
+} 
+
+#################################################################################
+define service{
+        use                    generic-service
+        host_name           mylinux
+        service_description  httpd
+        check_command     check_http! -H 192.168.0.27
+}
+
+###########################################################################################################
+
+nagios监控mysql服务器： 
+ 
+1、建立专用数据库： 
+[root@svr3 ~]# /usr/local/webserver/mysql/bin/mysql -u root -p 
+Enter password:  
+Welcome to the MySQL monitor.  Commands end with ; or \g. 
+Your MySQL connection id is 51910 
+Server version: 5.5.3-m3-log Source distribution 
+ 
+Type 'help;' or '\h' for help. Type '\c' to clear the current input statement. 
+ 
+mysql> create database nagios; 
+Query OK, 1 row affected (0.00 sec) 
+ 
+mysql> grant select on nagios.* to nagios@'%' identified by '123qweasd'; 
+Query OK, 0 rows affected (0.00 sec) 
+ 
+mysql> flush privileges; 
+Query OK, 0 rows affected (0.00 sec) 
+ 
+mysql> select User,Password,Host from user; 
++----------------+-------------------------------------------+------------------+ 
+| User           | Password                                  | Host             | 
++----------------+-------------------------------------------+------------------+ 
+| root           | *84BB5DF4823DA319BBF86C99624479A198E6EEE9 | localhost        | 
+| nagios         | *A1F1CB851D62F002C09A0C9C4A76262473432F55 | %                | 
++----------------+-------------------------------------------+------------------+ 
+14 rows in set (0.00 sec) 
+12 rows in set (0.00 sec) 
+ 
+[root@svr3 ~]# /var/www/nagios/libexec/check_mysql -H 10.1.1.30 -u nagios -d nagios -p 123qweasd 
+Uptime: 970046  Threads: 1  Questions: 684583  Slow queries: 3  Opens: 672  Flush tables: 1  Open tables:  
+ 
+369  Queries per second avg: 0.705 
+ 
+[root@svr4 nrpe_install]# /var/www/nagios/libexec/check_mysql -H 10.1.1.30 -u nagios -d nagios -p 123qweasd 
+Uptime: 970348  Threads: 1  Questions: 684584  Slow queries: 3  Opens: 672  Flush tables: 1  Open tables: 369  Queries per second avg: 0.705 
+ 
+果断开始设置： 
+#定义用户 
+#定义组，及隶属用户 
+#用户增加 
+ 
+在command.cfg里增加插件命令： 
+#check mysql 
+define command{ 
+command_name check_mysql 
+command_line $USER1$/check_mysql -H $HOSTADDRESS$ -u nagios -d nagios -p 123qweasd 
+} 
+ 
+#定义服务： 
+vim  mylinux.cfg
+define service { 
+        host_name mysql
+      
+        check_period 24x7 
+        max_check_attempts 2 
+        normal_check_interval 1 
+        retry_check_interval 1 
+        contact_groups admins
+        notification_interval 5 
+        notification_period 24x7 
+        notification_options w,u,c,r 
+        check_command check_mysql 
+        }
+
+
+飞信报警
+1.修改模板文件
+修改contact.cfg
+2.
+修改
+ commands.cfg
+define command{
+        command_name notify-service-by-fetion
+        command_line      /usr/bin/fetion --mobile 15003880800 --pwd 123qweQWE --to 15003880800 --msg-tpye=0  --msg-utf8 $HOSTNAME
+
+
+nconf
+nconf是基于PHP使用户通过web页面实现对nagios各项属性进行配置，诸如模板定义、添加修改监控的主机/服务等操作；
+一：
+首先对mysql数据库进行定义
+service mysqld start 
+#启动mysql 
+mysqladmin -uroot -p password 'redhat'; 
+#给mysql添加管理员密码 
+mysql –uroot –p 
+#进入mysql数据库 
+mysql> create database nconf;  
+#创建nconf数据库 
+mysql> grant all privileges on nconf.* to nconf@localhost identified by 'nconf'; 
+#创建nconf用户并赋权   
+mysql> flush privileges;   
+#刷新特权表 
+mysql>quit 
+解压nconf到指定目录下
+tar -zxf nconf-1.2.6-0.tgz -C /var/www/html/ 
+cd /var/www/html/nconf 
+chown -R apache.apache config/ temp/ static_cfg/ output/ 
+#给相关文件赋予权限 
+SELINUX安全上下文
+chcon -R -t httpd_sys_content_t /var/www/html/nconf/  
+chcon -t httpd_sys_script_exec_t /var/www/html/nconf/bin/nagios  
+#修改文件的安全上下文  
+ Ps：如果您的SELinux已经关闭，忽略此步操作
+ http：//您nagios监控端的IP/nconf
+ 
+二：网页配置
+
+
+三：
+ #网页安装完成
+rm -rf INSTALL INSTALL.php  UPDATE UPDATE.php  
+#删除安装所需的初始化文件 
+ln -s /usr/local/nagios/bin/nagios bin/nagios  
+#给nagios命令创建符号链接 
+chmod +x /var/www/html/nconf/bin/generate_config.pl  
+#给与nagios关联的配置文件赋予执行权限 
+chown -R apache.apache  bin 
+#修改文件的属组和属主 
+
+四：
+#尝试生成配置文件，以测试是否与nagios成功关联
+到此nconf就安装完成了！
+NConf 使用方法：
+查看这两个文件是否有执行权限
+chmod +x /var/www/html/nconf/bin/generate_config.pl  
+#用来将web页面的配置设置转化成文nagios配置文件的脚本，其需要apache用户有可执行权限 
+chmod +x  /usr/local/nagios/bin/nagios 
+#给other执行权限，用来检测nagios配置文件是否有语法错误 
+使用流程：
+注意：nconf在点击【Generate Nagios config】后将您的生成nagios配置文件是/var/www/html/nconf/output/NagiosConfig.tgz，而并非直接导入nagios中。
+1.在web页面对监控服务和主机配置完毕，点击【Generate Nagios config】
+2.deploy_local.sh是nconf自带配置文件导入脚本
+chmod +x /var/www/html/nconf/ADD-ONS/deploy_local.sh         
+#这一步不解释，你懂的 
+/var/www/html/nconf/ADD-ONS/deploy_local.sh 
+#手动执行此脚本，将在/usr/local/nagios/etc下生成两目录Default_collector与global 
+3.修改nagios主配置文件
+vim /usr/local/nagios/etc/nagios.cf 
+#将其中cfg_file=*******字段全部注释 
+cfg_dir=/usr/local/nagios/etc/Default_collector 
+cfg_dir=/usr/local/nagios/etc/global 
+#添加将其配置文件指向 
+service nagios reload 
+#重载nagios配置文件使之生效 
+4.添加到crontab
+crontab -e 
+*/1 * * * *  /var/www/html/nconf/ADD-ONS/deploy_local.sh 
+#每分钟监测一下是否有更新，有更新就自动覆盖最新的配置文件 

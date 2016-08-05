@@ -1,0 +1,7 @@
+邮件服务：SMTP (25端口)协议
+MTA:邮件传输代理 SMTP
+MDA:
+postfix服务
+ 删除sendmail：service sendmail stop
+ chkconfig sendmail off
+ rpm -e sendmail --nodeps

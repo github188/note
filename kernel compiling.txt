@@ -1,0 +1,27 @@
+crypto/signature/ksign-publickey.c:2:17: error: key.h: No such file or directory
+crypto/signature/ksign-publickey.c: In function ‘ksign_init’:
+crypto/signature/ksign-publickey.c:10: error: ‘ksign_def_public_key’ undeclared (first use in this function)
+crypto/signature/ksign-publickey.c:10: error: (Each undeclared identifier is reported only once
+crypto/signature/ksign-publickey.c:10: error: for each function it appears in.)
+crypto/signature/ksign-publickey.c:11: error: ‘ksign_def_public_key_size’ undeclared (first use in this function)
+make[2]: *** [crypto/signature/ksign-publickey.o] Error 1
+make[1]: *** [crypto/signature] Error 2
+make: *** [crypto] Error 2
+
+
+
+1) Select “Enable loadable module support”, then “Module signature verification (EXPERIMENTAL)”. Disable it.
+2) Then go back to the main menu, select “Cryptographic API” then “In-kernel signature checker (EXPERIMENTAL)” and disable that one too.
+
+
+
+
+
+
+
+ACCT的功能已经可以在内核参数中按需启用或禁用。
+net.netfilter.nf_conntrack_acct = 1
+
+
+
+

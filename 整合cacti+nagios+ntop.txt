@@ -1,0 +1,403 @@
+依赖的软件包的安装
+# yum install gcc glibc glibc-common gd gd-devel php php-mysql php-gd php-snmp php-pdo mysql mysql-server mysql-devel httpd net-snmp net-snmp-libs net-snmp-utils libart_lgpl libart_lgpl-devel
+
+一、cacti安装
+
+pango的安装
+
+# tar jxvf pango-1.17.5.tar.bz2
+
+# cd pango-1.17.5
+# ./configure
+# make
+# make install
+
+rrdtool安装
+
+# tar xvf rrdtool-1.4.4.tar.gz
+# cd rrdtool-1.4.4
+# ./configure --prefix=/usr/local
+# make
+# make install
+
+为rrdtool的二进制文件创建链接至/usr/local/bin，cacti默认到这里查找所需的rrdtool
+# ln -s /usr/local/rrdtool/bin/* /usr/local/bin
+
+将rrdtool的库文件添加至系统库文件搜索路径：
+# vi /etc/ld.so.conf
+添加：
+/usr/local/rrdtool/lib
+
+#ldconfig -v
+
+
+所需系统环境的配置
+
+(1)配置php工作环境
+
+首先需要确保php能够加载所需的系统模块，cacti所需要用到的php模块有mysql、SNMP 、XML、Session、Sockets、LDAP（仅在使用LDAP认证时需要）、GD（某些插件可能用到）。/etc/php.ini文件中的如下选项可以保证php能够加载到所需的模块：
+extension_dir = /usr/lib/php/modules
+
+
+可以使用如下命令查看本机php已经打开的支持模块：
+
+# php -m
+
+如果在以后的使用中需要导入cacti模板，这还需要确保在/etc/php.ini中打开了文件上传的功能：
+file_uploads = On
+
+(2)配置httpd
+
+默认情况下，打开httpd对php支持所需要的配置文件在/etc/httpd/conf.d/目录中，所以，请确保您的httpd.conf文件中开启了以下选项：
+Include conf.d/*.conf
+
+启动httpd服务，并把它加入到自动启动队列(如果是第一次配置httpd)：
+# service httpd start
+# chkconfig --level 2345 httpd on
+
+(3)配置MySQL
+
+首先启动mysql，并将其加入到自动启动服务队列(如果是第一次配置MySQL)：
+# service mysqld start
+# chkconfig --level 2345 mysqld on
+
+
+
+接着登录mysql，创建cacti的数据库，并为其指定cacti用户和密码（cacti）。数据库名字可根据需要指定，这里指定为cacti：
+
+# mysql 
+mysql> create database cacti;
+mysql> GRANT all privileges ON cacti.* TO cacti@localhost IDENTIFIED BY 'cacti';
+mysql> flush privileges;
+mysql> quit
+
+(4)配置SNMP
+
+在net-snmp的主配置文件/etc/snmp/snmpd.conf中，默认的community为public，建议将public修改为您需的密码项。
+
+接着，启动snmp进程，并将其加入到自动启动服务队列(只在第一次配置时需要)：
+# service snmpd start
+# chkconfig --level 2345 snmpd on
+
+
+安装设定cacti
+
+(1)解压cacti的压缩包，并将其移至网站目录中：
+# tar zxvf cacti-0.8.7e.tar.gz
+# mv cacti-0.8.7e  /var/www/html/cacti
+
+说明：如果您的网站目录在别处，这里需要做相应的改变；同时，您也可以使用httpd的虚拟目录，而不必要一定要将cacti目录移至网站目录；
+
+(2)使用cacti提供的schema生成cacti所需要的表等对象：
+# cd /var/www/html/cacti
+# mysql -u root -p cacti < cacti.sql
+
+(3)编辑cacti的主配置文件，为其指定对应的数据库参数：
+# vi /var/www/html/cacti/include/config.php
+
+将下列各参数的值修改为您前面所设定的：
+$database_type = "mysql";
+$database_default = "cacti";
+$database_hostname = "localhost";
+$database_username = "cacti";
+$database_password = "cacti";
+$database_port = "3306";
+
+(4)添加运行cacti所需要的用户帐号，并将运行时需要生成rrd文件和日志文件的目录权限赋予给它：
+# useradd cacti
+# passwd cacti
+
+# chown -R cacti rra/ log/
+
+(5)为cacti用户添加周期性任务，以实现所需数据的获取：
+# vi /etc/crontab
+添加如下行：
+*/5 * * * * cacti  php  /var/www/html/cacti/poller.php > /dev/null 2>&1
+
+(6)进入安装界面，开始安装设定cacti
+打开浏览器，在地址栏输入如下地址，当安装界面出现后，按照提示一步步安装即可。
+http://youIP/cacti
+
+刚刚安装成功时，cacti还没有获取到所需要的数据，因此，可能不会有图表显示。待过上五分钟以上的一段时间，就会有关于本机负载情况的统计图表出现了。如果要监控其它主机，请首先确保其它主机开启中了SNMP服务，接着在cacti控制台“device”中添加新设备，并为其创建“New graph”即可。后文将演示如何监控Windows主机的工作情况。
+
+
+二、安装ntop
+
+安装辅助软件
+# yum install libpcap libpcap-devel libpng gdbm gdbm-devel glib libxml2-devel pango pango-devel gd -y
+# yum localinstall --nogpgcheck GeoIP-1.4.7-0.1.20090931cvs.el5.i386.rpm GeoIP-devel-1.4.7-0.1.20090931cvs.el5.i386.rpm
+
+rrdtool上面已经安装，这里就不在安装
+
+编译安装NTOP
+# tar xvf ntop-4.0.1.tar.gz
+# cd ntop-4.0.1
+# ./autogen.sh --with-tcpwrap    //配置--with-tcpwrap选项用于支持TCP Wrappers访问控制
+# make 
+# make install
+
+
+设置NTOP数据存放目录，NTOP系统默认以低权限用户nobody身份运行，为了使ntop可以读写数据，需要对默认的存放目录/usr/local/var/ntop进行权限调整：
+# chown -R nobody /usr/local/var/ntop
+
+为NTOP管理员设置密码，NTOP默认的管理员为admin，为安全起见，需要为其设置一个密码。另外，通过web页面修改NTOP设置或者关闭NTOP服务时，必须使用管理员用户名和密码进行验证：
+# ntop -A
+
+# ntop -d -i eth0 //以后台守护进程的方式（-d）运行NTOP服务，并监测eth0网卡所连接的流量
+如果有多块网卡，可以使用以下命令连接不同的局域网段：
+# ntop -d -i eth0，eth1 -M
+ntop默认监听端口为3000，所以可在浏览器中输入http://IP:3000查看ntop监控画面
+
+使之开机自动启动：
+# echo 'ntop -i eth0 -d -L -u ntop &> /dev/null' >> /etc/rc.d/rc.local
+
+
+将其与cacti整合在一起：
+要安装别的插件前,先要安装cacti的一个patch－－Plugin Architecture,才能支持插件PA 2.8 = cacti 0.8.7g
+
+# tar xvf cacti-plugin-0.8.7g-PA-v2.8.tar.gz
+# cp -R cacti-plugin-arch/* /var/www/html/cacti/
+cd /var/www/html/cacti/
+mysql -ucacti -pcacti cacti <pa.sql
+patch -p1 -N <cacti-plugin-0.8.7g-PA-v2.8.diff
+vi include/config.php
+修改为$url_path = “/cacti/”;
+
+首先去下载cacti的ntop插件，而后解压至cacti的插件目录：
+# tar zxvf ntop-0.1.tar.gz -C /var/www/html/cacti/plugins/
+
+接着配置cacti的主配置文件，启用此插件：
+# vim  /var/www/html/cacti/include/config.php
+添加如下内容：
+$plugins[] = 'ntop';
+
+接下来到cacti的控制台中"settings"中配置此插件，将其指向实际的ntop服务器所在的URL；然后再到cacti控制台的"user Management"中的admin用户中启用此插件即可。
+
+
+
+
+
+三、nagios的安装
+
+# useradd nagios 
+# usermod -G nagios apache 
+# wget http://sourceforge.net/projects/nagios/files/nagios-3.x/nagios-3.3.1/nagios-3.3.1.tar.gz 
+# tar zxf nagios-3.3.1.tar.gz 
+# cd nagios 
+# ./configure --prefix=/var/www/html/nagios 
+# make all 
+# make install 
+# make install-init 
+# make install-commandmode 
+# make install-config 
+# make install-webconf 
+
+
+# htpasswd -c /var/www/html/nagios/etc/htpasswd.users admin    之后提示输入密码
+
+
+安装插件:
+# wget http://sourceforge.net/projects/nagiosplug/files/nagiosplug/1.4.15/nagios-plugins-1.4.15.tar.gz 
+# tar -xf nagios-plugins-1.4.15.tar 
+# cd nagios-plugins-1.4.15 
+# ./configure --prefix=/var/www/html/nagios/ 
+# make 
+# make install  
+
+# chown nagios.nagios /var/www/html/nagios/ -R 
+# service httpd restart  
+# chkconfig httpd on   
+# service nagios restart 
+# chkconfig --add nagios 
+# chkconfig nagios on
+
+
+
+将系统日志存放到mysql数据库中，以供cacti调用
+
+# wget http://sourceforge.net/projects/nagios/files/ndoutils-1.x/ndoutils-1.4b9/ndoutils-1.4b9.tar.gz/download 
+# tar zxvf ndoutils-1.4b9.tar.gz  
+# cd ndoutils-1.4b9 
+下载补丁
+# wget http://svn.centreon.com/trunk/ndoutils-patch/ndoutils1.4b9_light.patch
+打补丁
+# patch -p1 -N < ndoutils1.4b9_light.patch
+# ./configure --prefix=/var/www/html/nagios --enable-mysql --disable-pgsql --with-mysql-inc=/usr/include/mysql --with-mysql-lib=/usr/lib/mysql 
+# make
+# make install 
+
+# cp -v src/{ndomod-3x.o,ndo2db-3x,file2sock,log2ndo} /var/www/html/nagios/bin 
+# cd db 
+# ./installdb -ucacti -pcacti -hlocalhost -d cacti 
+# cd .. 
+# cp -v config/{ndo2db.cfg-sample,ndomod.cfg-sample} /var/www/html/nagios/etc 
+# cp /var/www/html/nagios/etc/ndo2db.cfg-sample /var/www/html/nagios/etc/ndo2db.cfg 
+# cp /var/www/html/nagios/etc/ndomod.cfg-sample /var/www/html/nagios/etc/ndomod.cfg 
+# chmod 644 /var/www/html/nagios/etc/ndo* 
+# chown nagios:nagios /var/www/html/nagios/etc/* 
+# chown nagios:nagios /var/www/html/nagios/bin/* 
+
+
+
+
+修改nagios.cfg配置文件以适应当前环境
+# vi /var/www/html/nagios/etc/nagios.cfg 
+  # 在文件中添加： 
+     broker_module=/var/www/html/nagios/bin/ndomod-3x.o config_file=/var/www/html/nagios/etc/ndomod.cfg 
+  # 检查  
+     event_broker_options=-1     ## 为Nagios开启event broker 
+
+
+修改ndo2db.cfg以适应当前环境
+vi  /var/www/html/nagios/etc/ndo2db.cfg 
+ # 确保下列内容为唯一项 
+     socket_type=tcp 
+     db_servertype=mysql 
+     db_host=localhost 
+     db_port=3306 
+  
+     db_name=cacti 
+  
+     db_prefix=nagios_ 
+     db_user=cacti 
+     db_pass=cacti 
+
+
+
+修改ndomod.cfg以适应当前环境 
+# vi /var/www/html/nagios/etc/ndomod.cfg 
+   # 确保下列项的唯一内容为 
+    output_type=tcpsocket 
+    output=127.0.0.1 
+
+为ndo2db添加启动进程
+# cp ./daemon-init /etc/init.d/ndo2db 
+# vi /etc/init.d/ndo2db
+   # 检查里面的路径确保不会出现“//"，并将Ndo2dbBin修改成下面的值： 
+     Ndo2dbBin=/var/www/html/nagios/bin/ndo2db-3x 
+# chmod +x /etc/init.d/ndo2db  
+
+启动守护进程与nagios 
+# service ndo2db start 
+# tail -20 /var/log/messages    ## 查看其中是否有错误出现。如无报错请继续 
+# service nagios start
+
+
+
+安装ncp，以在Cacti中展现Nagios
+
+1.先安装cacti扩展模块
+# wget http://www.cacti.net/downloads/pia/cacti-plugin-0.8.7h-PA-v3.0.tar.gz 
+# tar xvf cacti-plugin-0.8.7h-PA-v3.0.tar.gz  
+# cp -R cacti-plugin-arch/* /var/www/html/cacti/ 
+# cd /var/www/html/cacti/ 
+# mysql -ucacti -pcacti cacti < pa.sql  
+# patch -p1 -N < cacti-plugin-0.8.7h-PA-v3.0.diff   
+ ## 为cacti配置文件打补丁的时候注意在为include/config.php打补丁的时候有可能它将 include/config.php.dist给打补丁了，我们只需要手动加入下面的内容即可。 
+# vim include/config.php   # 修改(或新加入)为 
+    $url_path = "/cacti/"; 
+
+
+从web进入cacti，启用cacti plugin扩展
+ 
+2.安装npc
+# tar zxvf npc-2.0.4.tar.gz 
+# mv npc /var/www/html/cacti/plugins/ 
+# vim /var/www/html/cacti/include/config.php   # 加入： 
+     $plugins[] = 'npc'; 
+
+3.安装 npc支持：json
+# wget http://pkgs.fedoraproject.org/repo/pkgs/php-pecl-json/json-1.2.1.tgz/d8904d2f004ceec85eeacf524cd25539/json-1.2.1.tgz 
+# tar zxvf json-1.2.1.tgz  
+# cd json-1.2.1 
+# phpize   ## 如果发现没有Phpize文件，则是因为php-devel包没有安装导致的  
+# ./configure  
+# make && make install 
+  
+# php -i | grep php.ini  ## 查看是否有导入信息 
+
+
+4.打开php.ini文件添加对json的支持
+# vim /etc/php.ini 
+   # 添加 
+    extension=json.so 
+
+5.为apache添加php支持。
+# vim /etc/httpd/conf/httpd.conf  
+   # 添加一行： 
+     AddType application/x-httpd-php .php .phtml 
+   # 修改原DirectoryIndex内容为： 
+     DirectoryIndex index.html index.html.var index.php 
+ 
+# usermod -G cacti apache 
+# service httpd restart    ## 重启apache以让php生效 
+# php -m   ## 查看是否有json被加载 
+
+6.修改配置文件以让npc读取到新的数据。
+# vim /var/www/html/nagios/etc/ndo2db.cfg 
+     db_prefix=npc_ 
+
+
+从Web进入Cacti，确保正确使用npc选项。
+
+
+重启ndo2db进程，重新加载配置文件重启nagios服务。
+# service ndo2db restart 
+# service nagios restart 
+7.在Web上配置NPC以使之正常读取工作。
+ 在Settings->npc中 ，勾上Remote Commands
+  Nagios Command File Path= /var/www/html/nagios/var/rw/nagios.cmd
+  Nagios URL=你的地址(http://ocalhost/nagios/)
+接下来刷新npc就可以看到数据啦:
+
+
+
+
+nconf配置：
+
+1.nconf的准备工作
+# 进入mysql数据库  
+mysql> create database nconf;   
+# 创建nconf数据库  
+mysql> grant all privileges on nconf.* to nconf@localhost identified by 'nconf';  
+# 创建nconf用户并赋权    
+mysql> flush privileges;    
+# 刷新特权表  
+mysql> quit  
+2.安装nconf
+wget http://sourceforge.net/projects/nconf/files/nconf/1.2.6-0/nconf-1.2.6-0.tgz/download 
+tar -zxf nconf-1.2.6-0.tgz -C /var/www/html/  
+cd /var/www/html/nconf  
+chown -R apache.apache config/ temp/ static_cfg/ output/  
+3.进入Web页面在web页面按照安装提示一步步安装
+ 
+4.使用刚才创建的nconf数据库和nconf数据库用户/密码
+
+5.成功连接mysql数据库,之后一切保持默认，直到下面的，设置nconf管理员密码，此时默认登录用户为admin
+
+6.之后，网页安装完成。
+rm -rf INSTALL INSTALL.php  UPDATE UPDATE.php   
+ # 删除安装所需的初始化文件  
+ln -s /var/www/html/nagios/bin/nagios bin/nagios   
+chmod +x /var/www/html/nconf/bin/generate_config.pl   
+chown -R apache.apache  bin  
+chmod +x /var/www/html/nagios/bin/nagios 
+chmod +x /var/www/html/nconf/ADD-ONS/deploy_local.sh    
+vim /var/www/html/nconf/ADD-ONE/deploy_local.sh  
+     修改里面的Nagios路径为 /var/www/html/nagios/etc/    
+7.重新刷新页面，输入admin/您设置的密码，进入nconf页面
+ 
+8.点击Generate Nagios config尝试生成配置文件，以测试是否与nagios成功关联
+ 
+9.最后的设置
+①在web页面对监控服务和主机配置完毕，点击Generate Nagios config
+②deploy_local.sh是nconf自带配置文件导入脚本
+/var/www/html/nconf/ADD-ONS/deploy_local.sh 
+手动执行此脚本，将在/var/www/html/nagios/etc下生成两目录Default_collector与global
+③修改nagios主配置文件
+vim /var/www/html/nagios/etc/nagios.cfg  
+   # 将其中cfg_file=*******字段全部注释 ,并加入 
+     cfg_dir=/var/www/html/nagios/etc/Default_collector 
+     cfg_dir=/var/www/html/nagios/etc/global 
+service nagios reload 
+   # 重载nagios配置文件使之生效 

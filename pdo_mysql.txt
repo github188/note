@@ -1,0 +1,32 @@
+PDO MySQL简介
+PHP Data Objects(PDO)扩展为 PHP 访问数据库定义了一个轻量级的一致接口。实现 PDO 接口的每个数据库驱动可以公开具体数据库的特性作为标准扩展功能。注意利用 PDO 扩展自身并不能实现任何数据库功能；必须使用一个具体数据库的 PDO 驱动来访问数据库服务。记录安装 PDO MySQL 扩展过程。
+
+PDO MySQL安装准备
+PDO_MYSQL-1.0.2.tgz 下载地址：http://pecl.php.net/get/PDO_MYSQL-1.0.2.tgz
+
+PDO MySQL详细的安装配置如下
+PDO MYSQL单独安装配置过程如下：
+1、下载 文件 或者 进入 在PHP源码包中进入ext/pdo_mysql
+http://pecl.php.net/get/PDO_MYSQL-1.0.2.tgz
+2、解压文件
+[root@localhost src]#tar zxvf PDO_MYSQL-1.0.2.tgz
+3、配置和编译文件
+[root@localhost src]cd PDO_MYSQL-1.0.2
+[root@localhost MYSQL-1.0.2]/usr/local/php/bin/phpize
+[root@localhost MYSQL-1.0.2]./configure --with-php-config=/usr/local/php/bin/php-config  --with-pdo-mysql=/usr/local/mysql/ --with-zlib-dir=/usr/local/lib
+[root@localhost MYSQL-1.0.2]make
+[root@localhost MYSQL-1.0.2]make install
+注： 我的PHP安装在 ： /usr/local/php/ mysql 安装在 ： /usr/local/mysql 编译的时候注意你自己的安装目录在哪里
+
+# 切换目录，查看pdo_mysql.so是否存在
+[root@localhost MYSQL-1.0.2]cd /usr/local/php/lib/php/extensions/no-debug-non-zts-20060613/
+ 
+# 编辑php.ini
+[root@localhost MYSQL-1.0.2]vi /usr/local/php/etc/php.ini
+ 
+# 添加pdo_mysql扩展
+extension=/usr/local/php/lib/php/extensions/no-debug-non-zts-20060613/pdo_mysql.so
+或者 extension=pdo_mysql.so 
+ 
+# 重启apache
+[root@localhost MYSQL-1.0.2]/usr/local/apache2/bin/apachectl restart

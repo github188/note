@@ -1,0 +1,56 @@
+tcp_wrapper
+
+	tcpd: 
+
+	/etc/hosts.allow, /etc/hosts.deny
+
+	注意：
+	1、并非所有服务均能由tcp_wrapper
+	2、判断某服务程序是否能够由tcp_wrapper
+		动态编译：
+		ldd 命令检测其是否链接至libwrap库上即可
+			libwrap.so.0 => /lib64/libwrap.so.0
+		静态编译：
+		strings /path/to/program
+			hosts.allow
+			hosts.deny
+
+	配置文件语法格式：
+		daemon_list: client_list [:options]
+
+			daemon_list: 
+				应用程序名称；
+				应用程序列表：如果有多个，用逗号分隔即可；
+				ALL：匹配所有进程
+
+			client_list:
+				IP地址：172.16.100.100
+				主机名：www.magedu.com
+				网络地址/子网掩码：掩码仅允许使用长格式，不允许使用CIDR格式
+					172.16. 表示 172.16.0.0/255.255.0.0
+
+			tcp_wrapper有几个内置的Macro 
+				用于client_list的有：ALL, KNOWN, UNKNOWN, PARANOID
+				用于daemon_list的有：ALL
+
+			EXCEPT: 可以用于client或daemon之中，起到排除功能
+
+		[:options]
+			在hosts.allow文件使用deny选项: 在hosts.allow文件定义拒绝规则
+			在hosts.deny文件使用allow选项：在hosts.deny文件定义放行规则
+
+			spawn
+				echo
+					%c: user@host
+					%s: server@host
+					%h: 客户端主机名
+					%p: 服务器上的进程的PID
+
+				man 5 hosts_access：获取其完整帮助信息
+
+			注意：echo的信息无需加引号，否则，命令替换可能不会进行
+
+				in.telnetd:     ALL : spawn echo `date` login attempt from %c to %s >> /var/log/tcp_wrapper.log
+
+	练习：使用tcp_wrapper控制vsftpd服务仅允许172.16.0.0网络中的主机访问；但要拒绝172.16.200.中的所有主机；
+		对所有的拒绝访问尝试都记录日志;

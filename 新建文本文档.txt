@@ -1,0 +1,80 @@
+
+#!/bin/sh
+ #####this is install mysql 5.5.32 scripts#####
+ #####liycwing
+
+
+ function mysql(){
+ yum install ncurses-devel libaio-devel -y
+ cd /application/tools
+ tar zxf cmake-2.8.8.tar.gz
+ cd cmake-2.8.8
+ ./configure
+ gmake
+ gmake install
+ cd ..
+ groupadd mysql
+ useradd mysql -s /sbin/nologin -M -g mysql
+ cd /application/tools/
+ tar zxf mysql-5.5.32.tar.gz
+ cd /application/tools/mysql-5.5.32
+
+ cmake . -DCMAKE_INSTALL_PREFIX=/application/mysql-5.5.32 \
+ -DMYSQL_DATADIR=/application/mysql-5.5.32/data \
+ -DMYSQL_UNIX_ADDR=/application/mysql-5.5.32/tmp/mysql.sock \
+ -DDEFAULT_CHARSET=utf8 \
+ -DDEFAULT_COLLATION=utf8_general_ci \
+ -DEXTRA_CHARSETS=gbk,gb2312,utf8,ascii \
+ -DENABLED_LOCAL_INFILE=ON \
+ -DWITH_INNOBASE_STORAGE_ENGINE=1 \
+ -DWITH_FEDERATED_STORAGE_ENGINE=1 \
+ -DWITH_BLACKHOLE_STORAGE_ENGINE=1 \
+ -DWITHOUT_EXAMPLE_STORAGE_ENGINE=1 \
+ -DWITHOUT_PARTITION_STORAGE_ENGINE=1 \
+ -DWITH_FAST_MUTEXES=1 \
+ -DWITH_ZLIB=bundled \
+ -DENABLED_LOCAL_INFILE=1 \
+ -DWITH_READLINE=1 \
+ -DWITH_EMBEDDED_SERVER=1 \
+ -DWITH_DEBUG=0
+
+
+ make && make install
+
+ if [ -d "/application/mysql-5.5.32" ];then
+         echo -e "\033[32mMySQL install successfully! \033[0m"
+ else
+         echo -e "\033[31mMySQL install failed,Please Contact Author! \033[0m"
+         exit 1
+ fi
+ cd ~
+ ln -s /application/mysql-5.5.32 /application/mysql
+ /bin/cp /application/tools/mysql-5.5.32/support-files/my-small.cnf /etc/my.cnf
+ echo 'export PATH=/application/mysql/bin:$PATH' >>/etc/profile
+ source /etc/profile
+ chown -R mysql.mysql /application/mysql
+ cd /application/mysql/scripts/
+ ./mysql_install_db --user=mysql --basedir=/application/mysql/ --datadir=/application/mysql/data/
+ /bin/cp /application/tools/mysql-5.5.32/support-files/mysql.server /etc/init.d/mysqld
+ chmod +x /etc/init.d/mysqld
+ /application/mysql/bin/mysqladmin -u root password 'liycwing123'
+ mysql -uroot -pliycwing123 -e "drop database test;"
+ mysql -uroot -pliycwing123 -e "delete from mysql.user where host='::1';"
+ mysql -uroot -pliycwing123 -e "delete from mysql.user where host='db2';"
+ mysql -uroot -pliycwing123 -e "delete from mysql.user where user='' and host='localhost';"
+ }
+
+ mysql
+
+
+ 
+  
+ 0
+
+
+
+
+ 
+
+
+ 

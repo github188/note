@@ -1,0 +1,3132 @@
+
+陈莉君
+
+提供机制，而非策略。策略相对短寿，只有机制才能长存。  大部分的编程问题都可以被切割成两个部分：“需要提供什么功能”（机制）和“怎样实现这些功能”（策略）。
+
+ 如果说机制是一种框架，那么，策略就是填充框架的一个个具体实体。机制提供的是一种开放而宽松的环境，而策略就是在这个环境下赖以生存的生命个体。比如，我们编写的一个程序，fork()以后，就成为一个个进程的生命个体。而操作系统所提供给我们创建、执行以及结束进程的各种原语-fork(),exex()和exit（）等是统管各种进程的机制。我们所创建进程的死活并不会影响机制本身。
+
+Unix的哲学：一个程序只做一件事，并做好；程序要能协作；程序要能处理文本流，因为这是最通用的接口；
+
+
+编程的核心是数据结构，而非算法；  ——Rob Pike
+
+
+1981，SCP(Seattle Computer Products)的Tim Paterson, QDOS(Quick and Dirty Opearation System)。5W
+
+Xenix 卖给了SCO
+
+172.16.100.77
+172.16.100.177
+192.168.0.100
+
+172.16.0.1, 192.168.0.1, 192.168.1.1
+
+pub/Tools/vnc-win32/
+
+博客：5w1h
+
+	what, why, when, who, where, how
+
+
+90, 80-89
+70-79
+60-69
+
+host: 宿主机，物理机
+guest: 虚拟机，实例
+	模拟出的硬件：CPU, Memory, I/O
+		Disk, Ethernet
+		Keyboard, Mouse
+
+
+vmnet1：仅主机
+vmnet8: nat
+
+
+Ctrl+Alt+Insert, F2 (BIOS)
+
+login: root (管理员)
+password: redhat
+
+prompt: 命令提示符
+
+人机交互接口：shell
+	GUI：Graphic User Interface
+		Windows
+		IOS, Android
+		X-Window
+			Gnome
+			KDE
+			Xfce
+	CLI: Command Line Interface
+		PowerShell
+		bsh
+		csh
+		tcsh
+		ksh
+		bash
+		zsh
+
+
+
+规范，协议
+
+实现
+
+shell环境：环境变量，配置文件
+
+root, redhat
+
+
+计算机=硬件+软件
+
+五大部件：
+	CPU: 运算器、控制器
+	存储器
+
+
+指令：微码编程，汇编编程
+	问题空间
+	解空间
+
+poll, interrupt
+
+语言：
+	解释型语言
+	编译型语言
+
+job: 
+	磁带，
+批处理作业系统：job1$$$$job2$$$$job3
+
+多任务：多个作业，一个监控程序
+
+系统调用：
+
+
+API：Application Programing Interface
+
+ABI: Application Binary Interface
+
+ANSI: 
+
+
+CPU：X86, X86-64, Power, PowerPC, Alpha, 安腾, UltraSparc, ARM, MIPS, M68000 
+
+m68k: 汇编, C
+
+x86
+
+glibc,
+
+GE, Bell, MIT
+	Multics
+
+Bell: Ken Thomson
+
+DEC: VAX, PDP
+	PDP-11, PDP-7: Unics --> Unix
+	B-->C
+
+	AT&T, Berkeley
+		Bill Joy: BSRG
+		BSD: 
+			sun microsystem
+		Microsoft: Xenix
+
+		DOS: 
+
+		SCO, SGI
+
+	Jobs
+
+VAX --> VMS
+
+	WindowsNT
+
+Novell, Netware
+
+BSD: BSRG, bsd 4.3-lite
+
+	FreeBSD: PC
+	OpenBSD: 
+	NetBSD:
+
+Unix: System V
+	SunOS  --> Solaris, ultrasparc
+		OpenSolaris: PC
+	AIX: IBM, powerpc
+	HP: HP-UX, alpha 
+
+Andrew: Minix
+
+Linus: 1991, 8月份
+
+MIT：Stallman 
+	Free, 自由运动
+	GNU：GNU is Not Unix.
+		GPL: General Public License
+
+	emacs, gcc, bash, vi
+
+Linux: kernel
+GNU:
+
+GNU/Linux: 开放源代码
+
+
+
+
+字长：32bits, 64bits
+
+Vmware虚拟网络类型：
+	桥接
+	nat
+	仅主机：伪网桥
+
+job: 
+
+多任务：process，进程：程序实例，程序子集
+
+生命周期：进程切换，上下文切换
+
+dll: Dynamic Link Libraries
+so: shared object
+
+IDE：
+
+进程：由父进程fork自身而来
+
+
+
+RedHat 6
+
+Redhat 9 --> Fedora
+Redhat Enterprise 6
+
+SUSE: OpenSUSE
+
+Debian --> Ubuntu --> Mint
+
+
+
+slackware
+
+LFS: Linux From Scratch
+
+
+Android: 
+	Linux kernel + busybox + java + android
+
+
+Linux: GNU/Linux
+	递归缩写：GNU is NOT Uinx
+		GPL, GPLv2, GPLv3, LGPL
+		BSD
+		Apache
+
+	版权：copyright, copyleft
+
+@课外扩展：了解这些开源协定；
+
+Redhat, SuSE, Debian
+
+程序包管理器：
+	二进制程序、配置文件、库文件、帮助文件
+
+	dpkg,
+	rpm
+
+X86-64, CentOS 6.4 32bits, test-3.2.1-CetnOS5.x86.rpm
+
+
+通用软件
+	Kernel
+		文件系统
+		网络协议栈
+		进程管理
+		加密/解密
+		驱动程序
+	
+应用软件
+
+系统管理：网络、文件（创建、删除、移动、权限）、用户、文件系统、加密/解密、内核（编译）、启动过程、程序包管理
+网络服务管理：Web(apache, nginx, mysql, php)、NFS/samba/ftp、Postfix/Dovecot、网络安全(iptables, tcp_wrapper)、DNS
+MySQL: CRUD、索引、存储引擎、备份、恢复、复制、集群、分片；
+集群：LB、HA、GFS
+Web: nginx、haproxy、keepalived、tomcat、分布式文件系统、CDN、NoSQL
+虚拟化：xen, kvm, lxc/openvz
+IaaS: Openstack
+自动化运维：
+大规模并行处理平台：hadoop
+系统原理及优化
+
+红帽公司：RHCSA、RHCE、RHCA
+
+
+
+清代大词人王国维：
+
+
+一、昨夜西风凋碧树，独上高楼，望断天崖路；
+
+二、衣带渐宽终不悔，为伊消得人憔悴；
+
+三、众里寻他千度，蓦然回首，那人却在灯火阑珊处；
+
+
+Unix: 
+
+Linux: Unix-like, 类Unix系统
+
+Linux: 内核
+
+GNU：GPL, gcc, emacs, vi,
+
+GNU/Linux: 
+
+Linux: www.kernel.org
+	init: upstart, systemd
+	shell: bash
+		bash-3.4.1, bash-4.2.2
+
+
+源码：
+	Linux发行版
+		RedHat: Fedora, CentOS, Mandriva
+			4: 2.4，2.1 3.1
+			5: 2.6, new-2.3  4.1
+		SuSE: SLES, OpenSuSE
+		Debian: Ubuntu
+		Gentoo:
+		LFS:
+		bt: BackTrace
+
+RedHat, SuSE: RPM
+Debian: deb
+
+
+硬盘：分区、格式化(创建文件系统)、
+
+安装程序：anaconda, kickstart, cobbler
+
+
+Linux终端：
+	串行终端：
+		/dev/ttyS#
+	物理终端:
+		/dev/console
+	虚拟终端：Ctrl+Alt+F[1-6]
+		图形终端：Ctrl+Alt+F7
+		startx &
+		/dev/tty#
+	伪终端（模拟终端）：远程连接，图形环境打开命令接口
+		/dev/pts/#
+
+# tty命令：显示当前终端对应终端设备文件
+# who命令：查看当前系统上登录的所有用户及其信息
+
+
+
+
+
+
+
+Ctrl+c: 取消当前程序
+Shift+PageUp/PageDown: 翻屏
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Linux哲学思想：
+1、一切皆文件；
+	open, read, write, close
+2、由众多目的单一应用程序组成：一个程序只做一件事，且做好；
+3、组合目的单一的小程序完成复杂任务；
+4、尽量避免跟用户交互；
+5、使用文本文件保存配置信息；
+6、提供机制，而非策略；
+
+
+6: 110
+	0000 0110
+13: 16
+13: 1101 
+
+
+
+自由软件的含义：
+	自由使用；
+	自由学习和修改；
+	自由分发；
+	自由创建衍生版；
+
+shell:
+	GUI:
+		Gnome
+		KDE
+		Xfce
+	CLI：
+		bsh
+		csh
+		tcsh
+		ksh
+		bash
+		zsh
+
+bash: 
+	管理员：提示符#
+	普通用户: 提示符$
+
+	环境变量：
+		PS1
+		# echo 
+		引用一个变量：${变量名}
+		[\u@\h \W]\$
+			\u: 当前用户
+			\h：主机名
+			\W: 工作目录的路径基名
+
+对于Linux来讲，路径分隔符：/
+	绝对路径：从顶层开始的路径
+	相对路径：从当前位置开始的路径
+
+		/x/y/z/m/n
+		/x/y/l/k
+		m
+
+
+
+		A=3
+		A=33
+
+Linux文件系统结构：
+	层次化
+
+	/：根
+
+
+用户：自己具有所有操作权限的目录，Home，家，主
+
+工作目录：当前所处的目录
+
+cd: change directory
+	cd 目标路径
+
+两个命令：
+	basename 路径：取路径基名
+	dirname 路径：取路径目录名
+
+Linux文件系统的特性：
+1、文件名可以使用除/以外的任意字符；但总长度不能超过255个；
+2、严格区分大小写；abc, Abc
+
+如何获取命令帮助：
+bash中，命令有两种类型：
+	builtin：在shell程序中实现的命令即为内建命令；
+	外部命令：在文件系统上的某位置有一个与命令名称对应的可执行文件；
+
+	如何判断：使用type命令
+
+shell: 事先通过一个变量(PATH)设定好了多个路径，当用户输入命令时，shell会自动到这些路径（由左向右）下查看与命令名称相同的可执行文件
+
+		查找到并执行过的命令会被保存至一个hash查找表中；可以使用hash命令查看此表；
+
+查看一个可执行程序的具体路径：使用“which 命令”
+
+
+
+命令的格式：
+	command options arguments
+	命令  选项  参数
+
+	选项：调整命令的执行特性的；
+		选项可以有多个；多个选项之间必须以空格分隔；
+		短选项：-char
+		长选项：--word
+		短选项可以合并；长选项一般不可以合并；
+		有些选项需要有参数；
+
+	命令参数：命令的作用对象；
+		有些命令可以带多个参数；各参数间需要使用空格分隔；
+
+获取帮助：
+	内置命令：
+		# help 命令名
+			例如：help cd
+	外部命令：
+		# 命令 --help
+		使用手册：manual
+			# man  命令
+				有很多使用段落：
+					NAME
+					SYNOPSIS
+					OPTIONS
+					EXAMPLES
+					DESCRIPTION
+			使用帮助中命令格式中的字符意义：
+				[]: 可选的部分；
+				{a|b}: 分组，a和b作为一个使用单元来使用，
+				|: 或者，只能选其一；
+				<>: 必不能少的部分；
+				...: 同类内容可以出现多个；
+
+			man的简要使用机制：
+				翻屏：
+					空格键：向文件尾部翻一屏；
+					b: 向文件首部翻一屏；
+					回车键：向文件尾部翻一行；
+					k: 向文件首部翻一行；
+					Ctrl+d: 向文件尾部翻半屏；
+					Ctrl+u: 向文件首部翻半屏；
+
+				文本搜索：
+					/keyword: 向文件尾部搜索；
+					?keyword：向文件首部搜索；
+						n：跟搜索命令相同的方向（下一个）；
+						N：路搜索命令相反的方向（上一个）；
+
+				q: 退出；
+
+
+			补充：man其实能为命令（普通命令、管理命令）、程序的配置文件格式、系统调用、库调用、游戏及其其它不便归类的文件提供帮助手册；
+				passwd命令，这个命令有个配置文件/etc/passwd
+
+			man命令的分段机制：
+				1-8：
+					1：用户命令
+					2：系统调用
+					3：库调用
+					4：设备文件
+					5：文件格式
+					6：游戏
+					7：杂项
+					8：管理命令
+
+			查看某关键字在哪些段落中有使用帮助，可以使用：
+				# whatis Keyword
+					精确查找
+					提示：如果whatis的数据尚未生成，可以使用makewhatis手动进行；
+				# man -k Keyword
+					模糊查找
+
+		info 命令：获取在线文档；
+		很多应用程序自带的有文档：/usr/share/doc/
+			ChangeLog, INSTALL, README
+		google: 
+			linux filetype:ppt
+			keyword site:magedu.com
+		RedHat官方文档：
+			www.redhat.com/docs/
+
+		shutdown，如何关机和重启；
+		reboot, halt, date, hwclock
+
+回顾：
+	shell: type，which, 环境变量PATH
+	引用变量：${变量名}
+	变量：内存空间
+	使用帮助：
+		# help 命令
+		# 命令  --help 
+		# man [section] 命令
+			1-8: 1, 8, 5
+			1G
+			G
+			q
+		# info
+		# 应用程序自带的文档：README, INSTALL， /usr/share/doc
+		# google
+		# 发行版的官方文档
+
+		命令的使用格式：
+			命令  选项   参数
+
+export LANG=en
+
+
+系统管理类的命令：
+	shutdown [option]...  TIME 
+		-r: 重启
+		-h：关机
+		-c：取消重启或关机命令
+
+	时间格式：
+		now
+		+#: #分钟以后
+		hh:mm 
+
+
+	reboot
+	halt -p
+	poweroff
+
+日期时间管理类命令：
+	date, hwclock
+
+	# date
+	# date MMDDhhmm[CC]YY.ss
+	# date [+FORMAT]
+		%Y：四位年份
+		%y: 2位年份
+		%m: 月
+		%M：分
+		%d: 日
+		%h: 
+		%H: 时
+		%S：秒
+
+		%D: 日期
+		%F: 日期
+
+		unix元年：1970-01-01 00:00:00
+		%s: timestamp
+
+
+
+	Linux有两个时钟：
+		硬件时钟：
+		软件时钟：开机时读取硬件时钟
+
+		hc
+		sys	
+
+		hwclock
+			-s: 以硬件时钟为准, --hctosys
+			-w: 以系统时钟为准, --systohc
+
+
+总结：man, info, help, date, hwclock, cal, shutdown, reboot, halt, poweroff, type, cd, which, dirname, basename, who, which, whatis, makewhatis, echo, hash, tty
+
+回顾：Linux文件系统
+
+/: 根分区，根文件系统，rootfs
+
+文件和目录管理类的命令：
+
+当前所在的目录：工作目录
+家目录，主目录
+
+shell的命令行展开：能够把一个特殊字符换成别的字符；
+	~: 指定用户的家目录；
+	{,}: 展开为多个条目；
+		x/{a,b} = x/a, x/b
+
+目录：
+	cd ~[username]
+	cd -：回到上一次所在目录；
+		/usr/share/doc/yum-3.2.1
+			cd - = /usr/share/doc
+			cd - = /usr/share/doc/yum-3.2.1
+			cd -
+
+	路径：
+		相对路径中：
+			.: 当前目录
+			..: 父目录
+
+	pwd: print working directory
+	mkdir: 创建目录
+		-p: 先创建父目录；
+		-v: 显示详细信息;
+
+		mkdir /a/b/c/d
+		x/a, x/b, x/a/m, x/a/n
+		mkdir -pv x/{a/{m,n},b}
+		a_c, a_d, b_c, b_d
+		mkdir a_c a_d b_c b_d
+		mkdir {a,b}_{c,d}
+
+			(x+y)(m+n) = xm + xn + ym + yn
+
+	rmdir：删除空目录
+
+练习：创建/tmp/mylinux/usr/local/bin, /tmp/mylinux/usr/local/sbin, /tmp/mylinux/etc/sysconfig, /tmp/mylinux/etc/init.d, /tmp/mylinux/bin, /tmp/mylinux/sbin
+
+# mkdir -pv /tmp/mylinux/{usr/local/{bin,sbin},etc/{sysconfig,init.d},bin,sbin}
+
+命令的执行结果：
+mkdir: created directory `/tmp/mylinux'
+mkdir: created directory `/tmp/mylinux/usr'
+mkdir: created directory `/tmp/mylinux/usr/local'
+mkdir: created directory `/tmp/mylinux/usr/local/bin'
+mkdir: created directory `/tmp/mylinux/usr/local/sbin'
+mkdir: created directory `/tmp/mylinux/etc'
+mkdir: created directory `/tmp/mylinux/etc/sysconfig'
+mkdir: created directory `/tmp/mylinux/etc/init.d'
+mkdir: created directory `/tmp/mylinux/bin'
+mkdir: created directory `/tmp/mylinux/sbin'
+
+练习：创建/tmp/a b
+
+shell中的引用：
+	''：强引用，变量替换不会进行
+	""：弱引用，能够执行变量替换
+	``：命令替换，引用命令的执行结果；命令替换的另外一符号：$(命令)；
+
+	变量替换：${变量名}
+		echo 
+练习：创建以当前时间命令目录，例如2014-02-11-16-25-20;
+
+# mkdir `date +%F-%H-%M-%S`
+
+练习：
+1、创建/tmp/etc/rc.d, /tmp/etc/rc.d/init.d, /tmp/etc/rc.d/rc0.d, /tmp/etc/sysconfig, /tmp/etc/pam, /tmp/etc/yum.repos.d/
+2、创建/tmp/etc/rc.d, /tmp/etc/rc.d/init.d, /tmp/etc/rc.d/rc0.d, /tmp/etc/sysconfig, /tmp/etc/pam, /tmp/etc/yum.repos.d/, /tmp/usr, /tmp/usr/share, /tmp/usr/share/doc, /tmp/usr/share/man, /tmp/usr/bin, /tmp/usr/sbin, /tmp/usr/lib, /tmp/usr/lib64
+
+
+
+命令总结: pwd, mkdir, rmdir
+
+shell的特性之三：命令历史
+	bash保存的过去曾经执行过的命令的列表；
+		当前shell进程的保存在缓冲区中；
+		缓冲区中的命令会在shell退出时保存至文件中, .bash_history
+
+	使用上下箭头键可以翻看此前曾经执行过的命令；
+
+	history快捷方式：
+		!#: #为命令历史列表中的命令编号；可用执行第#条命令；
+		!!: 执行上一条命令；
+		!-#: 执行命令历史列表中的倒数第#条命令；
+		!string: 执行命令历史列表中的最近一次以string开头的命令；
+
+		!$: 引用上个命令的最后一个参数； ESC, .
+
+	history
+		-c: 清空列表
+		-d #: 删除指定的历史命令
+		-a: 追加当前会话的命令历史至历史文件中去；
+
+	命令历史相关的环境变量：
+		HISTSIZE：命令历史中可以保存的命令的个数；
+		HISTFILE: 命令历史文件；
+		HISTFILESIZE：命令历史文件可以保存的命令的个数；
+		HISTCONTROL: 控制命令历史的生成；
+			ignoredups: 忽略记录重复的命令；连续的相同命令才为重复；
+			ignorespace: 不记录以空白字符开头的命令；
+			ignoreboth: 同时具有上面两种特性；
+
+	补充：Linux文件系统的另一特性：以点号开头的文件为隐藏文件; ls -a
+
+shell中的变量赋值：
+	变量名=值
+	注意：变量在赋值时不能使用$；
+		  变量名只能包含字母、数字和下划线，而且不能以数字开头；
+		  变量名区别大小写；
+
+FHS:
+
+	/bin: 所有用户可执行的程序
+	/sbin: 管理员可执行的程序
+		/usr/bin
+		/usr/sbin
+		/usr/local/bin
+		/usr/local/sbin
+	/boot: 存储系统引导文件：内核、ramfs文件、bootloader（grub）；
+	/dev: 设备文件存放目录；
+	/etc: 配置文件的存放目录；
+		/etc/sysconfig: 
+		/etc/init.d: 系统服务脚本
+	/home: 普通用户，默认在/home下有一个与其名称同名目录，作为用户的家目录；
+	/root: 管理员的家目录；
+	/lib, /lib64：库文件；
+	/media: 专用挂载位置，通常用来挂载便携式设备；
+	/mnt: 专用挂载位置，挂载额外存储设备；
+	/misc: 备用目录
+	/opt: 备用目录，但通常用来安装第三方软件；
+	/proc: 伪文件系统，内核参数的映射；
+	/sys: 伪文件系统，系统级别的用于配置外围设备秘的参数；
+	/srv: 为服务提供数据存放位置；
+	/tmp: 临时文件系统；
+	/usr: shared, readonly
+		/usr/include: 头文件
+	/var: 频繁发生变化的文件
+		/var/log
+		/var/lock
+		/var/run
+		/var/cache
+
+
+大纲
+
+	文件管理类的命令：
+	文件类型
+	用户和权限
+	bash的其它特性；
+	管道和重定向；
+	文本编辑器；正则表达式；
+	文件查找; 
+
+
+2014.02.13
+
+
+Cobbler: CentOS 6.5 
+
+回顾：
+
+1、命令历史、目录管理、命令行展开、引用、FHS
+
+history, -c, -d #, -a
+	HISTSIZE, HISTFILE, HISTFILESIZE, HISTCONTROL
+
+总结命令：mkdir, rmdir, cd, pwd
+	mkdir -p, -v
+	{}
+
+引用：
+	''
+	""
+	``, $()
+
+FHS: 
+	/bin, /sbin
+	/lib, /lib64
+	/etc
+	/boot
+	/home/USERNAME, /root
+	/dev
+	/media, /mnt
+	/proc, /sys
+	/srv
+	/usr
+		bin, sbin, lib, lib64, include, local
+	/var
+		cache, log, run, lock, tmp
+	/tmp
+	/opt
+	/misc
+
+
+文件管理类命令
+ls, 
+查看：cat, head, tail, less, more, tac
+复制：cp
+移动：mv
+删除：rm
+创建：touch
+元数据属性：stat
+查看内容类型：file
+文本编辑器：nano, vi
+
+
+Linux的文件类型：
+	普通文件：-, f
+	目录文件：d
+	链接文件(符号链接)：l
+	设备文件：
+		字符设备：c
+		块设备: b
+	命名管道：p
+	套接字文件：s
+
+Linux文件时间戳：
+	访问时间
+	修改时间
+	改变时间
+
+ls
+	-a: 显示所有文件，包含隐藏文件，
+	-l: 长格式
+		l          rwxrwxrwx.     1      root   root      2 Feb 12 09:49      rvi       -> vi
+		文件类型   文件权限   硬链接数   属主   属组      最近一次修改时间    文件名    原始文件
+	-d: 显示目录自身的信息, 通常与-l同时使用
+	-r: 逆序显示
+	-R: 递归显示
+	-h: 文件大小以易读格式显示
+	-i: inode号， index node
+
+tree
+	# cd /etc/yum.repos.d/
+	# wget http://172.16.0.1/centos6.5.repo
+	# rm CentOS-Base.repo
+	# yum -y install tree
+
+
+bash的特性之四：命令别名
+	alias: 显示当前shell中定义的所有别名；
+		?思考：
+	# alias 别名='原始命令'
+	# unalias 别名
+
+文本文件查看：
+	/etc/passwd
+	/bin/ls
+
+	file FILE...: 查看文件内容的格式
+
+	cat: 
+		-E: 显示行结束符
+		-v: 显示非打印字符
+		-e: 相当于-vE
+		-n: 显示时给行按顺序编号
+		-s: 多个连续的空白行显示为一个空白行
+
+		?思考：如何换行？
+			控制符，如换行符
+
+	tac:
+
+	more:
+
+	less:
+
+
+	head
+		-n #
+		-#
+	tail
+		-n #
+		-f
+
+
+	echo命令的用法：
+		-e
+			\0NNN
+				\033[##m
+					第一个#: 3表示前景色
+					   	     4表示背景色
+                    第二个#：颜色，1-7
+                \033[0m: 控制符结束
+        -n: 不为显示内容自动换行
+
+
+名称解析：name resolving
+
+命令总结：cat, tac, ls, more, less, tail, head, echo, tree
+
+文件操作：
+	touch
+	cp: copy
+		SRC, DEST
+		cp SRC  DEST
+		假如SRC是一个文件：
+			如果目标是一个文件且存在：覆盖
+			如果目标文件不存在：创建新文件
+			如果目标存在，且是个目录：复制源至目标目录，并保持原名
+
+		cp SRC... DEST
+		假如SRC有多个文件：
+			如果目标存在，且是一个文件：复制无法进行
+			如果目标存在，且是一个目录：复制各文件至目标目录中，并保持原名
+			如果目标不存在：复制无法进行
+
+		如果SRC只有一个且是目录：-r
+			如果目标是一个文件且存在：失败
+			如果目标文件不存在：创建新目录
+			如果目标存在，且是个目录：复制源目录至目标目录中，且保持原名
+
+bash中的特性之五：globbing，文件名通配
+	通配符：
+		*: 匹配任意长度的任意字符
+			abc, abb, abm, xab, ab
+			ab*
+			*ab
+			*ab*:
+		?：匹配任意单个字符
+		[]: 匹配指定字符范围内的任意单个字符
+			[xyz]
+			[a-z]
+			[A-Z]
+			[0-9]
+				[0-9a-zA-Z]
+
+			[[:upper:]]   所有大写字母
+			[[:lower:]]
+			[[:alpha:]]
+			[[:digit:]]
+			[[:alnum:]]
+			[[:space:]]
+			[[:punct:]]
+		[^]: 匹配指定字符范围外的任意单个字符
+			[^0-9], [^[:digit:]]
+
+练习：复制/var目录下所有以l开头，以一个小写字母结尾，且中间出现一位数字的文件或目录至/tmp下
+1*[0-9]*[[:lower:]]
+l*?*[[:lower:]]
+
+
+练习：如果符合条件是目录，也要复制；
+1、复制/etc目录下以p开头，中间跟了任意字符，并以d结尾的文件至/tmp目录中；
+2、复制/etc/目录下以p开头，中间跟了4个任意字符，并以d结尾的文件至/tmp/a目录中；如果a不存在，先创建出来；
+3、复制/etc/目录下以任意一位数字开头，并以非数字结尾的文件至/tmp/b目录中；
+4、复制/etc/目录下以非字母开头，后面跟了一个字母及其它任何长度字符的文件至/tmp/c目录中；
+
+1、cp -r /etc/p*d /tmp
+2、cp -r /etc/p????d  /tmp/a
+3、cp -r /etc/[0-9]*[^0-9] /tmp/b
+4、cp -r /etc/[^[:alpha:]][[:alpha:]]* /tmp/c
+
+
+cp命令的长用选项：
+	-r：递归
+	-i: 交互
+	-d: 当源为链接文件时，复制链接文件本身而非指向的源文件
+	-a: 相当于-dr
+	-p: 保持原有属性
+	-f: 强制
+
+mv: 移动文件，用法跟cp相近
+	可以直接移动目录，而无须-r选项; 
+	mv /tmp/passwd /tmp/abc
+
+
+rm: 移除文件
+	删除非空目录：# rm -rf 
+
+总结命令：cp, mv, rm
+总结globbing: *, ?, [], [^]
+
+
+	文件系统：
+
+
+
+stat命令，文本编辑器：nano
+
+touch
+
+	access time, atime
+	modify time, mtime
+	change time, ctime
+
+	-c: 不创建空文件
+	-a: 仅修改访问时间
+	-m: 仅修改修改时间
+	-t STAMP: [CC]YYMMDDhhmm.ss
+
+stat命令：
+	stat FILE...
+
+nano, vi
+
+Linux编辑器：
+	行编辑器：sed
+	全屏编辑器：nano, vi, vim
+
+# nano FILE...
+# nano
+	/tmpp/abc
+
+
+
+用户和权限管理:
+
+1、用户是什么？
+2、没有用户，可否？
+
+file1: Tom
+file2: Jerry
+
+用户：资源分配，是安全权限模型的核心要素之一
+密码：用户认证
+
+多用户的操作系统：
+
+信息库：用户 密码
+
+名称解析：User IDentifier, UID
+
+10: 
+
+用户容器：组（group），角色（role）
+	组名，Group IDentifier， GID
+
+	解析：在数据库按搜索码查找到对应的条目，并找与之对应额外其它数据过程
+
+	数据库
+		文本文件
+		SQL数据库
+		ldap数据库
+
+		/etc/passwd：
+
+		加密方法：
+			对称加密：DES, 3DES, AES
+			公钥加密：DSA, RSA
+			单向加密：雪崩效应，定长输出，不可逆
+				MD5: 信息摘要，128bits
+				SHA1: 安全的hash算法, 160bits
+				SHA256：
+				SHA512：
+
+		密码信息库：/etc/shadow
+
+			Tom:mageeduabce,    $6$abce$fkdlagjdkalghio3qu4389qjtrkiejgr
+			Jerry:mageeduxyzm   $6$xyzm$878956ukijotrjiytoeutyvimyeuiore
+
+md5sum, sha1sum
+
+组：用户容器，角色
+	/etc/group
+	/etc/gshadow
+
+安全上下文：
+	运行中的进程有其属主和属组：
+
+大纲：useradd, id, passwd, usermod, chsh, chage, chfn, userdel, groupadd, groupmod, groupdel, su
+
+
+创建用户：
+	useradd UserName
+
+	/etc/passwd:
+		用户名:x:UID:基本组ID:comment信息:HOME:默认shell
+
+	useradd: adduser
+		-u UID：指定UID
+		-g GID: 指定GID，即指定用户的基本组，但GID要事先存在
+		-G GID：指定用户的额外组，组要事先存在；
+		-d /path/to/somewhre: 
+		-c "Comment"： 
+		-s /path/to/shell: 指定默认shell，应该指定使用/etc/shells文件中出现的shell；
+
+		-m: 创建用户时，强制给用户创建家目录；
+		-M: 创建用户，但不创建家目录;
+
+		-r: 创建系统用户
+			id: 1-499
+			不会为用户创建家目录
+			默认shell为/sbin/nologin
+
+		-D: default，为useradd命令创建的用户指定新的默认值
+
+	groupadd GrpName
+		-g GID: 创建组并为其指定GID
+
+
+
+用户类别：
+	管理员：0
+	普通用户：1-65535
+		系统用户：1-499
+		登录用户：500+
+
+用户组：
+	管理员组
+	普通组
+
+	以用户为视角，组可为两类：
+		基本组: 显示在/etc/passwd中GID字段组，为用户的基本组；
+		额外组，附加组: /etc/group
+
+
+	userdel: 删除用户, 默认会保留家目录
+		格式：userdel UserName
+		-r: 一并删除家目录
+
+总结：
+	/etc/passwd：
+		Username:x:UID:GID:Comment:Home:Shell
+	/etc/group：
+		GroupName:x:GID:User List
+
+	/etc/skel, /etc/default/useradd
+
+
+设定用户密码: passwd
+	普通用户：passwd
+	管理员：
+		改自己密码：passwd
+		改其它用户密码：passwd UserName
+
+	密码安全性策略：足够复杂
+		够长；
+		交叉应用数字、大写字母、小写字母和特殊中的至少三种；
+		尽量避免使用易猜测的密码；
+		定期更换；
+
+/etc/shadow文件的格式：
+	UserName:加密的密码:最近一次密码修改时间:最短使用期限:最长使用期限:警告区间:非活动区间:帐号的过期期限:预留段
+
+	-l: 锁用户
+	-u: 解锁
+
+设定组密码：gpasswd GroupName
+
+如何修改用户的属性定义：
+	修改用户默认shell: chsh
+	修改用户注释：chfn
+
+	usermod: 
+		-u UID:
+		-g GID:
+		-G GID: 默认会覆盖原有的附加组；如果是添加，则同时使用-a选项; 
+		-c String: 
+		-d /path/to/New_Home： 默认不会迁移用户的家目录；如果要迁移，则同时使用-m
+		-s SHELL: 
+		-l New_login_name: 	
+
+		-L: 锁定用户帐号
+		-U: 解锁
+
+如何修改组属性定义：
+	groupmod: 
+		-g GID
+		-n New_Group_Name: 
+
+修改帐号日期属性：chage
+	-E
+	-I
+	-m
+	-M
+	-W
+
+查看用户相关信息id：
+	id UserName
+		-u: 显示UID，跟-n一起使用则显示用户名
+		-g: 显示基本组ID，跟-n一起使用则显示基本组名
+		-G: 显示所有组ID，跟-n一起使用则显示所有组名
+
+组管理相关命令总结：
+	groupadd
+	groupmod
+	groupdel
+	gpasswd
+
+su: Switch User
+	切换用户：
+		su Username
+			-l
+			-c 'COMMAND'
+
+练习：
+1、创建一个用户mandriva，其ID号为2002，基本组为distro（组ID为3003），附加组为linux；
+# groupadd linux
+# groupadd -g 3003 distro
+# useradd -u 2002 -g distro -G linux mandriva
+
+2、创建一个用户fedora，其全名为Fedora Community，默认shell为tcsh；
+# useradd -c "Fedora Community" -s /bin/tcsh fedora
+
+3、修改mandriva的ID号为4004，基本组为linux，附加组为distro和fedora；
+# usermod -u 4004 -g linux -G distro,fedora mandriva
+
+4、给fedora加密码，并设定其密码最短使用期限为2天，最长为50天；
+# passwd fedora
+# chage -m 2 -M 50 fedora
+
+5、将mandriva的默认shell改为/bin/bash; 
+
+
+权限、shell特性
+
+
+
+
+2014/02/14: 元宵节
+
+回顾：
+文件管理：ls, cat, tac, tail, head, more, less, cp, mv, rm, touch, stat, file, nano
+用户管理：useradd, usermod, userdel, passwd, groupadd, groupmod, groupdel, id, su, chage, chfn, chsh, newgrp, gpasswd
+
+用户类型：
+	管理员：0
+	一般用户：1-65535
+		系统用户：1-499
+		普通用户：500+
+
+		userdd 
+			-r: 
+
+组类型：
+	基本组
+	附加组
+
+Linux文件类型：
+	普通文件：-,f
+	目录：d
+	链接文件：l
+	设备文件：
+		字符设备：c
+		块设备：b
+	命名管道：p
+	套接字文件：s
+
+	-d
+	-g -n
+	-l
+
+
+
+权限管理: owner, group
+
+	属主，属组，其它
+
+	file1: fedora, fedora
+
+权限：read, write, execute
+		r, w, x
+
+		文件：
+			r: 可以使用内容查看类的命令来显示其相关内容；
+			w: 可以使用编辑器修改其内容；
+			x: 可以将其发起一个进程；
+
+		目录：
+			r: 可以使用ls命令查看目录内容的文件信息；
+			w: 可以创建、删除文件；
+			x: 可以使用ls -l命令查看目录内容的文件信息，并且可以使用cd命令切换此目录为工作目录；
+
+
+		用户的不拥有某位权限，则使用-占位；
+		r-x: 
+		r--
+		rw-
+
+		-rw-r--r--   1 root root      852 Jul 30  2013 bincp.sh
+
+		000：---, 0
+		001: --x, 1
+		010: -w-
+		011: -wx
+		100: r--
+		101: r-x
+		110: rw-, 6
+		111: rwx, 7
+
+
+
+		6: rw-
+		5: r-x
+
+		640: rw-r-----
+
+元数据，属性，inode:
+
+修改属主、属组：仅管理员可执行，chown, chgrp
+改文件权限：chmod
+
+chmod命令：
+	操作三类用户的权限：使用8进制形式
+		chmod [-R] OCTAL-MODE file...
+	操作指定类别用户的权限：使用u,g,o,a来赋权,基于=或+/-来进行
+		u: 属主
+		g: 属组
+		o: 其它
+		a: 所有
+
+		=：操作指定类别用户的权限；u=, ug=,     u=,g=
+		+/-: 操作指定类别用户的单个权限: u-x, g+r, o-x, +x
+
+	参照其它文件的权限为当文件赋权
+		--reference=要参照的文件   要修改权限的文件
+
+	rw-r--r--: rwxr-xr--
+	755:rwxr-xr-x
+	644:rw-r--r--
+	700:rwx------
+	600
+	750
+	640:rw-r-----
+	040
+
+	umask
+		创建文件：666-umask
+			文件默认决不允许出现执行权限；
+			umask 023
+			666-023=644
+		创建目录：777-umask
+
+	root: 022
+	如果用户名和基本组组名一致：002；否则则为022；
+
+修改文件的属主或属组：chown, chgrp
+	-R: 递归
+	--reference=
+
+	chown [option] UserName[{:|.}GroupName] file...
+
+权限应用模型：
+	进程的属主，是否与文件的属主相同；如果相同，进程则以文件属主的权限来访问文件；否则
+	进程的属主所属的组，是否其中之一与文件的属组相同；如果相同，进程则以文件属组的权限来访问文件；否则，
+	进程则以文件的其它用户的权限来访问文件；
+
+
+
+
+练习：
+1、新建一个用户openstack，但不给其创建家目录；创建完成后使用su命令切换至此用户，查看其命令提示符及PATH和HOME两个环境变量的值；
+# useradd -M openstack
+# su - openstack
+# echo $PATH $HOME
+
+2、复制/etc/skel目录为/home/openstack；
+# cp -r /etc/skel /home/openstack
+
+
+3、改变/home/openstack及其内部文件的属主属组均为openstack；
+# chown -R openstack.openstack /home/openstack
+
+
+4、/home/openstack及其内部的文件，属组和其它用户没有任何访问权限；
+# chmod -R go= /home/openstack
+# su - openstack
+# echo $PATH $HOME
+
+
+练习：
+完成以下任务：
+  （1）新建系统组mysql；新建系统用户mysql，属于mysql组，要求其没有家目录且shell为/sbin/nologin；
+  # groupadd -r mysql
+  # useradd -r -s /sbin/nologin -g mysql mysql
+
+  （2）新建GID为600的组magedu；新建用户gentoo，要求其家目录为/users/gentoo，密码同用户名；
+  # groupadd -g 600 magedu
+  # mkdir /users
+  # useradd -d /users/gentoo gentoo
+  # passwd gentoo
+
+
+  （3）新建用户centos，其家目录为/users/centos，密码同用户名；
+  # useradd -d /users/centos centos
+  # passwd centos
+
+
+  （4）新建用户www，其家目录为/users/www；删除www用户，但保留其家目录；
+  # useradd -d /users/www www
+  # userdel www
+
+  （5）用户gentoo和centos均以magedu为其附加组；
+  # usermod -a -G magedu gentoo
+  # usermod -a -G magedu centos
+         
+总结权限管理：chmod, chown, chgrp, umask
+
+
+
+bash介绍：
+	shell: 人机交互界面
+		sh、csh、tcsh、bash、ksh、dash、zsh
+
+	bash: 命令解释器
+
+bash特性之六：bash的快捷键
+	Ctrl+a: 跳至命令行首
+	Ctrl+e:           尾
+	Ctrl+u: 删除命令行首至当前光标所在处的内容
+	Ctrl+k: 删除当前光标所有处至命令行尾的内容
+	Ctrl+l: 清屏，相当于clear命令
+	Ctrl+c: 取消或终止；
+	Ctrl+z: 将当前命令送至后台
+
+bash特性之七：bash补全
+	命令补全:
+		shell命令：内部，外部
+			外部：在系统某路径下有一个可执行程序
+		PATH，是一组由冒号分隔的路径
+		使用tab键执行补全
+	路径补全：在给出的打头路径补全；如果没有打头路径，则为当前；
+
+#,$ 
+	bash: 解释器，解析器
+
+
+编程语言：
+	C：关键字，选择、顺序
+		编译器：语言平台
+		解释器：语言平台
+
+	程序执行逻辑：
+		顺序执行
+		选择执行（条件）
+		循环执行：1+...+100
+
+
+	动态语言：
+		解释型
+			perl, bash, python
+	静态语言:
+		编译型
+			C, C++
+
+	变量：
+		数据存储格式：
+			ASCII：11
+			Binary：11
+
+		按照其变量是否需要严格定义其类型来划分：
+			强类型语言：C
+			弱类型语言：bash
+
+		定义变量类型的作用：
+			1、数据存储格式；
+			2、数据的有效存储范围；
+			3、比较机制不同；
+			4、参与的运算类型不同；
+
+			字符型
+
+			数值型：正，负
+				精确数值型：
+					整型: 
+				近似数值型：
+					浮点数
+						单精度
+						双精度
+
+			布尔型：
+
+		bash特性之八：提供编程环境
+			变量
+			程序控制
+
+		#!/bin/bash
+			shebang
+
+练习：写一个脚本
+1、创建一个组newgroup, id号为4000；
+2、创建一个用户mageedu1, id号为3001，附加组为newgroup；
+3、创建目录/tmp/hellodirxyz
+4、复制/etc/fstab至上面的目录中
+5、改变目录及内部文件的属主和属组为mageedu1;
+6、让目录及内部文件的其它用户没有任何权限；
+
+
+		#!/bin/bash
+		# Description:
+		# Version:
+		# Datetime:
+		# Author:
+
+		myGroup="newgroup1"
+		myUser="mageedu2"
+		myDir="/tmp/hellodirxyz1"
+		myID=3002
+
+		groupadd -g 4001 $myGroup
+		useradd -u $myID -G $myGroup $myUser
+		mkdir $myDir
+		cp /etc/fstab $myDir
+		chown -R $myUser:$myUser $myDir
+		chmod -R o= $myDir 
+
+		unset myGroup myUser myID myDir
+
+回顾：权限、bash
+
+权限和用户：Linux
+
+进程：属主、属组
+
+文件：属主、属组、其它
+
+r、w、x
+
+chmod:
+	OCTAL-MODE
+	u,g,o,a = 
+	u,g,o,a +/-
+
+bash特性：
+	快捷操作、补全
+
+	ELF：
+	#!/bin/bash
+
+	程序=指令+数据
+		变量：
+			弱类型语言：
+				1、不强制区分变量的类型，无论存储何种数据，均以字符格式进行；
+				2、无须事先声明；用到时，直接使用，直接赋值；
+
+			bash: 动态编程语言，是弱类型语言；
+
+	bash的特性之九：bash中的变量
+		变量的类型：
+			本地变量：只对当前shell进程有效，对其子shell以及其它shell都无效；
+				定义变量： [set]Var_Name="Value"
+				引用变量： ${Var_Name}
+				撤销变量： unset Var_Name
+			局部变量：仅对局部代码生效
+				local Var_Name="Value"
+			环境变量：对当shell进程及其子shell有效；
+				export Var_Name="Value"
+				Var_Name="Value"
+				export Var_Name
+				导出
+			位置变量：
+				$1, ..., $n
+				./first.sh 2 8
+			特殊变量：
+				$0: 脚本名称自身
+				$?: 上一条命令的执行状态；
+					状态用数字来表示：0-255;
+						0: 成功
+						1-255: 失败
+				$$
+				$!
+				$#
+				$*
+
+
+		变量的命名要求：
+			只能使用数字、字母和下划线组成；
+			不能以数字开头；
+			不能使用程序中的关键字；
+			见名知义；totalWeight 
+
+
+例：新建十个用户：mageduuser1-mageeduuser10
+# useradd mageeduuser1
+
+
+
+练习：
+完成以下任务：
+  （1）新建系统组mysql；新建系统用户mysql，要求其没有家目录且shell为/sbin/nologin；
+
+  （2）新建GID为600的组magedu；新建用户gentoo，要求其家目录为/users/gentoo，密码同用户名；
+
+
+  （3）新建用户centos，其家目录为/users/centos，密码同用户名；
+
+
+  （4）新建用户www，其家目录为/users/www；删除www用户，但保留其家目录；
+
+  （5）用户gentoo和centos均以magedu为其附加组；
+         
+
+完成以下任务：
+	(1) 切换至centos用户，定义本地变量FirstVar，其值为“test variable”；
+	# su - centos
+	# FirstVar="test variable"
+
+	(2) 另启一个终端，使用gentoo用户查看FirstVar变量的值；如果没有值，为什么？
+
+	(3) 声明一个变量CurTime，其值为当前系统时间；
+	# curTime=`date +%T`
+
+	(4) 使用echo命令显示“The current time is：”，is后跟上CurTime变量的值；
+	# echo "The current time is: $curTime."
+
+	(5) 回至centos用户的终端：复制/etc/pam.d目录至/tmp目录中，并重命名为test；
+	# cp -r /etc/pam.d /tmp/test
+
+	(6) 声明变量fileName，其值为刚才复制的目录/tmp/test；
+	# fileName="/tmp/test"
+
+	(7) 修改变量fileName所表示的目录及其内部所有文件的其它用户均没有任何访问权限；
+	# chmod -R o= $fileName
+
+	(8) centos用户是否可以修改变量fileName所表示的目录的属主和属组？如果能，将其改为gentoo用户和gentoo组；如果不能，则使用root用户修改；
+
+
+
+set
+
+环境变量：用来bash的工作特性，用于保存当前会话的属性信息；
+
+显示所有环境变量：export, env, printenv
+定义：export Var_Name="Value"
+	PATH, PS1
+
+
+bash的配置文件：持久保存用户配置
+	profile类：为交互式登录的用户提供配置
+		/etc/profile：全局
+		/etc/profile.d/*.sh：全局
+		~/.bash_profile：个人配置，仅对当前用户有效
+
+		功能：
+			设定环境变量
+			运行命令或脚本
+
+	bashrc类：非交互工登录用户提供配置
+		/etc/bashrc: 全局
+		~/.bashrc: 个人配置
+
+		功用：
+			设定本地变量
+			定义命令别名
+
+
+	登录类型：
+		交互式登录：
+			直接通过终端输入用户信息登录系统；
+			su - UserName或su -l UserName；
+
+		非交互式登录：
+			su UserName
+			图形界面的终端
+			执行脚本
+
+新增配置的生效方式：
+	通知shell重读配置文件的命令：
+		source (.)
+		. FILE
+	重新登录
+
+
+
+交互式登录用户：
+	/etc/profile --> /etc/profile.d/*.sh --> ~/.bash_profile --> ~/.bashrc --> /etc/bashrc
+
+非交互式登录用户：
+	~/.bashrc --> /etc/bashrc --> /etc/profile.d/*.sh
+
+
+？思考：
+	Java, JVM, /usr/java/latest/bin
+
+
+bash脚本：面向过程的编程中
+	顺序执行：默认法则，逐条执行各语句
+	选择执行：分支，条件判断，符合条件的分支予以执行；
+	循环执行：将同一段代码反复执行有限次，所以，循环必须有退出条件，否则将陷入死循环；
+
+程序代码：语句和表达式组成
+
+	控制语句：
+
+		bash循环控制语句：
+			for
+			while
+			until
+
+	for循环：
+		for var_Name in 列表; do
+			语句1
+			语句2
+			...
+		done
+
+		for userName in gentoo mandriva debian; do
+			useradd $userName
+		done
+
+	语法错误检测：
+	# bash -n 脚本文件
+
+写一个脚本：添加10个用户，user101-user110
+
+	列表的生成方法：
+		生成数字序列：{start..end}、seq [start] [step] end
+
+		#!/bin/bash
+
+		for userName in `seq 101 110`; do
+		  useradd user$userName
+		  echo "Add user$userName successfully."
+		done
+
+练习：写一个脚本，用file命令显示/var/log目录下每个文件的内容类型；
+	提示：列表生成的方法为/var/log/*
+
+#!/bin/bash
+#
+dirName=/var/log
+for fileName in $dirName/*; do
+	file $fileName
+done 
+
+bash -n /path/to/script
+
+
+循环：退出条件, 元素列表遍历结束
+
+for varName in LIST
+do
+	statement1
+	...
+done
+
+
+练习：写一个脚本，
+1、创建/tmp/scripttest目录，用变量保存目录名；
+2、在目录里创建测试文件tfile1-tfile20;
+3、创建用户testuser1和testuser2; 
+4、将tfile1-tfile10的属主和属组改为testuser1；
+5、将tfile11-tfile20的属主和属组改为testuser2；
+
+#!/bin/bash
+dirName=/tmp/scripttest
+
+mkdir $dirName
+for fileNo in {1..20}; do
+	touch $dirName/tfile$fileNo
+	echo "Create $dirName/tfile$fileNo finished"
+done 
+
+useradd testuser1
+useradd testuser2
+
+for fileNo in {1..10}; do
+	chown testuser1:testuser1 $dirName/tfile$fileNo
+done
+
+for fileNo in {11..20}; do
+	chown testuser2:testuser2 $dirName/tfile$fileNo
+done
+
+
+#!/bin/bash
+dirName=/tmp/scripttest
+
+useradd testuser1
+useradd testuser2
+
+mkdir $dirName
+for fileNo in {1..10};do
+	touch $dirName/tfile$fileNo
+	chown testuser1:testuser1 $dirName/tfile$fileNo
+done
+
+
+
+
+
+
+
+文本处理类的命令：wc, word count
+	wc [option] [file]...
+		-l: 统计行数
+		-c: 统计字节数
+		-w；统计单词数
+
+	tr: 转换字符或删除字符
+		tr '集合1' '集合2'
+		tr -d '字符集合'
+
+	cut: 
+		This is a test line.
+		-d字符：指定分隔符
+		-f#: 指定要显示字段
+			单个数字：一个字段
+			逗号分隔的多个数字：指定多个离散字段
+			-：连续字段，如3-5；
+
+	sort: 按字符进行比较
+		sort [option] file...
+			-f: 忽略字符大小写；
+			-n: 比较数值大小；
+			-t: 指定分隔符
+			-k: 指定分隔后进行比较字段
+			-u: 重复的行，只显示一次；
+
+	uniq: 移除重复的行
+		-c：显示每行重复的次数
+		-d：仅显示重复过的行
+		-u: 仅显示不曾重复的行
+
+练习：
+1、统计/bin、/usr/bin、/sbin和/usr/sbin等各目录中的文件个数；
+# ls /bin | wc -l
+2、显示当前系统上所有用户的shell，要求，每种shell只显示一次；
+# cut -d: -f7 /etc/passwd | sort -u
+3、取出/etc/passwd文件的第7行；
+# head -7 /etc/passwd | tail -1
+4、显示第3题中取出的第7行的用户名；
+# head -7 /etc/passwd | tail -1 | cut -d: -f1
+
+# head -7 /etc/passwd | tail -1 | cut -d: -f1 | tr 'a-z' 'A-Z'
+5、统计/etc目录下以P或p开头的文件个数；
+# ls -d /etc/[Pp]* | wc -l
+
+
+
+
+
+练习：写一个脚本，用for循环实现
+显示/etc/init.d/functions、/etc/rc.d/rc.sysinit和/etc/fstab各有多少行；
+
+#!/bin/bash
+for fileName in /etc/init.d/functions /etc/rc.d/rc.sysinit /etc/fstab; do
+	wc -l $fileName
+done
+
+#!/bin/bash
+for fileName in /etc/init.d/functions /etc/rc.d/rc.sysinit /etc/fstab; do
+	lineCount=`wc -l $fileName | cut -d' ' -f1`
+	echo "$fileName: $lineCount lines."
+done
+
+#!/bin/bash
+for fileName in /etc/init.d/functions /etc/rc.d/rc.sysinit /etc/fstab; do
+	echo "$fileName: `wc -l $fileName | cut -d' ' -f1` lines."
+done
+
+练习：写一个脚本
+将上一题中三个文件的复制到/tmp目录中；
+用for循环实现，分别将每个文件的最近一次的修改时间改为2011年9月15号13点27分；
+#!/bin/bash
+for fileName in /etc/init.d/functions /etc/rc.d/rc.sysinit /etc/fstab; do
+	cp $fileName /tmp
+	baseName=`basename $fileName`
+	touch -m -t 201109151327 /tmp/$baseName
+done
+
+
+练习：写一个脚本
+显示/etc/passwd中第3、7和11个用户的用户名和ID号；
+#!/bin/bash
+#
+for lineNo in 3 7 11; do
+	userInfo=`head -n $lineNo /etc/passwd | tail -1 | cut -d: -f1,3`
+	echo -e "User: `echo $userInfo | cut -d: -f1`\nUid: `echo $userInfo |cut -d: -f2`"
+done
+
+
+for：通过使用一个变量去遍历给定列表中的每个元素，在每次变量赋值时执行一次循环体，直至赋值完成所有元素退出循环；
+	总结：生成列表的方式
+		1、直接给出列表；
+		2、使用文件名通配的机制生成列表
+		3、可以使用{}或seq命令生成数字序列  1, $lineCount   `seq 1 $lineCount`  {1..$lineCount}
+		4、使用命令生成
+
+
+2013.02.06
+回顾：
+变量：
+	本地变量(set)、局部变量(local)、环境变量(export)、位置变量($1,...)、特殊变量($?、)
+文本处理命令：
+	wc, cut, tr, sort, uniq
+
+
+
+shell的特性之十：输入输出重定向和管道
+
+I/O: 设备, 寄存器，
+	I/O port
+
+Linux: 一切皆文件
+	
+名称解析：
+
+文件描述符：file descriptor， FD
+	web server: 进程：（）
+
+	INPUT：标准输入，stdin, 0 
+	OUPUT: 标准输出，stdout, 1
+		   标准错误：stderr, 2
+
+I/O重定向
+
+	输入重定向：<, <<
+		<: 输入重定向
+		<< EOF: 此处创建文件, Here Document
+			常用于在脚本中创建文件或生成菜单；
+
+		a: show user info
+		d: show disk info
+		c: show cpu info
+		b: show group info
+
+
+	输出重定向：>, >>
+		>: 覆盖输出
+		>>: 追加输出
+		set -C：禁止使用覆盖重定向至已经存在的文件;
+		set +C: 关闭上述特性；
+		>|：在-C特性下，强制使用覆盖重定向；
+
+		/dev/null: bit bucket，位桶
+
+	错误重定向：2>, 2>>
+		2>: 覆盖
+		2>>: 追加
+
+	同时重定标准输出和错误输出：
+		COMMAND > /path/to/outfile 2> /path/to/errfile
+		COMMAND &> /path/to/somefile
+		COMMAND > /path/to/somefile 2>&1  
+
+管道：
+	Linux: 
+		使用目的单一的小程序
+		组合小程序完成复杂任务
+
+		COMMAND1 | COMMAND2 | COMMAND3 | ...
+
+
+bash中的算术运算
+	
+	declare
+		-i: 整型变量
+		-x: 环境变量, 类似于export
+
+	let varName=算术表达式
+	varName=$[算术表达式]
+	varName=$((算术表达式))
+	varName=`expr $num1 + $num2`
+
+	如果计算结果中存在小数，将会被圆整：
+
+	操作符：+, -, *, /, %
+		+=, -=, *=, /=, %=
+
+	totalWeight=40
+
+	totalWeight=$[$totalWeight+1]
+	let totalWeight+=1
+	let totalWeight++
+
+练习：计算100以内所有正整数之和；
+#!/bin/bash
+#
+declare -i sum=0
+for i in {1..100}; do
+  let sum=$sum+$i
+done
+
+echo "The sum is: $sum."
+
+
+
+知识点：bash的单步执行：
+	bash -x /path/to/script
+
+
+
+练习：分别计算100以内所有偶数之和和奇数之和；
+#!/bin/bash
+declare -i oddSum=0,evenSum=0
+
+for i in `seq 1 2 100`; do
+  oddSum=$[$oddSum+$i]
+done
+
+for j in `seq 2 2 100`; do
+	evenSum=$[$evenSum+$j]
+done
+
+echo "The Even Sum is: $evenSum, the odd sum is: $oddSum"
+
+练习：计算当前系统所有用户的ID之和；
+
+#!/bin/bash
+declare -i uidSum=0
+for i in `cut -d: -f3 /etc/passwd`; do
+	uidSum=$[$uidSum+$i]
+done
+
+echo "The UIDSum is: $uidSum."
+
+练习：计算/etc/rc.d/rc.sysinit、/etc/init.d/functions和/etc/issue三个文件的字符数之和；
+#!/bin/bash
+#
+declare -i bytesCount=0
+for file in /etc/rc.d/rc.sysinit /etc/init.d/functions /etc/issue; do
+	let bytesCount=$bytesCount+`wc -c $file | cut -d' ' -f1`
+done
+
+echo $bytesCount
+
+练习：新建用户tmpuser1-tmpuser10，并计算他们的id之和；
+#!/bin/bash
+#
+declare -i uidSum=0
+for i in {1..10}; do
+ 	useradd tmpuser$i 
+ 	let uidSum=$uidSum+`id -u tmpuser$i`
+done
+
+
+知识点：位置参数
+	位置参数：
+		/tmp/test.sh 3 89 
+		$0: 脚本自身
+		$1: 脚本的第一个参数
+		$2
+		...
+
+	特殊变量：
+		$#: 位置参数的个数；
+		$*,$@: 引用所有的位置参数；
+
+知识点：交互式脚本
+	read
+
+知识点：给变量以默认值
+	varName=${varName:-value}
+		如果varName不空，则返回varName的值；否则，则返回value；
+		如果varName不空，则其值不变；否则，varName会使用value作为其值；
+
+练习：通过键盘给定一个目录路径，默认为/，来判断目录下文件内容的类型；
+
+
+回顾：重定向、管道、算术运算、位置参数、特殊变量、交互式脚本
+
+
+文本处理工具之grep、egrep和fgrep：
+
+grep: （global search regular expression(RE) and print out the line
+
+文本搜索工具，根据用户指定的文本模式对目标文件进行逐行搜索，显示能够被模式所匹配到的行
+
+格式：grep [options] 'PATTERN' file,...
+	--color=auto
+
+正则表达式：是一类字符所书写出的模式(pattern)
+	元字符：不表示字符本身的意义，用于额外功能性的描述
+
+	基本正则表达式和扩展正则表达式
+
+	基本正则表式的元字符：grep -E
+		字符匹配：
+			.: 任意单个字符
+			[]: 指定范围内的任意单个字符
+				[0-9], [[:digit:]]
+				[a-z], [[:lower:]]
+				[A-Z], [[:upper:]]
+				[[:alpha:]]
+				[[:alnum:]]
+				[[:space:]]
+				[[:punct:]]
+			[^]：指定范围外的任意单个字符
+		次数匹配：用来指定匹配其前面的字符的次数
+			*: 任意次
+				例子：x*y, xxy, xy, y, 
+				.*: 匹配任意长度的任意字符
+			\?: 0次或1次
+				x\?y, xy, y, xxy
+
+				贪婪模式：尽可能的长的去匹配字符；
+			\{m\}: 匹配m次
+			\{m,n\}:
+			\{m,\}: 至少m次;
+			\{0,n\}:至多n次;
+		位置锚定：用于指定字符出现的位置
+			^: 锚定行首
+				^Char
+			$: 锚定行尾
+				char$
+			^$: 空白行
+
+			\<char: 锚定词首，\bchar
+			char\>: 锚定词尾，char\b
+		分组：
+			\(\)
+				\(ab\)*xy
+		引用：
+			\1: 后向引用，引用前面的第一个左括号以及与之对应的右括号中的模式所匹配到的内容
+			\2
+			...
+				\(a.b\)xy\1: a6bxya6b, 
+
+
+				He like his lover.
+				She love her liker.
+				He love his lover.
+				She like her liker.
+
+grep 常用选项：
+	-v: 反向，显示不能被模式所匹配到的行；
+	-o: 仅显示被模式匹配到的字串，而非整行；
+	-i: 不区分字符大小写, ignore-case
+	-E: 支持扩展的正则表达式
+	-A #：
+	-B #
+	-C #
+
+练习：
+	1、显示/proc/meminfo文件中以大小写s开头的行；
+	# grep "^[sS]" /proc/meminfo
+	# grep -i "^s" /proc/meminfo
+	2、取出默认shell为非bash的用户；
+	# grep -v "bash$" /etc/passwd | cut -d: -f1
+	3、取出默认shell为bash的且其ID号最大的用户；
+	# grep "bash$" /etc/passwd | sort -n -t: -k3 | tail -1 | cut -d: -f1
+	4、显示/etc/rc.d/rc.sysinit文件中，以#开头，后面跟至少一个空白字符，而后又有至少一个非空白字符的行；
+	# grep "^#[[:space:]]\{1,\}[^[:space:]]\{1,\}" /etc/rc.d/rc.sysinit
+	5、显示/boot/grub/grub.conf中以至少一个空白字符开头的行；
+	# grep "^[[:space:]]\{1,\}[^[:space:]]\{1,\}" /boot/grub/grub.conf 
+	6、找出/etc/passwd文件中一位数或两位数；
+	# grep --color=auto "\<[0-9]\{1,2\}\>" /etc/passwd
+	7、找出ifconfig命令结果中的1到255之间的整数；
+	# ifconfig | grep -E --color=auto "\<([1-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\>"
+	8、查看当前系统上root用户的所有信息;
+	# grep "^root\>" /etc/passwd
+	9、添加用户bash和testbash、basher，而后找出当前系统上其用户名和默认shell相同的用户；
+	# grep --color=auto "^\([[:alnum:]]\{1,\}\)\>.*\1$" /etc/passwd
+	10、找出netstat -tan命令执行的结果中以“LISTEN”或“ESTABLISHED”结尾的行；
+	11、取出当前系统上所有用户的shell，要求：每种shell只显示一次，且按升序显示；
+	# cut -d: -f7 /etc/passwd | sort -u
+	挑战题：写一个模式，能匹配真正意义上的IP地址；（1.0.0.1--223.255.255.254）
+
+grep, egrep, fgrep
+egrep: 使用扩展正则表达来构建模式，相当于grep -E 
+	元字符：
+		字符匹配：
+			.: 任意单个字符
+			[]: 指定范围内的任意单个字符
+			[^]: 指定范围外的任意单个字符
+		次数匹配：
+			*：匹配其前面的字符任意次；
+			?: 匹配其前面的字符0或1次；
+			+: 匹配其前面的字符至少1次
+			{m}: 匹配其前面的字符m次；
+			{m,n}: 至少m次，至多n次
+			{m,}: 至少m次；
+			{0,n}：至多n次；
+		锚定：
+			^: 行首
+			$: 行尾
+			\<, \b: 词首
+			\>, \b：词尾
+		分组：
+			(): 分组
+
+			|: 或者, ac|bc
+				grep -E "con(C|c)at" 
+					conC或cat
+					conCat或concat
+
+
+
+
+练习：写一个脚本，分别统计/etc/rc.d/rc.sysinit、/etc/init.d/functions和/etc/fstab文件中各自以#开头的行的行数，以及空白行的行数；
+
+练习：写一个脚本，分别复制/etc/rc.d/rc.sysinit、/etc/init.d/functions和/etc/fstab文件至/tmp目录中，文件名为原名后跟上当前的日期组成；
+	例如第一个文件复制后的名称为/tmp/rc.sysinit-2-14-02-16；
+
+练习：写一个脚本
+	显示当前系统上所有默认shell为bash的用户的用户名、UID以及其在/etc/passwd文件中的行号；
+
+
+第一篇博客：讲清楚grep和egrep的使用
+
+fgrep: fast, 不解析正则表达式
+
+
+
+bash编程之条件判断：判定后续操作的前提条件是否满足。
+
+
+mkdir /tmp/scripttest
+
+条件判断的常用测试类型：
+	整数测试
+	字符测试
+	文件测试
+
+$?:
+	0
+	1-255	
+
+布尔值：
+	真，假
+	逻辑运算：
+		与运算：
+			真 && 真 = 真
+			真 && 假 = 假
+			假 && 真 = 假
+			假 && 假 = 假
+		或运算：
+			真 || 真 = 真
+			真 || 假 = 真
+			假 || 真 = 真
+			假 || 假 = 假
+		非运算：
+			! 真 = 假
+			! 假 = 真
+
+	bash中如何做测试：
+		test EXPRESSION
+		[ EXPRESSION ]
+		[[ EXPRESSION ]]
+
+	bash中条件判断使用if：
+		单分支：
+			if 条件; then
+				分支1; 
+			fi
+
+		双分支：
+			if 条件; then
+				分支1;
+			else
+				分支2;
+			fi
+
+		多分支：
+			if 条件1; then
+				分支1;
+			elif 条件2; then
+				分支2;
+			elif 条件3; then
+				分支3;
+			...
+			else
+				分支n;
+			fi
+
+练习：让用指定一个文件，判定：
+	如果文件有空白行，就显示空白行数；
+#!/bin/bash
+#
+read -p "Enter a file path: " fileName
+
+if grep "^$" $fileName &> /dev/null; then
+	linesCount=`grep "^$" $fileName | wc -l`
+	echo "$fileName has $linesCount space lines."
+fi
+
+练习：让用指定一个文件，判定：
+	如果文件有空白行，就显示空白行数；否则，就说明文件无空白行；
+#!/bin/bash
+#
+read -p "Enter a file path: " fileName
+
+if grep "^$" $fileName &> /dev/null; then
+        linesCount=`grep "^$" $fileName | wc -l`
+        echo "$fileName has $linesCount space lines."
+else
+    	echo "$fileName hava no space line."
+fi
+
+
+
+bash编程之：整数测试
+	二元测试：
+		num1 OPRAND num2
+		-gt: 大于[ $num1 -gt $num2 ]
+		-lt: 小于
+		-ge：大于等于
+		-le: 小于等于
+		-ne: 不等于
+		-eq: 等于
+
+练习：判定两个数孰大孰小，整数是通过命令行参数传递而来。
+
+#!/bin/bash
+#
+if [ $1 -gt $2 ]; then
+	echo "The max num is $1."
+else
+	echo "The max num is $2."
+fi
+
+
+bash知识点之脚本自定义退出：
+	exit [n]
+
+
+
+#!/bin/bash
+#
+if [ $# -lt 2 ]; then
+        echo "Stupid..."
+        echo "Usage: `basename $0` argu1 argu2"
+        exit 4
+fi
+
+if [ $1 -gt $2 ]; then
+        echo "The max num is $1."
+else
+    	echo "The max num is $2."
+fi
+
+
+grep "^root\>" /etc/passwd
+id root
+
+
+bash知识点：只要命令用作条件，就表示引用是其状态结果（即执行成功与否），而非命令的输出结果，因此，不能使用命令替换符；
+
+
+2014.02.17
+
+
+练习：写一脚本，实现如下功能：
+	1、让用户通过键盘输入一个用户名
+	2、如果用户存在，就显示其用户名和UID；
+	3、否则，就显示用户不存在；
+
+#!/bin/bash
+read -t 10 -p "Enter a username: " userName
+# userName=${userName:-root}
+if id $userName &> /dev/null; then
+	userID=`id -u $userName`
+	echo "$userName: $userID"
+else
+	echo "$userName not exist."
+fi
+
+
+练习：写一脚本，实现如下功能：
+	1、让用户通过键盘输入一个用户名，如果用户不存在就退出；
+	2、如果用户的UID大于等于500，就说明它是普通用户；
+	3、否则，就说明这是管理员或系统用户；
+
+#!/bin/bash
+
+
+# exit 6 -- 
+read -t 10 -p "Enter a username: " userName
+if ! id $userName &> /dev/null; then
+	echo "$userName not exist."
+	exit 6
+fi
+
+userID=`id -u $userName`
+
+if [ $userID -ge 500 ]; then
+	echo "A common user."
+else
+	echo "Admin or System user."
+fi
+
+
+bash的知识点：
+	组合条件测试：对条件做逻辑运算
+		与：条件1 && 条件2
+			条件1为假，则最终结果一定为假，因此，条件2将不执行；
+			条件1为真，则最终结果决于后面条件，因此，条件2必须执行; 
+		或：条件1 || 条件2
+			条件1为真，则最终结果一定为真，因此，条件2将不再执行；
+			条件1为假，则最终结果决于后面条件，因此，条件2必须执行; 
+		非: ! 条件
+
+
+
+练习：写一脚本，实现如下功能：
+	1、让用户通过键盘输入一个用户名，如果用户不存在就退出；
+	2、如果其UID等于其GID，就说它是个"good guy"
+	3、否则，就说它是个“bad guy”；
+
+#!/bin/bash
+# exit 6 -- 
+read -t 10 -p "Enter a username: " userName
+if ! id $userName &> /dev/null; then
+	echo "$userName not exist."
+	exit 6
+fi
+
+if [ `id -u $userName` -eq `id -g $userName` ]; then
+	echo "Good guy."
+else
+	echo "Bad guy."
+fi
+
+扩展：判断当前系统上的所有用户是Good guy还是Bad guy.
+
+for userName in `cut -d: -f1 /etc/passwd`; do
+	
+done
+
+
+练习：写一个脚本，实现如下功能：
+	1、添加10个用户stu1-stu10；但要先判断用户是否存在；
+	2、如果存在，就用红色显示其已经存在
+	3、否则，就添加此用户；并绿色显示；
+	4、最后显示一共添加了几个用户；
+
+#!/bin/bash
+#
+declare -i userCount=0
+for i in {1..10}; do
+	if id stu$i &> /dev/null; then
+		echo -e "\033[31mstu$i\033[0m exists."
+	else
+		useradd stu$i && echo -e "add \033[32mstu$i\033[0m finished."
+		let userCount++
+	fi
+done
+
+echo "Add $userCount users."
+
+
+
+
+练习：求200以内所有3的整数倍的正整数的和；
+#!/bin/bash
+declare -i sum=0
+for i in {1..200}; do
+	if [ $[$i%3] -eq 0 ]; then
+		let sum+=$i
+	fi
+done
+
+echo "The sum is: $sum."
+
+
+
+ 
+在剩下的三月里，你愿意与学习结为伴侣，无论贫穷还是富贵，无论电脑还是手机，无论多困或者多累，无论想吃还是想睡，都要把学习放在第一位，以不落后为目标，同甘共苦同舟共济永不言弃，爱惜她尊重她理解她保护她，你愿意这样做么？
+Yes, I do.
+
+
+bash编程之：字符测试
+	双目：
+		>: 大于
+		<: 小于
+		==: 等于，等值比较
+		=~：左侧是字符串，右侧是一个模式，判定左侧的字符串能否被右侧的模式所匹配；通常只在[[]]中使用；
+			模式中可以使用行首、行尾锚定符；但模式不要加引号；
+	单目：
+		-n $stringVar: 字符串是否不空，不空为真，空则为假；
+		-z $stringVar: 字符串是否为空，空则为真，不空则假；
+
+
+
+判定所有用户是否拥有可登录shell
+#!/bin/bash
+for userName in `cut -d: -f1 /etc/passwd`; do
+	if [[ `grep "^$userName\>" /etc/passwd | cut -d: -f7` =~ sh$ ]]; then
+		echo "login user: $userName"
+	else
+		echo "nologin user: $userName"
+	fi
+done
+
+
+
+
+练习：写一个脚本
+	1、让用户交互式输入一个用户名，先判定用户是否存在；不存在，则以7为退出码；
+    2、判断用户的shell是否为/bin/bash；如果是，则显示为“Bash User.”，退出码为0; 否则，则显示为“Not Bash User.”，退出码为1;
+
+练习：写一个脚本
+	1、显示如下菜单：
+		cpu) show cpu info;
+		mem) show memory info;
+		quit) quit
+		Enter your option: 
+	2、如果用户选择cpu，则显示文件/proc/cpuinfo的信息；
+	3、如果用户选择mem，则显示文件/proc/meminfo的信息；
+	4、如果用户选择quit，则退出，且退出码为5;
+	5、如果用户键入其它字符，则显示未知选项，请重新执行脚本；退出码为6;
+
+
+
+
+正则表达式，grep, egrep；diff, patch
+
+
+
+
+grep, egrep
+
+grep [options] 'pattern' file...
+
+基本：
+	字符匹配：., [], [^]
+	次数匹配：*, \?, \{m\}, \{m,n\}
+				.*
+	位置锚定：\<, \b, \>, ^, $
+	分组：\(\)
+	前向引用：\1, \2
+
+扩展:
+	字符匹配：., [], [^]	
+	次数匹配：*, ?, {m}, {m,n}, +
+	位置锚定：\<, \b, \>, ^, $
+	分组：()	
+	前向引用：\1, \2
+	或：a|b
+
+条件判断
+	if CONDITION; then
+		statement1
+		...
+	fi
+
+	if CONDITION; then
+		分支1;
+	else
+		分支2;
+	fi
+
+	if CONDITION1; then
+		分支1
+	elif CONDITION2; then
+		分支2
+	...
+	else
+		分支n
+	fi
+
+条件测试：
+	bash: 每个命令，执行状态返回值：
+		成功：0
+		失败：非0
+		$?: 
+
+		脚本的状态返回值：脚本执行的最后一条命令；
+		自定义脚本状态返回值：exit [n]
+
+		引用命令的执行结果：使用`COMMAND`或$(COMMAND)
+		引用命令执行成功与否的状态结果：一定是直接执行命令，此时，通常需要将执行结果重定向至/dev/null；
+
+if id $userName &> /dev/null
+
+if [ `id -u $userName` -eq 0 ]
+
+	条件测试：
+		test 测试表达式
+		[ 测试表达式 ]
+		[[  ]]
+
+	整数测试：
+		-eq, -ne, -le, -gt, -lt, -ge
+
+
+vi编辑器
+
+Linux: 使用文本文件来保存配置文件
+
+文本编辑器：ASCII文件
+	emacs, vi
+
+	vi: Visual Interface
+
+	全屏文本编辑器, nano
+	模式化的编辑器
+
+	moduler
+
+	vim: vi improved
+	vi的模式：
+		编辑模式：键盘操作通常被解析为编辑命令；
+		输入模式：输入模式；
+		末行模式：vim的内置的命令行接口，执行vim内置命令
+
+	编辑模式-->输入模式
+		i: 在当前光标所在处输入；
+		I: 在当前光标所在行的行首输入；
+
+		a: 在当前光标所在处后面输入；
+		A：在当前光标所在行的行尾输入；
+
+		o: 在光标所在行的下方新增一个空白行输入；
+		O：              上方
+
+	输入模式-->编辑模式：
+		ESC
+
+	编辑模式-->末行模式：
+		:
+	末行模式-->编辑模式：
+		ESC, ESC		
+
+
+
+	vim命令的使用格式：
+		vim [options] /path/to/file...
+
+	退出
+	:q!, 不保存并退出
+	:wq, 保存并退出
+	:x, 保存并退出
+	编辑模式：ZZ, 保存退出
+	
+	打开：
+		多文件跳转：
+			:next
+			:prev
+			:first
+			:last
+
+		分割窗口打开多个文件：
+			-o: 水平分割
+				Ctrl+w, 左右箭头键
+			-O：垂直分割	
+				Ctrl+w, 上下箭头键
+
+			+[#]: 打开文件后直接让光标处于第#行的行首；
+
+	光标移动：
+		单字符移到：
+			h: 左
+			l: 右
+			j: 下
+			k: 上
+
+		单词间移动：
+			w: 下个单词的词首；
+			b: 当前或前一个词的词首
+			e: 当前或下一个词的词尾
+
+		行内移动：
+			0: 绝对行首
+			^: 第一个非空白字符
+			$: 绝对行尾
+
+		句子间移动：
+			)
+			(
+
+		段落间移动：
+			}
+			{
+
+		行间移动：
+			#G
+			G：最后一行
+			1G: 第一行
+
+	编辑操作：
+		x: 删除光标所在处的字符
+		#x: 删除光标所在处开始向后的#个字符；
+
+		r: 替换光标所在处的字符
+
+		d: 删除命令
+			结合各光标跳转命令使用
+		dd: 删除一行
+		#dd: 
+
+	末行模式：范围定界
+		start,end: 
+		10,19
+		10,+9
+		.:表示当前行
+		$:最后一行
+			.,$-2
+		/pat1/,/pat2/: 起始处为光标所在行，
+		:% 
+
+
+		c: 改变
+		cc:
+		#cc:
+
+		y: yank, 复制
+		yy
+		#yy
+
+		p: paste, 粘贴
+			复制或删除的是整行
+				p: 粘贴在光标所在行的下方
+				P:                   上方
+
+			复制或删除的为非整行
+				p: 粘贴在光标所在字符的后面
+				P：                    前面
+
+		撤消编辑：
+			u: undo
+			#u: 
+
+		撤消此前的撤消：
+			Ctrl+r
+
+		重复执行此前的命令：
+			.
+
+
+	翻屏：
+		Ctrl+f: 向文件尾部翻一屏
+		Ctrl+b:       首
+		Ctrl+d:       尾    半
+		Ctrl+u:       首    半
+		Enter:
+		k:
+
+	查找：
+		/keyword
+		?keyword
+		n:
+		N:
+
+
+
+练习：写一个脚本
+	1、让用户交互式输入一个用户名，先判定用户是否存在；不存在，则以7为退出码；
+    2、判断用户的shell是否为/bin/bash；如果是，则显示为“Bash User.”，退出码为0; 否则，则显示为“Not Bash User.”，退出码为1;
+
+#!/bin/bash
+#
+read -p "Enter a user name: " userName
+if ! id $userName &> /dev/null; then
+  echo "No such user."
+  exit 7
+fi      
+
+userShell=`grep "^$userName\>" /etc/passwd | cut -d: -f7`
+
+if [[ "$userShell" == "/bin/bash" ]]; then
+  echo "bash user."
+  returnValue=0
+else
+  echo "Not bash user."
+  returnValue=1
+fi
+
+exit $returnValue
+
+
+练习：写一个脚本
+	1、显示如下菜单：
+		cpu) show cpu info;
+		mem) show memory info;
+		quit) quit
+		Enter your option: CPU Cpu, CpU
+	2、如果用户选择cpu，则显示文件/proc/cpuinfo的信息；
+	3、如果用户选择mem，则显示文件/proc/meminfo的信息；
+	4、如果用户选择quit，则退出，且退出码为5;
+	5、如果用户键入其它字符，则显示未知选项，请重新执行脚本；退出码为6;
+
+#!/bin/bash
+#
+returnValue=0
+
+cat << EOF
+cpu) print cpu infomation
+mem) print meory infomation
+quit) Quit
+EOF
+
+read -p "Enter your option: " userOption
+userOption=`echo $userOption | tr 'A-Z' 'a-z'`
+
+if [[ "$userOption" == "cpu" ]]; then
+  cat /proc/cpuinfo
+elif [[ "$userOption" == "mem" ]]; then
+  cat /proc/meminfo
+elif [[ "$userOption" == "quit" ]]; then
+  echo "quit"
+  returnValue=6
+else
+  echo "unkown option"
+  returnValue=7
+fi
+
+exit $returnValue
+
+
+
+
+
+回顾：
+	字符测试：
+		双目：
+			>
+			<
+			==
+			=~
+			!=, <>
+		单目：
+			-n
+			-z
+
+	vim:
+		编辑、输入、末行
+		vim +# file
+
+		光标跳转：h, j, k, l
+				  w, b, e
+				  0, ^, $
+				  ), (
+				  {, }
+				  G, #G
+		编辑命令：
+				x, r
+				d, 
+				y,
+				c,
+				p,P
+				u
+				.
+				Ctrl+r
+
+vim可视化模式：
+	v: 按光标走过的区域选择
+	V: 选择矩形块
+
+打开多个文件，分窗口：
+	vim -o
+	vim -O
+	Ctrl+w, arrow
+
+分割当前窗口：
+	Ctrl+w, s
+	Ctrl+w, v
+
+窗口属性的定义：
+	:set nu
+	:set nonu
+
+	:set ai
+	:set noai
+
+	:set ic
+	:set noic
+
+	显示对应的括号
+	:set sm (show match)
+	:set nosm
+
+	语法高亮：
+	:syntax on
+	:syntax off
+
+	搜索高亮：
+	:set hlsearch
+	:set nohlsearch
+
+vim的配置文件：
+	全局：/etc/vimrc
+	个人：~/.vimrc
+
+查找替换：
+	:地址定界s/查找模式/替换为的内容/gi
+		g: global
+		i: ignore-case
+
+	:地址定界s@查找模式@替换为的内容@gi
+
+	&: 用于在替换为的内容部分中引用前面匹配到的所有内容；
+
+练习：
+	1、复制/etc/grub.conf至/tmp目录，删除/tmp/grub.conf文件中行首的空白符；
+	%s@^[[:space:]]\{1,\}@@g
+
+	2、复制/etc/rc.d/rc.sysinit至/tmp目录，将/tmp/rc.sysinit文件中的以至少一个空白字符开头的行，行首加#号
+	:%s@^[[:space:]]\{1,\}.*@#&@
+
+	3、删除/tmp/rc.sysinit文件中以#开头且后面跟了至少一个空白字符的行的行首的#号和空白符；
+	:%s@^#[[:space:]]\{1,\}@@g
+
+	4、为/tmp/grub.conf文件中前三行的行首加#号; 
+	1,3s@^@#@g
+
+	5、将/etc/yum.repos.d/CentOS-Media.repo中enable=0一行最后的0改为1；
+	%s@\(enabled=\)[0-9]@\11@g
+
+
+
+
+
+
+算术计算
+条件判断
+磁盘分区、格式化
+
+
+
+172.16.0.0/255.255.0.0
+
+1/101
+
+
+0，100
+
+
+
+
+
+
+
+
+
+
+文件描述符：文件描述符在形式上是一个非负整数。实际上，它是一个索引值，指向内核为每一个进程所维护的该进程打开文件的记录表。当程序打开一个现有文件或者创建一个新文件时，内核向进程返回一个文件描述符。
+
+请参见：http://zh.wikipedia.org/wiki/%E6%96%87%E4%BB%B6%E6%8F%8F%E8%BF%B0%E7%AC%A6
+
+
+
+bash知识点：文件测试
+	[]
+	[[]]
+	test
+
+	单目测试：
+		-e file: 
+		-a file: 测试文件是否存在;
+		-f /path/to/file: 测试是否为普通文件;
+		-d /path/to/somefile: 测试是否为目录文件;
+		-b /path/to/somefile: 测试文件是否存在并且是否是一个块设备文件; 
+		-c /path/to/somefile:                               字符设备文件;
+		-h|-L /path/to/somefile: 测试文件是否存在并且为符号链接文件：
+		-p /path/to/somefile:                       管道文件;  
+		-S /path/to/somefile:                        套接字文件; 
+		-r /path/to/somefile: 测试其有效用户是否对此文件有读取权限；
+		-w
+		-x 
+		-s /path/to/somefile: 测试文件是否存在并且不空，
+
+	双目测试：
+		file1 -nt file2: 测试file1是否为file2更 新一些；
+
+
+      -a file
+              True if file exists.
+       -b file
+              True if file exists and is a block special file.
+       -c file
+              True if file exists and is a character special file.
+       -d file
+              True if file exists and is a directory.
+       -e file
+              True if file exists.
+       -f file
+              True if file exists and is a regular file.
+       -g file
+              True if file exists and is set-group-id.
+       -h file
+              True if file exists and is a symbolic link.
+       -k file
+              True if file exists and its ?.€.ticky?.€.bit is set.
+       -p file
+              True if file exists and is a named pipe (FIFO).
+       -r file
+              True if file exists and is readable.
+       -s file
+              True if file exists and has a size greater than zero.
+       -t fd  True if file descriptor fd is open and refers to a terminal.
+       -u file
+              True if file exists and its set-user-id bit is set.
+       -w file
+              True if file exists and is writable.
+       -x file
+              True if file exists and is executable.
+       -O file
+              True if file exists and is owned by the effective user id.
+       -G file
+              True if file exists and is owned by the effective group id.
+       -L file
+              True if file exists and is a symbolic link.
+       -S file
+              True if file exists and is a socket.
+       -N file
+              True if file exists and has been modified since it was last read.
+       file1 -nt file2
+              True if file1 is newer (according to modification date) than file2, or if file1 exists and file2 does not.
+       file1 -ot file2
+              True if file1 is older than file2, or if file2 exists and file1 does not.
+       file1 -ef file2
+              True if file1 and file2 refer to the same device and inode numbers.
+
+
+写一个脚本，完成如下任务：
+	1、分别复制/var/log下的文件至/tmp/logs/目录中；
+	2、复制目录时，才使用cp -r
+	3、复制文件时，使用cp
+	4、复制链接文件，使用cp -d
+	5、余下的类型，使用cp -a
+
+#!/bin/bash
+#
+targetDir='/tmp/logs'
+
+[ -e $targetDir ] || mkdir $targetDir
+
+for fileName in /var/log/*; do
+  if [ -d $fileName ]; then
+    copyCommand='cp -r'
+  elif [ -f $fileName ]; then
+    copyCommand='cp'
+  elif [ -h $fileName ]; then
+    copyCommand='cp -d'
+  else
+    copyCommand='cp -a'
+  fi  
+
+  $copyCommand $fileName $targetDir
+done
+
+
+
+写一个脚本，完成如下任务，其使用形式如下所示：
+	script.sh {start|stop|restart|status}
+其中：
+	如果参数为空，则显示帮助信息，并退出脚本；
+	如果参数为start，则创建空文件/var/lock/subsys/script，并显示“starting script successfully.”
+	如果参数为stop，则删除文件/var/lock/subsys/script，并显示“Stop script successfully.”
+	如果参数为restart，则删除文件/var/locksubsys/script并重新创建，而后显示“Restarting script successfully.”
+	如果参数为status，那么：
+		如果文件/var/lock/subsys/script存在，则显示“Script is running...”，否则，则显示“Script is stopped.”
+
+
+bash的知识点：位置参数轮替(shift)
+
+#!/bin/bash
+#
+
+declare -i sum=0
+
+for i in `seq 1 $#`; do
+  let sum+=$1
+  shift
+done
+
+echo $sum
+
+
+写一个脚本：使用形式如下
+	userinfo.sh -u username [-v {1|2}]
+	-u选项用于指定用户；而后脚本显示用户的UID和GID；
+	如果同时使用了-v选项：
+		-v后面的值如果是1, 则额外显示用户的家目录路径;
+		-v后面的值如果是2, 则额外显示用户的家目录路径和shell；
+
+#!/bin/bash
+#
+[ $# -lt 2 ] && echo "Too less argements, quit" && exit 3
+
+if [[ "$1" == "-u" ]];then
+  userName="$2"
+  shift 2
+fi
+
+if [ $# -ge 2 ] && [ "$1" == "-v" ]; then
+  verFlag=$2
+fi
+
+verFlag=${verFlag:-0}
+
+if [ -n $verFlag ];then
+  if ! [[ $verFlag =~ [012] ]];then
+    echo "Wrong parameter."
+    echo "Usage: `basename $0` -u UserName -v {1|2}"
+    exit 4
+  fi  
+fi
+
+# echo $userName $verFlag
+
+if [ $verFlag -eq 1 ]; then
+  grep "^$userName" /etc/passwd | cut -d: -f1,3,4,6
+elif [ $verFlag -eq 2 ];then 
+  grep "^$userName" /etc/passwd | cut -d: -f1,3,4,6,7
+else
+  grep "^$userName" /etc/passwd | cut -d: -f1,3,4
+fi	
+
+
+
+
+
+
+
+
+^$, .*
+.,$-1
+.,+9
+
+:set ai
+u, 3u
+Ctrl+r
+
+s///
+&
+w, b, W, B, e
+
+
+
+
+
+
+
+
+
+
+

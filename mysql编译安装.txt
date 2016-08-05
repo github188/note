@@ -1,0 +1,84 @@
+1、mkdir –pv /home/oldboy/tools（将两个安装包拷贝进来）
+2、tar  xf cmake-2.8.8.tar.gz
+   tar xf  mysql-5.5.32.tar.gz
+3、cd cmake-2.8.8
+   ./configure
+   gmake
+   gmake install
+   echo $?#查看是否成功#
+
+
+4、yum install ncurses-devel –y（安装依赖包）
+   groupadd mysql
+   useradd mysql -s /sbin/nologin -M -g mysql
+5、解压编译MySQL
+
+[root@localhost ~]# cd ..
+[root@localhost ~]# tar -zxvf mysql-5.5.32.tar.gz 
+[root@localhost ~]# cd mysql-5.5.32
+[root@localhost mysql-5.5.32]#  cmake -DCMAKE_INSTALL_PREFIX=/application/mysql-5.5.32 \
+  -DMYSQL_DATADIR=/application/mysql-5.5.32/data \
+  -DMYSQL_UNIX_ADDR=/application/mysql-5.5.32/tmp/mysql.sock \
+  -DDEFAULT_CHARSET=utf8 \
+  -DDEFAULT_COLLATION=utf8_general_ci \
+  -DWITH_EXTRA_CHARSETS=all \
+  -DWITH_INNOBASE_STORAGE_ENGINE=1 \
+  -DWITH_ARCHIVE_STORAGE_ENGINE=1 \
+  -DWITH_BLACKHOLE_STORAGE_ENGINE=1 \
+  -DWITH_PERFSCHEMA_STORAGE_ENGINE=1 \
+  -DWITH_SSL=yes  \
+  -DENABLED_LOCAL_INFILE=1
+
+[root@localhost mysql-5.5.32]# make && make install
+6、ln -s /application/mysql-5.5.32/ /application/mysql  #将源代码目录中的配置文件copy到/etc目录下
+7、cp support-files/my-small.cnf /etc/my.cnf
+
+8、echo 'export PATH=/application/mysql/bin:$PATH' >> /etc/profile（配置环境变量）
+   source /etc/profile（刷新）
+
+9、mkdir -pv /application/mysql/data （如果已存在则直接进行下一步）
+10、chown -R mysql.mysql /application/mysql/data
+11、chmod  -R  1777  /tmp/
+12、cd /application/mysql/scripts
+    ./mysql_install_db --basedir=/application/mysql --datadir=/application/mysql/data --user=mysql
+Installing MySQL system tables...
+OK
+Filling help tables...
+OK
+13、cd ..
+    cp support-files/mysql.server /etc/init.d/mysqld
+14、添加至服务列表：
+ chkconfig --add mysqld
+ chkconfig mysqld on
+15、service mysqld  start
+    service mysqld  start
+*********************************************************************************
+备份：
+mysqldump -uroot -p123456 oldboy  >backup/oldboy.sql
+egrep -v "#|\*|--|^$" backup/oldboy.sql
+mysql -uroot -p123456 oldboy <backup/oldboy.sql
+***********************************************************
+mysql  -uroot -p123456 -B  oldboy   <backup/oldboy_B.sql 
+mysql  -uroot -p123456    <backup/oldboy_B.sql 
+****************************************************************
+mysqldump  -uroot -p123456 -B  oldboy|gzip   >backup/oldboy_B.sql.gz
+*************************************************************
+分库备份：
+
+[root@localhost ~]# mysql -uroot -p'123456' -e "show databases;"|grep -Evi "database|infor|perfor"|sed -r 's#^([a-z ].*$)#mysqldump -uroot -p'123456' -B  --events  \1|gzip >backup/\1.sql.gz#g'|bash
+分库备份脚本：
+#!/bin/bash
+#mysql backup
+
+for dbname in `mysql -uroot -p'123456' -e "show databases;"|grep -Evi "d
+atabase|infor|perfor"`
+do
+    mysqldump -uroot -p'123456' --events -B $dbname|gzip >/backup/${dbna
+me}_bak.sql.gz
+done
+
+***********************************************************************
+备份表结构：加 -d 就可以了;-t 直接备份的数据  ;全库备份： mysqldump -uroot -p123456 -A -B --events |gzip >/backup/a.sql.gz|还原：在MySQL里：mysql> source /backup/aaaaaa.sql
+
+
+增量备份：mysqlbinlog 》 解析mysql的binlog日志： mysqlbinlog /application/mysql/data/mysql-bin..000002

@@ -1,0 +1,224 @@
+
+一、简介
+
+Ansible is a radically simple configuration-management, application deployment, task-execution, and multinode orchestration engine.
+
+Design Principles
+
+	Have a dead simple setup process and a minimal learning curve
+	Be super fast & parallel by default
+	Require no server or client daemons; use existing SSHd
+	Use a language that is both machine and human friendly
+	Focus on security and easy auditability/review/rewriting of content
+	Manage remote machines instantly, without bootstrapping
+	Allow module development in any dynamic language, not just Python
+	Be usable as non-root
+	Be the easiest IT automation system to use, ever.
+
+
+
+
+二、安装
+
+2.1 编译安装
+
+解决依赖关系
+
+# yum -y install python-jinja2 PyYAML python-paramiko python-babel python-crypto
+# tar xf ansible-1.5.4.tar.gz
+# cd ansible-1.5.4
+# python setup.py build
+# python setup.py install
+# mkdir /etc/ansible
+# cp -r examples/* /etc/ansible
+
+2.2 rpm包安装
+
+
+三、简单应用
+
+ansible通过ssh实现配置管理、应用部署、任务执行等功能，因此，需要事先配置ansible端能基于密钥认证的方式联系各被管理节点。
+
+
+
+ansible <host-pattern> [-f forks] [-m module_name] [-a args]
+	-m module：默认为command
+
+
+ansible-doc: Show Ansible module documentation
+ 	-l, --list            List available modules
+  	-s, --snippet         Show playbook snippet for specified module(s)
+
+
+
+
+
+
+
+
+
+
+
+
+四、YAML
+
+4.1 YAML介绍
+
+YAML是一个可读性高的用来表达资料序列的格式。YAML参考了其他多种语言，包括：XML、C语言、Python、Perl以及电子邮件格式RFC2822等。Clark Evans在2001年在首次发表了这种语言，另外Ingy döt Net与Oren Ben-Kiki也是这语言的共同设计者。
+
+YAML Ain't Markup Language，即YAML不是XML。不过，在开发的这种语言时，YAML的意思其实是："Yet Another Markup Language"（仍是一种标记语言）。其特性：
+
+	YAML的可读性好
+	YAML和脚本语言的交互性好
+	YAML使用实现语言的数据类型
+	YAML有一个一致的信息模型
+	YAML易于实现
+	YAML可以基于流来处理
+	YAML表达能力强，扩展性好
+
+更多的内容及规范参见http://www.yaml.org。
+
+4.2 YAML语法
+
+YAML的语法和其他高阶语言类似，并且可以简单表达清单、散列表、标量等数据结构。其结构（Structure）通过空格来展示，序列（Sequence）里的项用"-"来代表，Map里的键值对用":"分隔。下面是一个示例。
+
+name: John Smith
+age: 41
+gender: Male
+spouse:
+    name: Jane Smith
+    age: 37
+    gender: Female
+children:
+    -   name: Jimmy Smith
+        age: 17
+        gender: Male
+    -   name: Jenny Smith
+        age 13
+        gender: Female
+
+YAML文件扩展名通常为.yaml，如example.yaml。
+
+
+五、ansible playbooks
+
+playbook是由一个或多个“play”组成的列表。play的主要功能在于将事先归并为一组的主机装扮成事先通过ansible中的task定义好的角色。从根本上来讲，所谓task无非是调用ansible的一个module。将多个play组织在一个playbook中，即可以让它们联同起来按事先编排的机制同唱一台大戏。下面是一个简单示例。
+
+	- hosts: webnodes
+	  vars:
+	    http_port: 80
+	    max_clients: 256
+	  remote_user: root
+	  tasks:
+	  - name: ensure apache is at the latest version
+	    yum: name=httpd state=latest
+	  - name: ensure apache is running
+	    service: name=httpd state=started
+	  handlers:
+	    - name: restart apache
+	      service: name=httpd state=restarted
+
+5.1 playbook基础组件
+
+5.1.1 Hosts和Users
+	
+	playbook中的每一个play的目的都是为了让某个或某些主机以某个指定的用户身份执行任务。hosts用于指定要执行指定任务的主机，其可以是一个或多个由冒号分隔主机组；remote_user则用于指定远程主机上的执行任务的用户。如上面示例中的
+		-hosts: webnodes
+		 remote_user: root
+
+	不过，remote_user也可用于各task中。也可以通过指定其通过sudo的方式在远程主机上执行任务，其可用于play全局或某任务；此外，甚至可以在sudo时使用sudo_user指定sudo时切换的用户。
+
+		- hosts: webnodes
+		  remote_user: mageedu
+		  tasks:
+		    - name: test connection
+		      ping:
+		      remote_user: mageedu
+		      sudo: yes
+
+5.1.2 任务列表和action
+
+	play的主体部分是task list。task list中的各任务按次序逐个在hosts中指定的所有主机上执行，即在所有主机上完成第一个任务后再开始第二个。在运行自下而下某playbook时，如果中途发生错误，所有已执行任务都将回滚，因此，在更正playbook后重新执行一次即可。
+
+	task的目的是使用指定的参数执行模块，而在模块参数中可以使用变量。模块执行是幂等的，这意味着多次执行是安全的，因为其结果均一致。
+
+	每个task都应该有其name，用于playbook的执行结果输出，建议其内容尽可能清晰地描述任务执行步骤。如果未提供name，则action的结果将用于输出。
+
+	定义task的可以使用“action: module options”或“module: options”的格式，推荐使用后者以实现向后兼容。如果action一行的内容过多，也中使用在行首使用几个空白字符进行换行。
+		tasks:
+		  - name: make sure apache is running
+		    service: name=httpd state=running
+
+		在众多模块中，只有command和shell模块仅需要给定一个列表而无需使用“key=value”格式，例如：
+			tasks:
+			  - name: disable selinux
+			    command: /sbin/setenforce 0
+
+		如果命令或脚本的退出码不为零，可以使用如下方式替代：
+			tasks:
+			  - name: run this command and ignore the result
+			    shell: /usr/bin/somecommand || /bin/true		
+
+		或者使用ignore_errors来忽略错误信息：
+			tasks:
+			  - name: run this command and ignore the result
+			    shell: /usr/bin/somecommand
+			    ignore_errors: True		
+
+5.1.3 handlers
+	
+	用于当关注的资源发生变化时采取一定的操作。
+
+	“notify”这个action可用于在每个play的最后被触发，这样可以避免多次有改变发生时每次都执行指定的操作，取而代之，仅在所有的变化发生完成后一次性地执行指定操作。在notify中列出的操作称为handler，也即notify中调用handler中定义的操作。
+		- name: template configuration file
+		  template: src=template.j2 dest=/etc/foo.conf
+		  notify:
+		     - restart memcached
+		     - restart apache	
+
+	handler是task列表，这些task与前述的task并没有本质上的不同。
+		handlers:
+		    - name: restart memcached
+		      service:  name=memcached state=restarted
+		    - name: restart apache
+		      service: name=apache state=restarted
+
+	
+案例：
+	heartbeat.yaml
+	- hosts: hbhosts
+	  remote_user: root
+	  tasks:
+	    - name: ensure heartbeat latest version
+	      yum: name=heartbeat state=present
+	    - name: authkeys configure file
+	      copy: src=/root/hb_conf/authkeys dest=/etc/ha.d/authkeys
+	    - name: authkeys mode 600
+	      file: path=/etc/ha.d/authkeys mode=600
+	      notify:
+	        - restart heartbeat
+	    - name: ha.cf configure file
+	      copy: src=/root/hb_conf/ha.cf dest=/etc/ha.d/ha.cf
+	      notify: 
+	       	- restart heartbeat
+	  handlers:
+	  	- name: restart heartbeat
+	  	  service: name=heartbeat state=restarted
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

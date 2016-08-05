@@ -1,0 +1,28 @@
+1.打开主库binlog
+  
+  vi /etc/mysql 
+  打开 logbin
+  确保serverid 最好不一样
+  添加账户让从库可以访问：grant replication slave on *.* to 'rep'@'192.168.0.%' identified by '123456';
+  刷新：flush privileges;
+  在主库上加锁：flush tables with read lock;  备份数据库：mysqldump 
+  备份完解锁：unlock tables ;
+  show master status; 查看binlog位置
+ 
+2.从库
+  CHANGE MASTER TO
+MASTER_HOST='192.168.0.35',
+MASTER_PORT=3306,
+MASTER_USER='rep',
+MASTER_PASSWORD='123456',
+MASTER_LOG_FILE='mysql-bin.000001',
+MASTER_LOG_POS=407;
+
+查看：cat master.info 
+
+start slave;
+ show slave status\G;
+出现两个yes 说明成功
+
+*****************************************************************************************
+问题：

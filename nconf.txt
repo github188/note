@@ -1,0 +1,47 @@
+nconf配置：
+
+1.nconf的准备工作
+# 进入mysql数据库  
+mysql> create database nconf;   
+# 创建nconf数据库  
+mysql> grant all privileges on nconf.* to nconf@localhost identified by 'nconf';  
+# 创建nconf用户并赋权    
+mysql> flush privileges;    
+# 刷新特权表  
+mysql> quit  
+2.安装nconf
+wget http://sourceforge.net/projects/nconf/files/nconf/1.2.6-0/nconf-1.2.6-0.tgz/download 
+tar -zxf nconf-1.2.6-0.tgz -C /var/www/html/  
+cd /var/www/html/nconf  
+chown -R apache.apache config/ temp/ static_cfg/ output/  
+3.进入Web页面在web页面按照安装提示一步步安装
+ 
+4.使用刚才创建的nconf数据库和nconf数据库用户/密码
+
+5.成功连接mysql数据库,之后一切保持默认，直到下面的，设置nconf管理员密码，此时默认登录用户为admin
+
+6.之后，网页安装完成。
+rm -rf INSTALL INSTALL.php  UPDATE UPDATE.php   
+ # 删除安装所需的初始化文件  
+ln -s /var/www/html/nagios/bin/nagios bin/nagios   
+chmod +x /var/www/html/nconf/bin/generate_config.pl   
+chown -R apache.apache  bin  
+chmod +x /var/www/html/nagios/bin/nagios 
+chmod +x /var/www/html/nconf/ADD-ONS/deploy_local.sh    
+vim /var/www/html/nconf/ADD-ONE/deploy_local.sh  
+     修改里面的Nagios路径为 /var/www/html/nagios/etc/    
+7.重新刷新页面，输入admin/您设置的密码，进入nconf页面
+ 
+8.点击Generate Nagios config尝试生成配置文件，以测试是否与nagios成功关联
+ 
+9.最后的设置
+①在web页面对监控服务和主机配置完毕，点击Generate Nagios config
+②deploy_local.sh是nconf自带配置文件导入脚本
+/var/www/html/nconf/ADD-ONS/deploy_local.sh 
+手动执行此脚本，将在/var/www/html/nagios/etc下生成两目录Default_collector与global
+③修改nagios主配置文件
+vim /var/www/html/nagios/etc/nagios.cfg  
+   # 将其中cfg_file=*******字段全部注释 ,并加入 
+     cfg_dir=/var/www/html/nagios/etc/Default_collector 
+     cfg_dir=/var/www/html/nagios/etc/global 
+service nagios reload 

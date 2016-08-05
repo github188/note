@@ -1,0 +1,1 @@
+mysqlbinlog mysql-bin.000005 --start-position=354 --stop-position=456 >mysql.sql
