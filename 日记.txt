@@ -1,0 +1,33 @@
+201607122038
+ 查看表索引： show indexes from ww;显示表上的索引；
+ create table li select  *from tablesname 根据别人的表创建一个表
+ 根据别的表创建一个空表；create table li like tablename；
+ desc  tablesname ;
+ 查看表结构：
+ 
+ 
+ 修改表属性：
+    alter table 
+添加 修改 删除 字段 
+添加 修改 删除 索引
+修改表属性
+增加键
+ alter  table li ADD  unique key （
+ 
+ 
+ 201607192029
+ 
+ insert into tb_name 
+  字符型 用单引号，数字不用
+  replace into 替换原有的重复的插入；
+  delete
+  auto_increment
+  tancate tb_name;清空计数器
+  服务器变量：
+     全局变量：
+       修改后不影响当前会话，只对新建回话有效
+       
+     会话变量：
+        仅对当前会话有效，并且立即生效
+      永久生效：修改配置文件.
+     
