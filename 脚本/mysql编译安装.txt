@@ -1,0 +1,130 @@
+1、mkdir –pv /home/oldboy/tools（将两个安装包拷贝进来）
+2、tar  xf cmake-2.8.8.tar.gz
+   tar xf  mysql-5.5.32.tar.gz
+3、cd cmake-2.8.8
+   ./configure
+   gmake
+   gmake install
+   echo $?#查看是否成功#
+
+
+4、yum install ncurses-devel –y（安装依赖包）
+   groupadd mysql
+   useradd mysql -s /sbin/nologin -M -g mysql
+5、解压编译MySQL
+
+[root@localhost ~]# cd ..
+[root@localhost ~]# tar -zxvf mysql-5.5.32.tar.gz 
+[root@localhost ~]# cd mysql-5.5.32
+[root@localhost mysql-5.5.32]#  cmake -DCMAKE_INSTALL_PREFIX=/application/mysql-5.5.32 \
+  -DMYSQL_DATADIR=/application/mysql-5.5.32/data \
+  -DMYSQL_UNIX_ADDR=/application/mysql-5.5.32/tmp/mysql.sock \
+  -DDEFAULT_CHARSET=utf8 \
+  -DDEFAULT_COLLATION=utf8_general_ci \
+  -DWITH_EXTRA_CHARSETS=all \
+  -DWITH_INNOBASE_STORAGE_ENGINE=1 \
+  -DWITH_ARCHIVE_STORAGE_ENGINE=1 \
+  -DWITH_BLACKHOLE_STORAGE_ENGINE=1 \
+  -DWITH_PERFSCHEMA_STORAGE_ENGINE=1 \
+  -DWITH_SSL=yes  \
+  -DENABLED_LOCAL_INFILE=1
+
+[root@localhost mysql-5.5.32]# make && make install
+6、ln -s /application/mysql-5.5.32/ /application/mysql  #将源代码目录中的配置文件copy到/etc目录下
+7、cp support-files/my-small.cnf /etc/my.cnf
+
+8、echo 'export PATH=/application/mysql/bin:$PATH' >> /etc/profile（配置环境变量）
+   source /etc/profile（刷新）
+
+9、mkdir -pv /application/mysql/data （如果已存在则直接进行下一步）
+10、chown -R mysql.mysql /application/mysql/data
+11、chmod  -R  1777  /tmp/
+12、cd /application/mysql/scripts
+    ./mysql_install_db --basedir=/application/mysql --datadir=/application/mysql/data --user=mysql
+Installing MySQL system tables...
+OK
+Filling help tables...
+OK
+13、cd ..
+    cp support-files/mysql.server /etc/init.d/mysqld
+14、添加至服务列表：
+ chkconfig --add mysqld
+ chkconfig mysqld on
+15、service mysqld  start
+    service mysqld  start
+*********************************************************************************
+备份：
+mysqldump -uroot -p123456 oldboy  >backup/oldboy.sql
+egrep -v "#|\*|--|^$" backup/oldboy.sql
+mysql -uroot -p123456 oldboy <backup/oldboy.sql
+***********************************************************
+mysql  -uroot -p123456 -B  oldboy   <backup/oldboy_B.sql 
+mysql  -uroot -p123456    <backup/oldboy_B.sql 
+****************************************************************
+mysqldump  -uroot -p123456 -B  oldboy|gzip   >backup/oldboy_B.sql.gz
+*************************************************************
+分库备份：
+
+[root@localhost ~]# mysql -uroot -p'123456' -e "show databases;"|grep -Evi "database|infor|perfor"|sed -r 's#^([a-z ].*$)#mysqldump -uroot -p'123456' -B  --events  \1|gzip >backup/\1.sql.gz#g'|bash
+分库备份脚本：
+#!/bin/bash
+#mysql backup
+
+for dbname in `mysql -uroot -p'123456' -e "show databases;"|grep -Evi "d
+atabase|infor|perfor"`
+do
+    mysqldump -uroot -p'123456' --events -B $dbname|gzip >/backup/${dbna
+me}_bak.sql.gz
+done
+
+***********************************************************************
+备份表结构：加 -d 就可以了;-t 直接备份的数据  ;全库备份： mysqldump -uroot -p123456 -A -B --events |gzip >/backup/a.sql.gz|还原：在MySQL里：mysql> source /backup/aaaaaa.sql
+
+
+增量备份：mysqlbinlog 》 解析mysql的binlog日志： mysqlbinlog /application/mysql/data/mysql-bin..000002
+备份类型：
+	热备份：
+		读写不受影响
+
+	温备份：只能执行读操作
+	冷备份： 停机备份
+
+	物理备份：复制数据文件	
+	逻辑备份：将数据导出至文本文件中，可能会丢失浮点数精度，可移植能力强；跨版本；
+	完全备份：备份全部数据
+	增量备份：每天增量备份，仅备份上次增加的备份
+	差异备份; 备份上次
+完全+增量：
+备份工具：mysqldump :逻辑备份
+	 mysqlhotcopy： 物理备份
+	 lv 逻辑卷的快照：
+商业工具：ibbackup，
+xtrabackup（开源工具）
+
+mysqldump
+	--master-data=（0,1,2）
+		不记录二进制文件及位置的；
+		以CHANGE MASTER TO D的发方式记录位置，可用于回复后直接启动从服务器
+		以CHANGE MASTER TO D的发方式记录位置，但是默认被注释掉了。
+	--lock-all-tables 锁定所有表
+	--flush-logs
+	-A  所库，--all-databases
+	-B 将后面所有的名字当成数据库名字；
+	--events 备份事件的
+ 进行增量还原时，首先关闭binlog日志
+ show global variables like "%log%";
+ set sql_bin_log=0;
+ 进行增量还原；
+ 还原后进行set sql_bin_log=1;
+ 重新开始 记录binlog
+ 还原完毕；
+
+mysqldump -uroot -p123456 --master-data=2 --lock-all-tables --flush-logs -A -B dname >/tmp/dabackup.sql
+ 逻辑备份：
+	可能丢失精度；
+	压缩可以减少大小；
+	不适合对大数据库进行备份；
+        适用于小型数据库；
+	对于mylsam 备份是要温备份；
+
+
