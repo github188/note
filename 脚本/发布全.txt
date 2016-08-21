@@ -1,0 +1,69 @@
+#!/bin/bash
+#projs:venueadmin,venuemanage,sportsmapi,tcjfweb
+if [ $# -ne 1 ]
+then
+        echo "Usage: `basename $0` [projs:venueadmin|venuemanage|vinfoservice|orderservice|longtiweb|sportsmapi|tcjfweb]"
+        exit 1
+fi
+
+proj="$1"
+
+if [ "x${proj}" != "xtcjfweb"  -a  "x${proj}" != "xsportsmapi" -a  "x${proj}" != "xjdorder" -a "x${proj}" != "xvenueadmin" -a "x${proj}" != "xvenuemanage" -a  "x${proj}" != "xvinfoservice" -a "x${proj}" != "xorderservice" -a "x${proj}" != "xventimer" -a "x${proj}" != "xvenstocks" -a "x${proj}" != "xlongtiweb" -a "x${proj}" != "xvenueappapi" ]
+then
+  echo "The project name input error!"
+  exit 1 
+fi
+
+workdir="$HOME/works"
+cd $workdir/$proj
+[ $? -ne 0 ] && exit 1
+
+#git checkout v1.0.0_mysql
+git checkout master
+git pull
+
+[ $? -ne 0 ] && exit 1
+
+mvn clean
+
+if [ "x${proj}" = "xvenueadmin" -o "x${proj}" = "xvenuemanage" -o "x${proj}" = "xvenstocks" ] 
+then
+  cp $HOME/backup/vconfig/jdbc.properties.mysql_pro src/main/resources/jdbc.properties
+elif [ "x${proj}" = "xvinfoservice" ] 
+then
+  cp $HOME/backup/vconfig/jdbc.properties.info_mysql_pro src/main/java/jdbc.properties
+elif [ "x${proj}" = "xorderservice" ]
+then
+  cp $HOME/backup/vconfig/jdbc.properties.order_mysql_pro src/main/java/jdbc.properties
+elif [ "x${proj}" = "xventimer" -o "x${proj}" = "xjdorder" ]
+then
+  cp $HOME/backup/vconfig/jdbc.properties.ventimer_mysql_pro src/main/java/jdbc.properties
+elif [ "x${proj}" = "xlongtiweb" ]
+then
+  cp $HOME/backup/vconfig/jdbc.properties.longtiweb src/main/resources/jdbc.properties
+elif [ "x${proj}" = "xvenueappapi" ]
+then
+  cp $HOME/backup/vconfig/jdbc.properties.appapi src/main/java/jdbc.properties
+elif [ "x${proj}" = "xsportsmapi" ]
+then
+   cp $HOME/backup/vconfig/jdbc.properties.sportsmapi  src/main/resources/jdbc.properties
+elif [ "x${proj}" = "xtcjfweb" ]
+then
+   cp $HOME/backup/vconfig/jdbc.properties.tcjfweb  src/main/resources/jdbc.properties
+else
+  echo "The code project name is error!"
+  exit 1
+fi
+
+mvn package
+
+if [ $? -ne 0 ];then
+  exit 1
+  echo  "${proj} compile  failed"
+else
+  echo  "${proj} compile  successful"
+fi
+
+[ "x${proj}" = "xvenueadmin" -o "x${proj}" = "xvenuemanage" -o "x${proj}" = "xvenstocks" ] && git checkout -- src/main/resources/jdbc.properties
+[ "x${proj}" = "xvinfoservice" -o "x${proj}" = "xorderservice" -o "x${proj}" = "xventimer" -o "x${proj}" = "xjdorder" ] && git checkout -- src/main/java/jdbc.properties
+[ "x${proj}" = "xsportsmapi" -o  "x${proj}" = "xtcjfweb" ] && git checkout -- src/main/java/jdbc.properties

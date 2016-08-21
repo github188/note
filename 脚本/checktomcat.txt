@@ -1,0 +1,49 @@
+#!/bin/bash
+#
+PATH1=/home/app/tomcat_timer/logs
+PATH2=/home/app/tomcat_vadm/logs
+PATH3=/home/app/tomcat_vapi/logs
+NAME1=tomcat_timer
+NAME2=tomcat_vadm 
+NAME3=tomcat_vapi
+BAKPATH=/home/app/backup/bak_logs
+
+ERR=`cat  $PATH1/catalina.out |grep 'Error\|ERROR\|error' `
+if [  ! -n "$ERR"  ] ;then
+   echo   "$NAME1 okok!!!"
+else
+   echo  "$NAME1:"
+   echo  "$ERR" 
+   echo  "$ERR">$BAKPATH/$NAME1-$(date +%Y%m%d).Error.log
+fi
+
+cp $PATH1/catalina.out $BAKPATH/catatlina-$NAME1-$(date +%Y%m%d).bak.log
+>$PATH1/catalina.out
+
+
+ERR1=`cat  $PATH2/catalina.out |grep 'Error\|ERROR\|error' `
+if [  ! -n "$ERR1"  ] ;then
+   echo " $NAME2  okok!!!"
+else
+   echo   "$NAME2:"
+   echo   "$ERR1" 
+   echo   "$ERR1">$BAKPATH/$NAME2-$(date +%Y%m%d).Error.log
+fi
+cp $PATH2/catalina.out $BAKPATH/catatlina-$NAME2-$(date +%Y%m%d).bak.log
+>$PATH2/catalina.out
+
+
+
+ERR2=`cat  $PATH3/catalina.out |grep 'Error\|ERROR\|error' `
+if [  ! -n "$ERR2"  ] ;then
+   echo " $NAME3 okok!!!"
+else
+   echo   "$NAME3:"
+   echo   "$ERR2" 
+   echo   "$ERR2">$BAKPATH/$NAME3-$(date +%Y%m%d).Error.log
+fi
+cp $PATH3/catalina.out $BAKPATH/catatlina-$NAME3-$(date +%Y%m%d).bak.log
+>$PATH3/catalina.out
+
+find $BAKPATH -mtime +5 -name "*.bak.log" |xargs rm -rf {}
+find $BAKPATH -mtime +5 -name "*.Error.log" |xargs rm -rf {}

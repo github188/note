@@ -1,0 +1,39 @@
+
+#!/bin/bash
+#projs:venueadmin,venuemanage,sportsmapi,tcjfweb
+if [ $# -ne 1 ]
+then
+        echo "Usage: `basename $0` [projs:venueadmin|venuemanage|vinfoservice|orderservice|longtiweb|sportsmapi|tcjfweb]"
+        exit 1
+fi
+
+proj="$1"
+
+if [ "x${proj}" != "xtcjfweb"  -a  "x${proj}" != "xsportsmapi" -a  "x${proj}" != "xjdorder" -a "x${proj}" != "xvenueadmin" -a "x${proj}" != "x
+venuemanage" -a  "x${proj}" != "xvinfoservice" -a "x${proj}" != "xorderservice" -a "x${proj}" != "xventimer" -a "x${proj}" != "xvenstocks" -a
+"x${proj}" != "xlongtiweb" -a "x${proj}" != "xvenueappapi" ]
+then
+  echo "The project name input error!"
+  exit 1
+fi
+
+workdir="$HOME/works"
+cd $workdir/$proj
+[ $? -ne 0 ] && exit 1
+
+#git checkout v1.0.0_mysql
+git checkout master
+git pull
+
+[ $? -ne 0 ] && exit 1
+
+mvn clean
+
+mvn package
+
+if [ $? -ne 0 ];then
+  exit 1
+  echo  "${proj} compile  failed"
+else
+  echo  "${proj} compile  successful"
+fi
