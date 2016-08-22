@@ -1,0 +1,35 @@
+#!/bin/bash
+#
+PATH1=/tmp
+PATH2=/mnt
+PATH3=/jiaoben
+NAME1=tomcat1
+NAME2=tomcat2
+NAME3=tomcat3
+DATE1=` date |awk '{print $2}' `
+DATE2=`date|awk '{print $3}'`
+ERR=` sed -n '/'$DATE1' 0'$DATE2', 2016/,/'$DATE1' 0'$[$DATE2+1]', 2016/p' $PATH1/catalina.out |grep 'Error\|ERROR\|error\|SEVERE: Socket accept failed' `
+if [  ! -n "$ERR"  ] ;then
+   echo   "$NAME1  okok!!!"
+else
+   echo  "$NAME1:"
+   echo  "$ERR" 
+   echo  "$ERR">/tmp/$NAME1.Error.log
+fi
+ERR1=` sed -n '/'$DATE1' 0'$DATE2', 2016/,/'$DATE1' 0'$[$DATE2+1]', 2016/p' $PATH2/catalina.out |grep 'Error\|ERROR\|error\|SEVERE: Socket accept failed' `
+if [  ! -n "$ERR1"  ] ;then
+   echo "$NAME2  okok!!!"
+else
+   echo   "$NAME2:"
+   echo   "$ERR1" 
+   echo   "$ERR1">/tmp/$NAME2.Error.log
+fi
+
+ERR2=` sed -n '/'$DATE1' 0'$DATE2', 2016/,/'$DATE1' 0'$[$DATE2+1]', 2016/p' $PATH3/catalina.out |grep 'Error\|ERROR\|error\|SEVERE: Socket accept failed' `
+if [  ! -n "$ERR2"  ] ;then
+   echo "$NAME3  okok!!!"
+else
+   echo   "$NAME3:"
+   echo   "$ERR2" 
+   echo   "$ERR2">/tmp/$NAME3.Error.log
+fi
