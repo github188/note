@@ -1,0 +1,198 @@
+LVS director 负载均衡器增加IPVSADM脚本
+#vim director.sh
+#!/bin/bash
+#chkconfig: - 88 66
+#description: this script to add lvs IP
+ 
+VIP=192.168.0.254
+DIP=192.168.0.100
+RIP1=192.168.0.101
+RIP2=192.168.0.102
+PORT=80
+SCHELE=wrr
+LOCKFILE=/var/lock/subsys/ipvsadm
+ 
+case $1 in
+start)
+#增加vip地址
+ /sbin/ifconfig eth0:0 $VIP broadcast $VIP netmask 255.255.255.255 up
+ /sbin/route add -host $VIP dev eth0:0
+#清除防火墙规则
+ /sbin/iptables -F
+ /sbin/iptables -X
+ /sbin/iptables -Z
+#开启ip转发功能
+ echo 1 > /proc/sys/net/ipv4/ip_forward
+#清除ipvsadm 规则
+ /sbin/ipvsadm -C
+#增加ipvsadm direcotor规则
+ /sbin/ipvsadm -A -t $VIP:$PORT -s $SCHELE
+#增加realserver 规则
+ /sbin/ipvsadm -a -t $VIP:$PORT -r $RIP1 -g
+ /sbin/ipvsadm -a -t $VIP:$PORT -r $RIP2 -g
+#增加ipvsadm 锁文件
+ /bin/touch  $LOCKFILE
+;;
+stop)
+ if [ ! -e $LOCKFILE ];then
+  echo "the ipvsadm is stopped..."
+ else
+ #删除vip地址
+  /sbin/ifconfig eth0:0 down
+ #关闭ip转发
+  echo 0 > /proc/sys/net/ipv4/ip_forward
+ #清除ipvsadm 规则
+  /sbin/ipvsadm -C
+ #删除锁文件
+  /bin/touch $LOCKFILE
+ fi
+;;
+status)
+ if [ ! -e $LOCKFILE ];then
+  echo "the ipvsadm is stopped..."
+ else
+  echo "the ipvsadm is running..."
+ fi
+;;
+*)
+ echo "Usage；$0:{start|stop|status}"
+;;
+esac
+  
+  
+LVS 增加 real server脚本
+Realserver script
+#!/bin/bash
+#chkconfig: - 77 66
+#description: this script to add real server 
+#
+VIP=192.168.0.254
+case $1 in
+start)
+#arp_ignore: 定义接收到ARP请求时的响应级别；1表示仅在请求的目标地址配置请求到达的接口上的时候，才给予响应
+#arp_announce：定义将自己地址向外通告时的通告级别：2表示仅向与本地接口上地址匹配的网络进行通告；
+ echo 1 >/proc/sys/net/ipv4/conf/lo/arp_ignore
+ echo 1 >/proc/sys/net/ipv4/conf/all/arp_ignore
+ echo 2 >/proc/sys/net/ipv4/conf/lo/arp_announce
+ echo 2 >/proc/sys/net/ipv4/conf/all/arp_announce
+#增加VIP地址到lo:0接口,增加路由条目：目的地址为VIP,由lo:0接口响应（即：源地址为VIP作为响应报文给客户端）
+  
+ /sbin/ifconfig lo:0 $VIP broadcast $VIP netmask 255.255.255.255 up && /sbin/route add -host $VIP dev lo:0
+  
+#新建一个锁文件,前面执行成功则建立锁文件
+ if [  $? -eq 0 ];then
+  /bin/touch /var/lock/subsys/ipvsreal
+ else
+  echo "fail to add vip address and route."
+ fi
+;;
+stop)
+#恢复arp响应级别
+    echo 0 >/proc/sys/net/ipv4/conf/lo/arp_ignore
+ echo 0 >/proc/sys/net/ipv4/conf/all/arp_ignore
+ echo 0 >/proc/sys/net/ipv4/conf/lo/arp_announce
+ echo 0 >/proc/sys/net/ipv4/conf/all/arp_announce
+#剔除VIP地址（路由地址自动删掉）
+  loip=`/sbin/ifconfig lo:0 |grep $VIP`
+  if [ '$loip'  == '' ];then
+   echo "VIP address not found."
+  else
+   /sbin/ifconfig lo:0 down && rm -rf /var/lock/subsys/ipvsreal
+   if [ $? -eq 0 ] ;then
+    echo "VIP address had been deled."
+   else
+    echo "VIP address del failly."
+    exit 1
+   fi
+  fi
+;;
+status)
+ if [ ! -e /var/lock/subsys/ipvsreal ];then
+  echo "LVS-DR real server stoped."
+ else
+  echo "LVS-DR real server is running."
+ fi
+;;
+*)
+ echo "Usage: $0 {start | stop |status}"
+ exit 1
+;;
+esac
+ 
+RS健康状态检查脚本
+#vim check_health.sh
+#!/bin/bash
+#chkconfig: - 88 77
+#description: check health real server or not
+#设置变量：VIP, director端口, 本地地址, real sever IP数组,状态数组（1表示正常，0表示异常）,权重数组，real server 服务地址，LVS 类型，状态检测次数，日志
+VIP=192.168.0.254
+CPORT=80
+FAIL_BACK=127.0.0.1
+RS=("192.168.0.101" "192.168.0.102")
+declare -a RSSTATUS
+RW=("2" "1")
+PPORT=80
+TYPE=g
+CHKLOOP=3
+LOG=/var/log/ipvsmonitor.log
+#当real server 恢复时，增加 real server 到 director 中
+addrs(){
+        ipvsadm -a -t $VIP:$CPORT -r $1:$PPORT -$TYPE -w $2
+        [ $? -eq 0 ] && return 0 || return 1
+}
+#当real server 不可用时，删除director中ipvsadm 条目
+delrs(){
+                ipvsadm -d -t $VIP:$CPORT -r $1:$PPORT
+                [ $? -eq 0 ] && return 0 || return 1
+}
+#real server 状态检测 
+checkrs(){
+                local I=1
+                while [ $I -le $CHKLOOP ];do
+                        if curl --connect-timeout 1 http://$1 &>/dev/null;then
+                                return 0
+                        fi
+                let I++
+                done
+                return 1
+}
+#初始化状态数组，当ipvsadm 中条目有real server IP规则时 状态为1；当realserver 在ipvsadm 条目中缺失时 状态为0
+initstatus(){
+        local I
+        local COUNT=0
+         for I in ${RS[*]};do
+                if ipvsadm -L -n |grep "$I:$PPORT" &>/dev/null;then
+                        RSSTATUS[$COUNT]=1
+                else
+                        RSSTATUS[$COUNT]=0
+                fi
+        let COUNT++
+        done
+}
+#调用初始化函数
+initstatus
+#定义死循环
+while :;do
+        let COUNT=0
+        #逐个遍历 real server
+        for I in ${RS[*]};do
+         #检测real server 正常与否
+                if checkrs $I ;then
+                #当检测到real 正常但ipvsadm中没有real server 条目时增加 real server 条目
+                        if [ ${RSSTATUS[$COUNT]} -eq 0 ];then
+                                addrs $I ${RW[$COUNT]}
+                                [ $? -eq 0 ]&& RSSTATUS[$COUNT]=1 && echo "`date +%F%H:%M:%S`, $I is back." >>$LOG
+                        fi
+                else
+                 #当检测到real server 异常时，删除在 ipvsadm 中异常的realserver 条目
+                        if [ ${RSSTATUS[$COUNT]} -eq 1 ];then
+                                delrs $I
+                                [ $? -eq 0 ]&& RSSTATUS[$COUNT]=0 && echo "`date +%F%H:%M:%S`, $I is gone." >>$LOG
+                        fi
+                fi       
+        let COUNT++
+        done
+         
+#每个五秒钟遍历一次        
+sleep 5
+done
