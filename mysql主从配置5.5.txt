@@ -1,0 +1,314 @@
+mySQL复制：
+
+	扩展：
+		scale on: 向上扩展，垂直扩展
+		scale out：向外扩展，水平扩展
+
+		1，4G：50 concurrent
+		2*8=16, 32G , 300
+
+	MySQL保存二进制日志：
+		statement
+		row
+		mixed
+
+		默认为异步工作模式
+
+		SLAVE: 
+			IO thread: 向主服务请求二进制日志中的事件
+			SQL thread：从中继日志读取事件并在本地执行
+
+		MASTER:
+			binlog dump: 将IO thread请求的事件发送给对方；
+
+		工作架构：
+			从服务器：有且只能有一个主服务器；
+				MariaDB-10：支持多主模型，多源复制(multi-source replication)
+			一主多从：
+
+		读写分离：主从模型下，让前端分发器能识别读/写，并且按需调度至目标主机；
+			amoeba: 
+			mysql-proxy：
+
+		双主：master-master
+			1、必须设定双方的自动增长属性，以避免冲突
+				auto_increment_increment=#
+					定义自动增长字段起始值
+				auto_increment_offset=2
+					步长
+			2、数据不一致；
+				Age, Salary
+
+				A： update t1 set Salary=salary+1000 WHERE Age>=30;
+				B:  update t1 set Age=Age-3 WHERE Salary < 3000;
+
+			功能：均衡读请求；写请求双方一样；
+
+		示例：主从复制的配置
+
+			版本
+				1、双方的MySQL要一致；
+				2、如果不一致：主的要低于从的；
+
+			从哪儿开始复制：
+				1、都从0开始：
+				2、主服务器已经运行一段时间，并且存在不小的数据集：
+					把主服务器备份，然后在从服务恢复，从主服务器上备份时所处的位置开始复制；
+
+		配置过程：
+			主服务器：
+				1、改server-id
+				2、启用二进制日志
+				3、创建有复制权限的帐号
+
+			从服务器：
+				1、改server-id
+				2、启用中继日志
+				3、连接主服务器
+				4、启动复制线程
+
+			连接主服务器的命令：
+				CHANGE MASTER TO
+					MASTER_HOST = '', MASTER_USER='', MASTER_PASSWORD='', MASTER_LOG_FILE='', MASTER_LOG_POS=;
+
+
+20140412
+
+回顾：
+	主：binlog dump
+	从：io thread, sql thread
+
+	传统概念：
+		1、一主可以多从
+		2、一从只能有一主（单源复制）
+	新机制：
+		3、一从多主（多源复制），MariaDB-10
+
+	主：read/write
+	从：read
+
+	简单的主从复制：
+		一、master
+			1、启用二进制日志
+				log-bin=master-bin
+				log-bin-index=master-bin.index
+				log-bin=mysql-bin
+                                log-bin-index=mysql-bin.index
+
+
+			2、为master选择一个在当前复制架构中惟一的server-id
+				server-id={0-2^32}
+
+			3、创建一个具有复制权限的用户帐号
+				mysql> GRANT REPLICATION SLAVE, REPLICATION CLIENT ON *.* TO 'repluser'@'hostname' IDENTIFIED BY 'repluser_pass';
+				mysql> FLUSH PRIVILEGES;
+
+		二、slave
+			1、启用中继日志（并关闭二进制日志）
+				relay-log=/mydata/relaylogs/relay-bin
+				relay-log-index=
+
+			2、为slave选择一个在当前复制架构中惟一的server-id
+				server-id={0-2^32}
+
+			3、连接至主服务器
+				mysql> CHANGE MASTER TO MASTER_HOST='',MASTER_PORT='', MASTER_USER='', MASTER_PASSWORD='', MASTER_LOG_FILE='', MASTER_LOG_POS=#;
+				mysql> START SLAVE;
+
+	MySQL简单复制应用扩展：
+		1、主从服务器时间要同步（ntp）：
+			*/5 * * * * /usr/sbin/ntpdate 172.16.0.1
+
+		2、如何限制从服务器只读？
+			read-only=ON
+
+			注意：仅能限制那不具有SUPER权限用户无法执行写操作；
+
+			想限制所有用户：
+			mysql> FLUSH TABLES WITH READ LOCK;
+
+		3、如何主从复制时的事务安全？
+			在主服务器上配置：
+			sync_binlog=1
+
+		4、半同步复制
+			主服务器：
+				mysql> INSTALL PLUGIN rpl_semi_sync_master SONAME 'semisync_master.so';
+				mysql> SHOW GLOBAL VARIABLES LIKE '%semi%';
+				mysql> SET GLOBAL rpl_semi_sync_master_enabled=ON;
+				mysql> SET GLOBAL rpl_semi_sync_master_timeout=1000;
+
+			从服务器：
+				mysql> INSTALL PLUGIN rpl_semi_sync_slave SONAME 'semisync_slave.so';
+				mysql> SET GLOBAL rpl_semi_sync_slave_enabled=ON;
+				mysql> STOP SLAVE IO_THREAD; START SLAVE IO_THREAD;
+
+			在主服务器验正半同步复制是否生效：
+				mysql> SHOW GLOBAL STATUS LIKE '%semi%';
+
+			一旦某次等待超时，会自动降级为异步；
+
+		5、复制过滤器
+			master: 
+				binlog_do_db=
+				binlog_ignore_db=
+
+			slave:
+				replicate_do_db=
+				replicate_ignore_db=
+
+				replicate_do_table= db_name.table_name
+				replicate_ignore_table=
+
+				replicate_wild_do_table=
+				replicate_wild_ignore_table=
+
+			my.cnf: [mysqld]
+
+
+		6、多主模型
+
+			1）、在两台服务器上各自建立一个具有复制权限的用户；
+			2）、修改配置文件：
+			# 主服务器A上
+			[mysqld]
+			server-id = 10
+			log-bin = mysql-bin
+			relay-log = relay-mysql
+			auto-increment-offset = 1
+			auto-increment-increment = 2
+
+
+			# 主服务器B上
+			[mysqld]
+			server-id = 20
+			log-bin = mysql-bin
+			relay-log = relay-mysql
+			auto-increment-increment = 2
+			# 步长
+			auto-increment-offset = 2 
+			# 起始值
+
+			3）、如果此时两台服务器均为新建立，且无其它写入操作，各服务器只需记录当前自己二进制日志文件及事件位置，以之作为另外的服务器复制起始位置即可
+
+			serverA|mysql> SHOW MASTER STATUS\G
+			************************** 1. row ***************************
+			            File: mysql-bin.000001
+			        Position: 710
+			    Binlog_Do_DB: 
+			Binlog_Ignore_DB: 
+			1 row in set (0.00 sec)
+
+			server2|mysql> SHOW MASTER STATUS\G
+			mysql> SHOW MASTER STATUS\G
+			*************************** 1. row ***************************
+			            File: mysql-bin.000003
+			        Position: 811
+			    Binlog_Do_DB: 
+			Binlog_Ignore_DB: 
+			1 row in set (0.00 sec)
+
+			4、各服务器接下来指定对另一台服务器为自己的主服务器即可：
+			serverA|mysql> CHANGE MASTER TO ...,MASTER_LOG_FILE='mysql-bin.000003', MASTER_LOG_POS=811
+
+			serverB|mysql> CHANGE MASTER TO ...,MASTER_LOG_FILE='mysql-bin.000001', MASTER_LOG_POS=710	
+
+
+			多主，且高可用的解决方案：
+				MMM：Multi Master MySQL
+				MHA：MySQL HA
+
+			独自完成：MMM
+
+		7、SSL
+			独自完成：基于ssl的复制	
+
+	博客作业：
+		1、上述1-7步；
+		2、MMM
+
+		主从：
+
+			从多个服务器，以均衡为目的挑选一个响应客户端请求的服务器：
+				round-robin: 
+				取模
+
+
+			memcached: 缓存能力+API
+			读写分离：读写分离，负载均衡
+
+
+	复制相关的文件：
+		master.info: 文本文件，保存从服务器连接至主服务时所需要的信息，每行一个值；
+		relay-log.info: 文本文件，保存了复制位置：包括二进制日志和中继日志的文件及位置；
+
+		为了复制的安全性：
+			sync_master_info = 1    
+			sync_relay_log = 1   
+			sync_relay_log_info = 1
+
+		从服务器意外崩溃时，建议使用pt-slave-start命令来启动slave; 
+
+	基于行和基于语句复制：
+		基于语句：
+			数据量小；易于查看；适应性强；
+			有些语句无法做精确复制；无法对使用了触发器、存储过程等代码的应用实现精确复制；
+
+		基于行：
+			能够精确完成有着触发器、存储过程等代码场景中的复制；能完成几乎所有的复制功能；较少的CPU占用率；
+			无法判断执行了什么样的SQL语句；数据量可能略大；
+
+	从服务器落后于主服务器：
+		Seconds_Behind_Master: 0
+
+	评估主从服务表中的数据是否一致：
+		pt-table-checksum
+
+		如果数据不一致，解决办法
+			1、重新备份并在从服务器导入数据；
+			2、pt-table-sync 
+
+		为了提高复制时的数据安全性，在主服务器上的设定：
+			sync_binlog = 1
+			innodb_flush_log_at_trx_commit = 1
+				此参数的值设定为1，性能下降会较严重；因此，一般设定为2等，此时，主服务器崩溃依然有可能导致从服务器无法获取到全部的二进制日志事件；
+
+		如果master意外崩溃导致二进制日志中的某事件损坏，可以在从服务器使用如下参数忽略：
+			sql_slave_skip_counter = 0
+
+
+	第三方复制解决方案：Tungsten, Galera 
+
+
+
+	MariaDB GTID:
+
+		文档中应用MariaDB-10，需要做的修改：
+		1、不支持的参数：
+			gtid-mode=on 
+			enforce-gtid-consistency=true
+
+		2、修改的参数：
+			slave-parallel-workers参数修改为slave-parallel-threads
+
+		3、连接至主服务使用的命令：
+			一个新的参数：MASTER_USER_GTID={current_pos|slave_pos|no}
+
+			CHANGE MASTER TO master_host="127.0.0.1", master_port=3310, master_user="root", master_use_gtid=current_pos;
+
+	Multi-Source Replication: 
+		CHANGE MASTER ['connection_name'] ...
+		FLUSH RELAY LOGS ['connection_name']
+		MASTER_POS_WAIT(....,['connection_name'])
+		RESET SLAVE ['connection_name']
+		SHOW RELAYLOG ['connection_name'] EVENTS
+		SHOW SLAVE ['connection_name'] STATUS
+		SHOW ALL SLAVES STATUS
+		START SLAVE ['connection_name'...]]
+		START ALL SLAVES ...
+		STOP SLAVE ['connection_name'] ...
+		STOP ALL SLAVES ...
+
+		总结：多源复制，每个源应该使用不同的数据库；多源复制目前不支持半同步复制；
+
+	总结：GTID（HA，多线程复制）、多源复制

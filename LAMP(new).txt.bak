@@ -211,6 +211,8 @@ vi /etc/httpd/conf/httpd.conf 加入一句 ServerName localhost:80
 # cd mysql 
 
 # chown -R mysql:mysql  .
+yum install -y perl-Module-Install.noarch
+
 # scripts/mysql_install_db --user=mysql --datadir=/mydata/data
 新逻辑卷： fdisk /dev/sda
 
@@ -289,6 +291,8 @@ wget http://pkgs.repoforge.org/rpmforge-release/rpmforge-release-0.5.3-1.el6.rf.
 rpm -ivh rpmforge-release-0.5.3-1.el6.rf.x86_64.rpm
 
 2、编译安装php-5.4.26
+  267  yum -y install libxml2
+  268  yum -y install libxml2-devel
 
 首先下载源码包至本地目录，下载位置ftp://172.16.0.1/pub/Sources/new_lamp。
 
@@ -358,6 +362,10 @@ mysql测试：
 # tar xf xcache-3.0.3.tar.gz
 # cd xcache-3.0.3
 # /usr/local/php/bin/phpize
+如果报错  Cannot find autoconf. Please check your autoconf installation and the
+$PHP_AUTOCONF environment variable. Then, rerun this script
+ yum install autoconf
+
 # ./configure --enable-xcache --with-php-config=/usr/local/php/bin/php-config
 # make && make install
 
@@ -453,6 +461,13 @@ Time per request:       6.933 [ms] (mean, across all concurrent requests)
 
 请配置好yum源（可以是本地系统光盘）后执行如下命令：
 # yum -y groupinstall "X Software Development" 
+wget http://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
+rpm -ivh epel-release-latest-7.noarch.rpm
+yum -y install mhash
+yum -y install mhash-devel
+yum -y install libxml2 
+yum -y install libmcrypt-devel  libmcrypt
+yum -y install bzip2 bzip2-devel
 
 如果想让编译的php支持mcrypt扩展，此处还需要下载ftp://172.16.0.1/pub/Sources/ngnix目录中的如下两个rpm包并安装之：
 libmcrypt-2.5.7-5.el5.i386.rpm

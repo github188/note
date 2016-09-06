@@ -404,23 +404,7 @@ location / {
 <?php
 phpinfo();
 ?>
-测试页面index.php示例如下：
-    <?php
-      $link = mysql_connect('127.0.0.1','root','mageedu');
-      if ($link)
-        echo "Success...";
-      else
-        echo "Failure...";
 
-      mysql_close();
-    ?>
-
-测试：
-
-<html><body><h1>It works!</h1></body></html>
-<?php
-   phpinfo();
-?>
 接着就可以通过浏览器访问此测试页面了。
 
 
