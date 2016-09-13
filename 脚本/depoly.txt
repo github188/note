@@ -1,0 +1,18 @@
+#!/bin/bash
+#deploy
+passwd=
+D_PATH=/home/sports/tomcat_sports/webapps
+cd  $D_PATH
+cp  sportsmapi.war  /mnt/backup/sportsmapi.war.bak$(date +%Y%m%d%H%M)
+if [ $? = 0 ];then
+   echo "BACKUP SUCCESS"
+else 
+   exit 1
+fi
+expect -c "
+  spawn scp -P  admin@/home/admin/works/sportsmapi/target/sportsmapi.war  .
+  expect {
+    \"*assword\" {set timeout 300; send \"$passwd\r\";}
+    \"yes/no\" {send \"yes\r\"; exp_continue;}
+  }
+  expect eof"
