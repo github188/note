@@ -1,0 +1,10 @@
+#jdk7 settings
+JAVA_HOME=/home/app/jdk1.7.0_67
+JRE_HOME=$JAVA_HOME/jre
+PATH=$PATH:$JAVA_HOME/bin:$JRE_HOME/bin
+CLASSPATH=:$JAVA_HOME/lib/dt.jar:$JAVA_HOME/lib/tools.jar:$JRE_HOME/lib
+export JAVA_HOME JRE_HOME PATH CLASSPATH
+
+#tomcat
+CATALINA_HOME=/home/app/tomcat_jfsc
+export  PATH=$PATH:$CATALINA_HOME/bin
