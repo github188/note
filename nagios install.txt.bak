@@ -52,7 +52,7 @@ email        nagios@localhost       #这个是默认设置
 # make install-webconf
 
 创建一个登录nagios web程序的用户，这个用户帐号在以后通过web登录nagios认证时所用：
-#  htpasswd -c /usr/local/nagios/etc/htpasswd.users nagiosadmin
+#  htpasswd -c /usr/local/nagios/etc/htpasswd.users nagios
 
 
 以上过程配置结束以后需要重新启动httpd：
