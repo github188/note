@@ -266,6 +266,10 @@ MANPATH  /usr/local/mysql/man
 vim /etc/profile.d/mysql.sh
 内容：export PATH=$PATH:/usr/local/mysql/bin
 执行脚本
+mysqladmin -u root password 123456
+mkdir /var/lib/mysql/
+ln -sv /tmp/mysql.sock /var/lib/mysql/mysql.sock
+
 三、编译安装php-5.4.26
 
 1、解决依赖关系：
