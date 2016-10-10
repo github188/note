@@ -347,6 +347,9 @@ libevent-devel-2.0.17-2.i386.rpm
 # tar xf php-5.4.4.tar.bz2
 # cd php-5.4.4
 #  ./configure --prefix=/usr/local/php --with-mysql=/usr/local/mysql --with-openssl --enable-fpm --enable-sockets --enable-sysvshm  --with-mysqli=/usr/local/mysql/bin/mysql_config --enable-mbstring --with-freetype-dir --with-jpeg-dir --with-png-dir --with-zlib-dir --with-libxml-dir=/usr --enable-xml  --with-mhash --with-mcrypt  --with-config-file-path=/etc --with-config-file-scan-dir=/etc/php.d --with-bz2 --with-curl 
+******************************************************************************************************************************************************************
+安装zabbix
+./configure --prefix=/usr/local/php --with-mysql=/usr/local/mysql --enable-mysqlnd --with-mysqli=mysqlnd --with-pdo-mysql=mysqlnd --with-iconv-dir=/usr/local/libiconv1.14 --with-pcre-regex --with-zlib --with-bz2 --enable-calendar --with-curl --enable-dba --with-libxml-dir --enable-ftp --with-gd --with-jpeg-dir --with-png-dir --with-zlib-dir --with-freetype-dir --enable-gd-native-ttf --with-mhash --enable-mbstring --with-mcrypt --enable-pcntl --enable-xml --disable-rpath --enable-shmop --enable-sockets --enable-zip --enable-bcmath --with-snmp --disable-ipv6 --with-gettext  --enable-fpm --with-fpm-user=www  --with-fpm-group=www --with-openssl
 
 说明：如果前面第1步解决依赖关系时安装mcrypt相关的两个rpm包，此./configure命令还可以带上--with-mcrypt选项以让php支持mycrpt扩展。--with-snmp选项则用于实现php的SNMP扩展，但此功能要求提前安装net-snmp相关软件包。
 
