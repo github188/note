@@ -1,11 +1,5 @@
 
 
-
-
-
-
-
-
 源码安装：
 
 下载地址：http://www.zabbix.com/download.php
@@ -79,17 +73,11 @@ proxy: zabbix_proxy
 
 
 
-
-
-
 安装frontend: 
 
 # cp -a  frontend/php/  /var/www/html/zabbix
 
 启动lamp或lnmp后，通过浏览器访问http://<server_ip_or_name>/zabbix即可进行安装。
-
-
-
 
 
 
@@ -152,29 +140,6 @@ zabbix:
 zabbix仅运行在触发器上定义依赖关系；
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 模板是一系列配置的集合，它可以方便地快速部署在某监控对象上，并支持重复应用。模板可包含多种类型的条目：
 	items
 	triggers
@@ -185,10 +150,6 @@ zabbix仅运行在触发器上定义依赖关系；
 
 
 将模板应用至某主机上时，其定义的所有条目都会自动添加。因此，模板通常用于为某监控的服务或应用程序整合一组条目并将之分别应用于对应的运行了相应服务的主机上。此外，模板的另一个好处在于，必要时，修改了模板，被应用的主机都会相应的作出修改。
-
-
-
-
 
 
 UserParameter：
@@ -204,12 +165,6 @@ UserParameter=<key>,<command>
 	分布式监控
 
 
-
-
-
-
-
-
 Delta (speed per second)：保存为(value-prev_value)/(time-prev_time的计算结果，即当前值减去前一次获取的数据值，除以当前时间戳减去前一次值获取时的时间戳得到的结果；如果当前值小于前一次的值，其将会被丢弃；
 Delta (simple change)：保存为 (value-prev_value)的计算结果；
 
@@ -220,15 +175,6 @@ Delta (simple change)：保存为 (value-prev_value)的计算结果；
 
 /etc/zabbix
 	zabbix_agentd.conf, zabbix_agentd.d/*.conf
-
-
-
-
-
-
-
-
-
 
 
 nginx status 开启方法：
