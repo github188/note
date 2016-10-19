@@ -1,0 +1,52 @@
+F:\Apache2.2\bin>ab -n 1000 -c 100 localhost/index.php
+This is ApacheBench, Version 2.3 <$Revision: 655654 $>
+Copyright 1996 Adam Twiss, Zeus Technology Ltd, http://www.zeustech.net/
+Licensed to The Apache Software Foundation, http://www.apache.org/
+
+Benchmarking localhost (be patient)
+Completed 100 requests
+Completed 200 requests
+Completed 300 requests
+Completed 400 requests
+Completed 500 requests
+Completed 600 requests
+Completed 700 requests
+Completed 800 requests
+Completed 900 requests
+Completed 1000 requests
+Finished 1000 requests
+
+
+Server Software:        Apache/2.2.25 (服务器软件名称及版本信息)
+Server Hostname:        localhost (服务器主机名)
+Server Port:            80 (服务器端口)
+Document Path:          /index.php (供测试的URL路径)
+Document Length:        10 bytes (供测试的URL返回的文档大小)
+Concurrency Level:      100 (并发数)
+Time taken for tests:   0.247 seconds (压力测试消耗的总时间)
+Complete requests:      1000 (压力测试的总次数)
+Failed requests:        0 (失败的请求数)
+Write errors:           0 (网络连接写入错误数)
+Total transferred:      198000 bytes (传输的总数据量)
+HTML transferred:       10000 bytes (HTML文档的总数据量)
+Requests per second:    4048.34 [#/sec] (mean) (平均每秒的请求数)
+Time per request:       24.701 [ms] (mean) (所有并发用户(这里是100)都请求一次的平均时间)
+Time per request:       0.247 [ms] (mean, across all concurrent requests) (单个用户请求一次的平均时间)
+Transfer rate:          782.78 [Kbytes/sec] received (传输速率，单位：KB/s)
+Connection Times (ms)
+              min  mean[+/-sd] median   max
+Connect:        0    0   0.3      0       1
+Processing:     6   23   4.2     24      30
+Waiting:        5   20   5.3     21      29
+Total:          6   23   4.2     24      30
+
+Percentage of the requests served within a certain time (ms)
+  50%     24
+  66%     25
+  75%     26
+  80%     26
+  90%     27
+  95%     27
+  98%     28
+  99%     29
+ 100%     30 (longest request
