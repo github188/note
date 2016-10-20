@@ -196,23 +196,12 @@ reading — nginx 读取到客户端的 Header 信息数。
 writing — nginx 返回给客户端的 Header 信息数。
 waiting — 开启 keep-alive 的情况下，这个值等于 active – (reading + writing)， 意思就是 Nginx 已经处理完正在等候下一次请求指令的驻留连接。
 
-
-
-
-
 /usr/lib/zabbix/externalscripts
 /etc/zabbix/externalscripts
-
-
 
 自动发现
 web监控
 分布式环境中使用zabbix
-
-
-
-
-
 
 UserParameter=Nginx.active[*], /usr/bin/curl -s "http://$1:$2/status" | awk '/^Active/ {print $NF}'
 UserParameter=Nginx.reading[*], /usr/bin/curl -s "http://$1:$2/status" | grep 'Reading' | cut -d" " -f2
@@ -221,12 +210,6 @@ UserParameter=Nginx.waiting[*], /usr/bin/curl -s "http://$1:$2/status" | grep 'W
 UserParameter=Nginx.accepted[*], /usr/bin/curl -s "http://$1:$2/status" | awk '/^[ \t]+[0-9]+[ \t]+[0-9]+[ \t]+[0-9]+/ {print $$1}'
 UserParameter=Nginx.handled[*], /usr/bin/curl -s "http://$1:$2/status" | awk '/^[ \t]+[0-9]+[ \t]+[0-9]+[ \t]+[0-9]+/ {print $$2}'
 UserParameter=Nginx.requests[*], /usr/bin/curl -s "http://$1:$2/status" | awk '/^[ \t]+[0-9]+[ \t]+[0-9]+[ \t]+[0-9]+/ {print $$3}'
-
-
-
-
-
-
 
 
 UserParameter=nginx.access_countaccess, /usr/lib/zabbix/externalscripts/logcheck_nginx.accesslog totalaccess
@@ -238,49 +221,9 @@ UserParameter=nginx.access_count5xx, /usr/lib/zabbix/externalscripts/logcheck_ng
 
 
 
-
-
-
-
-
-
-
-
 UserParameter=varnish.stat[*], /usr/lib/zabbix/externalscripts/varnishstatus varnish_stat $1
 UserParameter=varnish.count[*], /usr/lib/zabbix/externalscripts/varnishstatus varnish_count $1
 UserParameter=varnish.hitrate, /usr/lib/zabbix/externalscripts/varnishstatus varnish_hitrate
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
