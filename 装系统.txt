@@ -8,3 +8,25 @@
 关闭KUMP
 配置网络
 改名字
+***************************************************************************************************
+vim /etc/selinux/config
+   SELINUX=disabled
+
+   systemctl stop NetworkManager
+   systemctl disable NetworkManager
+   systemctl stop firewalld
+   systemctl disable firewalld.service
+   yum -y install iptables-services
+   systemctl enable iptables.service
+   systemctl start iptables  启动
+***************************************************************************************************
+vim /etc/ssh/sshd_config
+   修改端口为 20022：：：将里面的 Port 22前面的注释去掉，将22修改为 20022
+   PermitRootLogin，将后面的yes改为no  
+   vim /etc/sysconfig/iptables
+   添加20022端口访问:
+   -A INPUT -p tcp -m state --state NEW -m tcp --dport 20022 -j ACCEPT
+   service iptables restart  重启iptabels 服务
+   service sshd restart     重启sshd  服务
+***************************************************************************************************
+systemctl set-default multi-user.target  #将图形界面改为字符界面
