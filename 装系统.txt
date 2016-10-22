@@ -30,3 +30,4 @@ vim /etc/ssh/sshd_config
    service sshd restart     重启sshd  服务
 ***************************************************************************************************
 systemctl set-default multi-user.target  #将图形界面改为字符界面
+cat  /proc/cpuinfo |grep "physical id"|sort |uniq|wc -l
