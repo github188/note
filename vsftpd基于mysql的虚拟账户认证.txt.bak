@@ -86,14 +86,6 @@ guest_username=vuser
   anon_upload_enable=NO
   anon_mkdir_write_enable=NO
   anon_other_write_enable=NO
-  每个用户也可以有自己的家目录
-  anon_upload_enable=YES
-  anon_mkdir_write_enable=YES
-  anon_other_write_enable=YES
-  dirmessage_enable=YES
-  anon_umask=022
-  local_root=/home/ftp
-  anon_world_readable_only=NO
 5.启动vsftpd
   service vsftpd start 
   此时应关闭Selinux ，否则将认证失败
