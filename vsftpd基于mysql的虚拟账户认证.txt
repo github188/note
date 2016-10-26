@@ -4,6 +4,7 @@ Vsftpd基于pam的mysql认证
   wget http://www.hndzz.cn/attachment/pam_mysql-0.7RC1.tar.gz
 
 2.编译安装pam_mysql-0.7RC1
+  yum install -y  pam-devel gcc gcc-c++ openssl
   wget http://www.hndzz.cn/attachment/pam_mysql-0.7RC1.tar.gz
   tar xf  pam_mysql-0.7RC1.tar.gz
   cd  pam_mysql-0.7RC1
