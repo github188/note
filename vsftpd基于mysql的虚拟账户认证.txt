@@ -36,10 +36,10 @@ Vsftpd基于pam的mysql认证
  setfacl -m u:vuser:rwx  /ftproot/upload
  setfacl -m u:vuser:rwx  /ftproot/
  修改vsftpd的配置文件，使其适应mysql认证
-  cp /etc/vsftpd/vsftpd.conf /etc/vsftpd/vsftpd.conf.bak
-  vim /etc/vsftpd/vsftpd.conf
-  删除所有内容
-  将以下内容加进去
+ cp /etc/vsftpd/vsftpd.conf /etc/vsftpd/vsftpd.conf.bak
+ vim /etc/vsftpd/vsftpd.conf
+ 删除所有内容
+ 将以下内容加进去
 ******************************************************************
 local_enable=YES
 write_enable=YES
