@@ -60,6 +60,8 @@ guest_enable=YES
 guest_username=vuser
 allow_writeable_chroot=YES
 user_config_dir=/etc/vsftpd/vusers_conf
+pasv_min_port=61001
+pasv_max_port=62000
 *******************************************************************
 或者
 修改pam_service_name选项的值如下所示
@@ -96,5 +98,9 @@ guest_username=vuser
   local_root=/home/ftp
   anon_world_readable_only=NO
 5.启动vsftpd
-  service vsftpd start 
+ service vsftpd start 
+ iptables 规则
+ -A INPUT -p tcp --dport 61001:62000 -j ACCEPT
+ -A OUTPUT -p tcp --sport 61001:62000 -j ACCEPT
+***********************************************************
   此时应关闭Selinux ，否则将认证失败
