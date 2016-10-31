@@ -4,3 +4,33 @@ useBodyEncodingForURI="true" URIEncoding="UTF-8"
 <Connector port="8000" protocol="HTTP/1.1"
                connectionTimeout="180000"
                redirectPort="8443" useBodyEncodingForURI="true" URIEncoding="UTF-8" maxHttpHeaderSize="10240000"/>
+*************************************************************************************************************************
+<Context path="" docBase="tcjfweb" debug="0" reloadable="true" />
+
+<Context path="" docBase="ims" debug="0" reloadable="true"/>
+这样就是不带项目名也可以访问我的ims项目。也就是说输入http://localhost:8088就可以访问到ims了。path就是在访问的时候后面要跟上的项目路径，不写就代表不输入就可以
+
+tomcat servlet.xml中 Context标签个参数含义
+<Context path="/xxx" docBase="D:\xxx" debug="0" reloadable="true" crossContext="true" />
+path 指出你的访问路径
+docBase指出你的存放路径
+debug 为设定debug的等级0提供最少的信息,9提供最多的信息
+reloadable=true时 当web.xml或者class有改动的时候都会自动重新加载不需要从新启动服务
+crosscontext="true"表示配置的不同context共享一个session
+
+tomcat部署服务的四种方式
+1、利用tomcat的自动部署
+ 此种方式最为简单，我们只需要将web应用放到tomcat的webapps目录下即可！
+2、利用控制台补部署
+ 
+3、增加自定义部署文件
+ 此种方式是在tomcat 的根目录下的\conf\Catalina\localhost目录下，添加一个任意名称的xml文件，此文件名将作为web应用的虚拟路径。
+内容如下：<Context   docBase="D:\xxx" debug="0" reloadable="true" crossContext="true" />
+4、修改server.xml文件，部署web应用
+在tomcat 的根目录下的\conf\目录下，修改server.xml文件，添加
+<Context path="/xxx" docBase="D:\xxx" debug="0" reloadable="true" crossContext="true" />
+
+****************************************************************************
+#service.url=http://localhost:8800/userservice/UserRestService/
+service.url=http://192.168.88.103:8014/userservice/UserRestService/
+service.password=tengcaiCWD521\!

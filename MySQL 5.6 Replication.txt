@@ -1,4 +1,4 @@
-
+﻿
 
 MySQL 5.6引入的GTID(Global Transaction IDs)使得其复制功能的配置、监控及管理变得更加易于实现，且更加健壮。
 
@@ -86,7 +86,7 @@ report-host=slave.magedu.com
 
 2、创建复制用户
 
-mysql> GRANT REPLICATION SLAVE ON *.* TO repluser@172.16.100.7 IDENTIFIED BY 'replpass';
+mysql> GRANT REPLICATION SLAVE ON *.* TO repluser@192.168.88.108 IDENTIFIED BY 'replpass';
 
 说明：172.16.100.7是从节点服务器；如果想一次性授权更多的节点，可以自行根据需要修改；
 
