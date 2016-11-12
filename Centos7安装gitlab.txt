@@ -1,0 +1,184 @@
+Centos7 安装Gtilab
+1. cd /etc/yum.repos.d
+   wget -O CentOS-Base.repo http://mirrors.aliyun.com/repo/Centos-6.repo
+   安装依赖包
+   yum -y install libicu-devel patch gcc-c++ readline-devel zlib-devel libffi-devel openssl-devel make autoconf automake libtool bison libxml2-devel libxslt-devel libyaml-devel zlib-devel openssl-devel cpio expat-devel gettext-devel curl-devel perl-ExtUtils-CBuilder perl-ExtUtils-MakeMaker
+2.安装Ruby环境
+   $ mkdir /tmp/ruby && cd /tmp/ruby
+   $ curl --progress ftp://ftp.ruby-lang.org/pub/ruby/ruby-2.1.5.tar.gz | tar xz
+   $ cd ruby-2.1.5
+   $ ./configure --disable-install-rdoc
+   $ make && make install
+
+   $ ln -s /usr/local/bin/ruby /usr/bin/ruby
+   $ ln -s /usr/local/bin/gem /usr/bin/gem
+   $ ln -s /usr/local/bin/bundle /usr/bin/bundle
+
+    // 设置ruby gem源为淘宝
+    $ gem sources --add https://gems.ruby-china.org/ --remove https://rubygems.org/
+    $ gem sources -l
+     *** CURRENT SOURCES ***
+
+     https://gems.ruby-china.org
+    # 请确保只有 gems.ruby-china.org
+    $ gem install bundler --no-ri --no-rdoc
+3.安装MySQL及初始化GitLab库
+
+    $ yum install mysql mysql-devel mysql-server -y
+    $ /etc/init.d/mysqld start
+    $ chkconfig mysqld on
+
+    // 登录mysql创建gitab的帐号和数据库
+    mysql> CREATE USER 'gitlab'@'localhost' IDENTIFIED BY 'gitlab';
+    mysql> CREATE DATABASE IF NOT EXISTS `gitlabhq_production` DEFAULT CHARACTER SET `utf8` COLLATE `utf8_unicode_ci`;
+    mysql> GRANT SELECT, INSERT, UPDATE, DELETE, CREATE, DROP, INDEX, ALTER ON `gitlabhq_production`.* TO 'gitlab'@'localhost';
+
+    //测试是否可以用git帐号登录数据库
+4.安装Redis
+    $ yum -y install redis
+    $ service redis start
+    $ chkconfig redis on
+5.添加git帐号并允许sudo
+    $ useradd --comment 'GitLab' git
+    $ echo "git ALL=(ALL)       NOPASSWD: ALL" >>/etc/sudoers
+6.安装GitLab
+    cd /home/git
+    sudo -u git -H git clone https://gitlab.com/gitlab-org/gitlab-ce.git -b 7-10-stable gitlab
+    $ cd /home/git/gitlab
+    $ sudo -u git -H cp config/gitlab.yml.example config/gitlab.yml
+
+    // 编辑git路径, gitlab的host:port
+    $ vim config/gitlab.yml
+    // bin_path: /usr/local/bin/git
+    // host: localhost   #这个host是显示你仓库的链接地址的ip ，这里要改成你自己的ip或域名
+     // port: 80 
+
+    // 给文件夹添加相应的权限
+    $ chown -R git log/
+    $ chown -R git tmp/
+    $ chmod -R u+rwX  log/
+    $ chmod -R u+rwX  tmp/
+
+    // 创建必要的文件夹，以及复制配置文件
+    $ sudo -u git -H mkdir /home/git/gitlab-satellites
+    $ sudo -u git -H mkdir tmp/pids/
+    $ sudo -u git -H mkdir tmp/sockets/
+    $ sudo chmod -R u+rwX  tmp/pids/
+    $ sudo chmod -R u+rwX  tmp/sockets/
+    $ sudo -u git -H mkdir public/uploads
+    $ sudo chmod -R u+rwX  public/uploads
+    $ sudo -u git -H cp config/unicorn.rb.example config/unicorn.rb
+    $ sudo -u git -H cp config/initializers/rack_attack.rb.example
+    config/initializers/rack_attack.rb
+
+    // 配置数据库连接信息
+    $ sudo -u git cp config/database.yml.mysql config/database.yml
+    $ sudo -u git -H vim  config/database.yml
+    $ vim config/database.yml
+    // production:
+    //     username: gitlab
+    //     password: "gitlab"
+7.安装GitLab-Shell
+    cd /home/git
+    sudo -u git -H git clone https://gitlab.com/gitlab-org/gitlab-shell.git -b v2.7.0
+    $ cd gitlab-shell/
+    $ sudo -u git -H cp config.yml.example config.yml
+
+    // 编辑配置文件, 设置gitlab_url, redis-cli, log-level...
+    $ vim config.yml
+    // gitlab_url: "http://localhost/"
+    // /usr/bin/redis-cli
+
+    // 安装git-shell
+    $ sudo -u git -H ./bin/install
+8.安装需要ruby的gems
+    $ cd /home/git/gitlab
+    $ vim  Gemfile
+      第一行改为 source "https://gems.ruby-china.org"
+    $ sudo -u git -H bundle install --deployment --without development test postgres aws
+    yum -y install cmake
+9.初始化数据库(创建GitLab相关表)
+    yum  -y install nodejs
+    $ sudo -u git -H bundle exec rake gitlab:setup RAILS_ENV=production
+10.安装启动文件以及日志切割文件
+    cp lib/support/init.d/gitlab /etc/init.d/gitlab
+    cp lib/support/init.d/gitlab.default.example /etc/default/gitlab
+    cp lib/support/logrotate/gitlab /etc/logrotate.d/gitlab
+11.设置git帐号信息
+    $ sudo -u git -H git config --global user.name "Troy Zhang"
+    $ sudo -u git -H git config --global user.email "troyz@synnex.com"
+    $ sudo -u git -H git config --global core.autocrlf input
+12.安装Nginx
+    $ yum -y install nginx
+$ vim /etc/nginx/nginx.conf
+user              root git;
+worker_processes  2;
+pid        /var/run/nginx.pid;
+
+events {
+    worker_connections  1024;
+}
+
+http {
+    include       /etc/nginx/mime.types;
+    default_type  application/octet-stream;
+
+    log_format  main  '$remote_addr - $remote_user [$time_local] "$request" '
+                      '$status $body_bytes_sent "$http_referer" '
+                      '"$http_user_agent" "$http_x_forwarded_for"';
+# GITLAB
+# Maintainer: @randx
+# App Version: 5.0
+
+upstream gitlab {
+  server unix:/home/git/gitlab/tmp/sockets/gitlab.socket;
+}
+
+server {
+  listen *:80 default_server;         # e.g., listen 192.168.1.1:80; In most cases *:80 is a good idea
+  server_name YOUR_SERVER_FQDN;     # e.g., server_name source.example.com;
+  server_tokens off;     # don't show the version number, a security best practice
+  root /home/git/gitlab/public;
+
+  # Set value of client_max_body_size to at least the value of git.max_size in gitlab.yml
+  client_max_body_size 5m;
+
+  # individual nginx logs for this gitlab vhost
+  access_log  /var/log/nginx/gitlab_access.log;
+  error_log   /var/log/nginx/gitlab_error.log;
+
+  location / {
+    # serve static files from defined root folder;.
+    # @gitlab is a named location for the upstream fallback, see below
+    try_files $uri $uri/index.html $uri.html @gitlab;
+  }
+
+  # if a file, which is not found in the root folder is requested,
+  # then the proxy pass the request to the upsteam (gitlab unicorn)
+  location @gitlab {
+    proxy_read_timeout 300; # https://github.com/gitlabhq/gitlabhq/issues/694
+    proxy_connect_timeout 300; # https://github.com/gitlabhq/gitlabhq/issues/694
+    proxy_redirect     off;
+
+    proxy_set_header   X-Forwarded-Proto $scheme;
+    proxy_set_header   Host              $http_host;
+    proxy_set_header   X-Real-IP         $remote_addr;
+    proxy_set_header   X-Forwarded-For   $proxy_add_x_forwarded_for;
+
+    proxy_pass http://gitlab;
+  }
+}
+}
+
+更改权限，启动nginx
+$ nginx -t
+$ chown -R git:git /var/lib/nginx/
+$ /etc/init.d/nginx start
+13.检测当前环境
+   cd /home/git/gitlab
+   sudo -u git -H bundle exec rake gitlab:env:info RAILS_ENV=production
+14.拉取gitlab静态资源文件
+   $ sudo -u git -H bundle exec rake assets:precompile RAILS_ENV=production
+15.启动gitlab
+   service  gitlab  start
+   登录GitLab -- Username: root Password: 5iveL!fe
