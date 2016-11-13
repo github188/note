@@ -110,7 +110,7 @@ Centos7 安装Gtilab
     $ sudo -u git -H git config --global core.autocrlf input
 12.安装Nginx
     $ yum -y install nginx
-    sudo cp /home/git/gitlab/lib/support/nginx/gitlab  /etc/nginx/conf.d/gitlab.conf
+    sudo cp lib/support/nginx/gitlab /etc/nginx/conf.d/gitlab.conf
     把nginx的运行用户改为root
 $ vim /etc/nginx/nginx.conf
 user              root git;
