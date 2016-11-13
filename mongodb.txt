@@ -1,0 +1,40 @@
+Centos7下安装mongodb数据库
+
+一、安装mongodb
+
+在/etc/yum.repos.d目录下添加mongodb源 
+新建mongodb-org-3.0.repo文件
+
+[mongodb-org-3.0]
+name=MongoDB Repository
+baseurl=https://repo.mongodb.org/yum/redhat/$releasever/mongodb-org/3.0/x86_64/
+gpgcheck=0
+enabled=1
+保存退出 
+yum命令安装mongodb-org
+在根目录下新建/data/db目录
+mkdir -p /data/db
+启动mongod
+systemctl start mongod
+停止mongod
+systemctl stop mongod
+重启mongo
+systemctl restart mongod
+二、安装php-mongodb扩展
+下载php-mongodb扩展
+wget http://pecl.php.net/get/mongo-1.6.12.tgz
+解压
+tar xvzf mongo-1.6.12
+编译安装
+cd mongo-1.6.12
+phpize
+./configure --with-php-config=/usr/bin/php-config
+make && make install
+在安装过程中可能会报以下错误
+/var/tmp/mongo/contrib/php-ssl.h:33:25: error: openssl/evp.h: No such file or directory
+需要安装openssl-devel
+yum install openssl-devel
+在php.ini文件中添加extension=mongo.so
+extension=mongo.so
+重启php-fpm或服务
+systemctl restart php-fpm
