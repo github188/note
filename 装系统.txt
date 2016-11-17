@@ -34,3 +34,4 @@ cat  /proc/cpuinfo |grep "physical id"|sort |uniq|wc -l
 *****************************************************************************************************
 更改centos7主机名：
      hostnamectl set-hostname typecodes
+wget -O /etc/yum.repos.d/CentOS-Base.repo http://mirrors.aliyun.com/repo/Centos-7.repo

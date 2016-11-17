@@ -49,7 +49,7 @@ mysql>grant all privileges on zabbix.* to zabbix_user@localhost identified by '1
 *************************************************************************************************************
 （8）编译安装zabbix
 
-#./configure --prefix=/usr/local/zabbix --with-mysql --with-net-snmp --with-libcurl --enable-server --enable-agent --enable-proxy --enable-java
+#./configure --prefix=/usr/local/zabbix --with-mysql --with-net-snmp --with-libcurl --enable-server --enable-agent --enable-proxy
 # make install
 ***************************************************************************************************************************************
 （9）修改server配置文件， zabbix数据库配置与步骤4中设置一致

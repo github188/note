@@ -1,0 +1,46 @@
+Linux(Centos)防DDOS攻击软件-DDoS-Deflate
+
+(D)DoS-Deflate是一款免费的用来防御和减轻DDoS攻击。它通过netstat监测跟踪创建大量网络连接的IP地址，在检测到某个结点超过预设的限制时，该程序会通过APF或IPTABLES禁止或阻挡这些IP.
+DDoS-Deflate安装及配置
+1、安装
+
+wget http://www.inetbase.com/scripts/ddos/install.sh
+chmod 0700 install.sh
+./install.sh
+
+2、配置
+
+配置文件是 /usr/local/ddos/ddos.conf ，默认有如下配置
+FREQ=1
+NO_OF_CONNECTIONS=150
+APF_BAN=0
+KILL=1
+EMAIL_TO="test@qq.com"
+BAN_PERIOD=600
+
+配置参数的解释：
+
+FREQ=1 ；检测时间间隔，默认是一分钟，如果修改这个要重新设置Cron Job
+NO_OF_CONNECTIONS=150 ；最大连接数，超过这个就会禁止IP
+APF_BAN=1 ；使用APF设置为1，使用iptables设置为0
+KILL=1 ；是否禁止IP
+EMAIL_TO=”root” ；邮件通知，写上接收邮件的邮箱
+BAN_PERIOD=600 ；禁止IP时长，默认是600秒
+
+IP地址白名单：/usr/local/ddos/ignore.ip.list
+卸载
+
+wget http://www.inetbase.com/scripts/ddos/uninstall.ddos
+chmod 0700 uninstall.ddos
+./uninstall.ddos
+
+查看IP
+netstat -ntu | awk '{print $5}' | cut -d: -f1 | sort | uniq -c | sort -n
+
+可以参考:
+http://www.huzs.net/?p=1526
+
+来做测试,看能否封掉IP.
+iptables -L -n
+
+如下图,192.168.1.200就被封掉了:
