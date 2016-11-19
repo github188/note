@@ -1,0 +1,194 @@
+Nginx+tomcat是目前主流的Java web架构，如何让nginx+tomcat同时工作呢，也可以说如何使用nginx来反向代理tomcat后端均衡呢？直接安装配置如下：
+
+1、Java JDK安装：
+
+#下载相应的jdk软件包，然后解压安装，我这里包名称为：jdk-7u25-linux-x64.tar.gz   
+    
+tar -xzf  jdk-7u25-linux-x64.tar.gz  ;mkdir -p /usr/java/ ;mv jdk1.7.0_25/ /usr/java/ 下.   
+    
+#然后配置环境变量，这样可以任何地方引用jdk，如下配置：   
+    
+#vi /etc/profile 最后面加入以下语句：   
+    
+export JAVA_HOME=/usr/java/jdk1.7.0_25   
+    
+export CLASSPATH=$CLASSPATH:$JAVA_HOME/lib:$JAVA_HOME/jre/lib  
+    
+export PATH=$JAVA_HOME/bin:$JAVA_HOME/jre/bin:$PATH:$HOMR/bin  
+    
+#source /etc/profile   #使环境变量马上生效   
+    
+#java  --version    #查看java版本，看到jdk1.7.0_25版本即代表java jdk安装成功。 
+2、Nginx安装：
+
+wget http://nginx.org/download/nginx-1.2.6.tar.gz   
+    
+useradd www   
+    
+tar zxvf nginx-1.2.6.tar.gz   
+    
+cd nginx-1.2.6/   
+    
+./configure --user=www --group=www --prefix=/usr/local/nginx  
+ \--with-http_stub_status_module --with-http_ssl_module   
+    
+make && make install  
+    
+#Nginx安装完毕，然后使用命令:/usr/local/nginx/sbin/nginx -t 测试OK，代表nginx安装成功。   
+    
+/usr/local/nginx/sbin/nginx 回车启动nginx，可以通过访问http://ip/看到nginx默认页面。 
+3、Tomcat安装：
+
+#官方网站下载tomcat 6.0.30或者其他版本：   
+    
+cd /usr/src  && tar xzf  apache-tomcat-6.0.30.tar.gz   
+    
+#直接解压就可以使用，解压完成执行，同时拷贝两个tomcat，命名为tomcat1 tomcat2   
+    
+mv apache-tomcat-6.0.30  /usr/local/tomcat1  
+    
+cp /usr/local/tomcat1  /usr/local/tomcat2 -r   
+    
+#分别修改tomcat1和tomcat2 端口，这里有三个端口需要修改，分别如下：   
+    
+shutdown 端口：8005  主要负责启动关闭.   
+    
+ajp端口：8009 主要负责通过ajp均衡（常用于apache和tomcat整合）   
+    
+http端口：8080 可以通过web页面直接访问（nginx+tomcata整合）   
+    
+#注* 如果tomcat1三个端口分别为：8005 8009 8080 ,那么tomcat2端口在此基础上都+1，即为：8006 8010 8081   
+    
+#一台服务器上，端口不能重复，否则会报错。   
+    
+#修改完端口后，然后启动两个tomcat，启动命令为：   
+    
+#如何提示没有这个文件或者权限不足，需要tomcat 的bin目录对sh文件赋予执行权限：chmod o+x   *.sh   
+    
+/usr/local/tomcat1/bin/startup.sh   
+    
+/usr/local/tomcat2/bin/startup.sh   
+    
+#启动后，使用netstat -tnl 可以看到6个端口，即代表tomcat1 tomcat2成功启动。你可以使用http://ip:8080  http://ip:8081访问tomcat默认页面。  
+#如果需要修改tomcat发布目录为自己制定的目录，需要做如下调整，创建两个发布目录：
+
+mkdir -p /usr/webapps/{www1,www2} 
+编辑vi /usr/local/tomcat1/conf/server.xml 在最后</Host>前一行加下内容：
+
+<Context  path="" docBase="/usr/webapps/www1" reloadable="false"/> 
+2.编辑vi /usr/local/tomcat2/conf/server.xml 在最后</Host>前一行加下内容：
+
+<Context  path="" docBase="/usr/webapps/www2" reloadable="false"/> 
+3.tomcat1发布目录内容：
+
+<html>   
+<body>   
+<h1>TOMCAT_1 JSP Test Page</h1>   
+<%=new java.util.Date()%>   
+</body>   
+</html> 
+4.tomcat2发布目录内容：
+
+<html>   
+<body>   
+<h1>TOMCAT_2 JSP Test Page</h1>   
+<%=new java.util.Date()%>   
+</body>   
+</html> 
+然后访问http://ip:8080、8081查看测试内容。
+
+5、Nginx+tomcat整合:
+
+整合主要是修改nginx.conf配置，给一个完整的nginx.conf线上配置，部分参数可以自己根据实际需求修改：
+
+user www www;   
+worker_processes 8;   
+pid /usr/local/nginx/nginx.pid;   
+worker_rlimit_nofile 102400;   
+events   
+{   
+use epoll;   
+worker_connections 102400;   
+}   
+http   
+{   
+  include       mime.types;   
+  default_type  application/octet-stream;   
+  fastcgi_intercept_errors on;   
+  charset  utf-8;   
+  server_names_hash_bucket_size 128;   
+  client_header_buffer_size 4k;   
+  large_client_header_buffers 4 32k;   
+  client_max_body_size 300m;   
+  sendfile on;   
+  tcp_nopush     on;   
+      
+  keepalive_timeout 60;   
+      
+  tcp_nodelay on;   
+  client_body_buffer_size  512k;   
+    
+  proxy_connect_timeout    5;   
+  proxy_read_timeout       60;   
+  proxy_send_timeout       5;   
+  proxy_buffer_size        16k;   
+  proxy_buffers            4 64k;   
+  proxy_busy_buffers_size 128k;   
+  proxy_temp_file_write_size 128k;   
+      
+  gzip on;   
+  gzip_min_length  1k;   
+  gzip_buffers     4 16k;   
+  gzip_http_version 1.1;   
+  gzip_comp_level 2;   
+  gzip_types       text/plain application/x-javascript text/css application/xml;   
+  gzip_vary on;   
+      
+###2012-12-19 change nginx logs   
+log_format  main  '$http_x_forwarded_for - $remote_user [$time_local] "$request" '  
+              '$status $body_bytes_sent "$http_referer" '  
+              '"$http_user_agent"  $request_time $remote_addr';   
+                  
+upstream web_app {   
+ server 127.0.0.1:8080 weight=1 max_fails=2 fail_timeout=30s;   
+ server 127.0.0.1:8081 weight=1 max_fails=2 fail_timeout=30s;   
+}   
+    
+####chinaapp.sinaapp.com   
+server {   
+    listen 80;   
+    server_name  chinaapp.sinaapp.com;   
+    index index.jsp index.html index.htm;   
+    #发布目录/data/www   
+    root  /data/www;   
+        
+    location /   
+    {   
+    proxy_next_upstream http_502 http_504 error timeout invalid_header;   
+    proxy_set_header Host  $host;   
+    proxy_set_header X-Real-IP $remote_addr;   
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;   
+    proxy_pass http://web_app;   
+    expires      3d;   
+    }   
+     
+  }   
+    
+} 
+#注* server段 proxy_pass定义的web_app需要跟upstream 里面定义的web_app一致，否则server找不到均衡。    
+
+#如上配置，nginx+tomcat反向代理负载均衡配置完毕，如果要做动静分离，只需要在nginx添加如下配置就OK了。
+
+ #配置Nginx动静分离   
+   
+location ~ .*\.(html|htm|gif|jpg|jpeg|bmp|png|ico|txt|js|css)$   
+   
+{   
+   
+root /data/www;   
+   
+#expires定义用户浏览器缓存的时间为3天，如果静态页面不常更新，可以设置更长，这样可以节省带宽和缓解服务器的压力   
+   
+expires      3d;   
+   
+} 

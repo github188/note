@@ -21,14 +21,14 @@ Hostname=client1             #必须与创建主机时的hostname一致
 ****************************************************************************************
 4）修改启动配置，添加软链接
 
-#cp zabbix-3.0.4/misc/init.d/tru64/zabbix_agentd /etc/init.d/
-# chmod +x /etc/init.d/zabbix_ agentd
+#cp  misc/init.d/tru64/zabbix_agentd /etc/init.d/
+# chmod +x /etc/init.d/zabbix_agentd
 # ln -s /usr/local/zabbix/sbin/* /usr/local/sbin/
 # ln -s /usr/local/zabbix/bin/* /usr/local/bin/
 ****************************************************************************************
 5）设置自启动
 
-# vi /etc/rc.d/init.d/zabbix_ agentd
+# vi /etc/rc.d/init.d/zabbix_agentd
 #在第二行添加如下内容
 #chkconfig: 2345 10 90
 #description: zabbix agent
