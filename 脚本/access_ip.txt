@@ -1,0 +1,6 @@
+#!/bin/bash
+#
+echo "ACCESS IP_ADDRESS">>ACCESS-$(date +%Y%m%d).txt
+/usr/bin/cat nginx.log |cut  -d - -f 1 |/usr/bin/sort -k2n |/usr/bin/uniq >>ACCESS-$(date +%Y%m%d).txt
+NUMBER=`/usr/bin/sed -n '$=' ACCESS-$(date +%Y%m%d).txt `
+echo "TOTAL ACCESS: $[$NUMBER-1]" >> ACCESS-$(date +%Y%m%d).txt
