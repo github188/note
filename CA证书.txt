@@ -1,0 +1,12 @@
+1.建立CA颁发机构
+ (umask  077 ; openssl genrsa -out private/cakey.pem 2048)
+ openssl  req -new -x509 -key private/cakey.pem -out cacert.pem -days 3655
+ touch  index.txt
+ echo "01" >serial
+2.服务器端建立私钥及签署请求
+ (umask  077 ; openssl genrsa 1024 >nginx.key ) 
+ openssl req -new -key nginx.key  -out nginx.csr
+ openssl ca  -in nginx.csr -out nginx.crt -days  3650 
+3.将.crt和.key  变成.keystore格式
+openssl pkcs12 -export -in nginx.crt -inkey nginx.key -out nginx.p12 -name tomcat -CAfile /etc/pki/CA/cacert.crt -caname root 
+/usr/local/jdk1.8.0_101/bin/keytool -importkeystore -v  -srckeystore nginx.p12 -srcstoretype pkcs12 -srcstorepass "123456" -destkeystore  nginx.keystore -deststoretype jks -deststorepass "123456"
