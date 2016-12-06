@@ -1,0 +1,11 @@
+ca服务器
+(umask  077 ; openssl genrsa -out private/cakey.pem 2048)
+
+openssl  req -new -x509 -key private/cakey.pem -out cacert.pem -days 3655
+touch  index.txt
+echo "01" >serial
+服务器短
+ (umask  077 ; openssl genrsa 1024 >nginx.key ) 
+ openssl req -new -key nginx.key  -out nginx.csr
+openssl ca  -in nginx.csr -out nginx.crt -days  3650 
+openssl ca  -in nginx.csr -out nginx.crt -days  3650
