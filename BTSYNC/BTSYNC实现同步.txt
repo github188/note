@@ -1,0 +1,212 @@
+BTSYNC实现同步方案
+一、btsync server端配置
+  1.下载 btsync 程序源代码或者二进制包
+  2.mkdir /opt/btsync  #建立工作目录
+  3.tar xf  resilio-sync_glibc23_x64.tar.gz  -C /opt/btsync 
+  4.vim /opt/btsync/btsync.cfg  # 建立配文件
+  **********************************************
+{
+  "device_name": "restore",
+  "listening_port" : 8889, // 0 - randomize port
+
+  "check_for_updates" : false,
+  "use_upnp" : false,
+  "storage_path" : "/opt/btsync",
+  "pid_file" : "/opt/btsync/btsync.pid",
+  "download_limit" : 0, // 0 - no limit
+  "upload_limit" : 0,
+
+  "webui" :
+  {
+    "listen" : "0.0.0.0:8888",
+    "login" : "admin",
+    "password" : "btsync"
+  }
+  ,
+
+  "folder_rescan_interval" : 60,
+  "lan_encrypt_data" : false,
+  "lan_use_tcp" : true
+}
+  ****************************************************** 
+ 5.建立服务脚本
+   vim  /etc/init.d/btsync
+  ******************************************************
+#!/bin/sh
+# chkconfig: - 85 15
+# Description: starts and stops the bitsync service
+CONF=/opt/btsync/btsync.cfg
+PROC=/opt/btsync/rslsync
+PIDFILE=/opt/btsync/btsync.pid
+
+start() {
+  PID1=$(pidof btsync)
+  if [ -z $PID1 ]; then
+    echo "Starting BitSync Service: "
+    $PROC --config ${CONF}
+  else
+    echo " BitSync service is already running at pid : ${PID1}"
+  fi
+  return $?
+}
+
+stop() {
+  PID1=$(pidof btsync)
+  if [ ! -z ${PID1} ]; then
+    kill -9 ${PID1}
+    echo "Stopped BitSync service: "
+  else 
+    echo "Failed"
+  fi
+  return $?
+}
+
+status() {
+  PID1=$(pidof btsync)
+  PID2=$(cat ${PIDFILE})
+  if [ ! -z ${PID1} ] && [ ${PID1} -eq ${PID2} ]; then
+    echo "BitSync is running ... (${PID1})"
+  else
+    echo "BitSync is not running ..."
+  fi
+  return $?
+}
+
+case "$1" in
+  start)
+    start
+;;
+  stop)
+    stop
+;;
+  status)
+    status
+;;
+  restart)
+    stop
+    sleep 1
+    start
+;;
+*)
+  echo $"Uasge: $0 {start|stop|restart|status}"
+  exit 2
+esac
+*******************************************
+chmod +x /etc/init.d/btsync
+*******************************************
+ 6.打开Web UI：http://restore:8888
+   用户名: admin
+   密码: btsync
+   点击 "Add Folder",
+   在 "Path" 中输入 "/opt/btsync_share"
+   点击 "Generate" 得到 "Secret" 为 "A2WLYG2HAEJMSZLJPQZJQCW42QU6WXQBC"
+二、客户端
+  1.下载 btsync 程序源代码或者二进制包
+  2.mkdir /opt/btsync  #建立工作目录
+  3.tar xf  resilio-sync_glibc23_x64.tar.gz  -C /opt/btsync 
+  4.vim /opt/btsync/btsync.cfg  # 建立配文件
+  *******************************************
+{
+"device_name": "recovery",
+"listening_port" : 8889, // 0 - randomize port
+"check_for_updates" : false,
+"use_upnp" : false,
+
+"storage_path" : "/opt/btsync",
+"pid_file" : "/opt/btsync/btsync.pid",
+"download_limit" : 0, // 0 - no limit
+"upload_limit" : 0,
+
+"webui" :
+{
+  "listen" : "0.0.0.0:8888",
+  "login" : "admin",
+  "password" : "btsync"
+}
+,
+"shared_folders" :
+[
+  {
+    "secret" : "A2WLYG2HAEJMSZLJPQZJQCW42QU6WXQBC", // * required field
+    "dir" : "/opt/btsync_share", // * required field
+    "use_sync_trash" : false,
+    "use_relay_server" : false,
+    "use_tracker" : false,
+    "search_lan" : true,
+    "known_hosts" :
+    [
+      "recovery:8889"
+    ]
+  }
+]
+,
+"folder_rescan_interval" : 60,
+"lan_encrypt_data" : false, // Encryption is very painful in terms of speed. Disabling it for LAN to increase the speed.
+"lan_use_tcp" : true
+}
+****************************************************************************
+ 5.建立服务脚本
+   vim  /etc/init.d/btsync
+ *************************************
+#!/bin/sh
+# chkconfig: - 85 15
+# Description: starts and stops the bitsync service
+CONF=/opt/btsync/btsync.cfg
+PROC=/opt/btsync/rslsync
+PIDFILE=/opt/btsync/btsync.pid
+
+start() {
+  PID1=$(pidof btsync)
+  if [ -z $PID1 ]; then
+    echo "Starting BitSync Service: "
+    $PROC --config ${CONF}
+  else
+    echo " BitSync service is already running at pid : ${PID1}"
+  fi
+  return $?
+}
+
+stop() {
+  PID1=$(pidof btsync)
+  if [ ! -z ${PID1} ]; then
+    kill -9 ${PID1}
+    echo "Stopped BitSync service: "
+  else 
+    echo "Failed"
+  fi
+  return $?
+}
+
+status() {
+  PID1=$(pidof btsync)
+  PID2=$(cat ${PIDFILE})
+  if [ ! -z ${PID1} ] && [ ${PID1} -eq ${PID2} ]; then
+    echo "BitSync is running ... (${PID1})"
+  else
+    echo "BitSync is not running ..."
+  fi
+  return $?
+}
+
+case "$1" in
+  start)
+    start
+;;
+  stop)
+    stop
+;;
+  status)
+    status
+;;
+  restart)
+    stop
+    sleep 1
+    start
+;;
+*)
+  echo $"Uasge: $0 {start|stop|restart|status}"
+  exit 2
+esac
+
+
+  
