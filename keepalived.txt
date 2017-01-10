@@ -502,6 +502,79 @@ esac
     notify_backup "/etc/keepalived/notify.sh -n backup -a 172.16.100.1"  
     notify_fault "/etc/keepalived/notify.sh -n fault -a 172.16.100.1"  
 
+**************************************************************************************
+keepalived + nginx  实现高可用
+vim /usr/local/keepalived/etc/keepalived/keepalived.conf
+! Configuration File for keepalived
+ 
+global_defs {
+ router_id LVS_DEVEL
+}
+vrrp_script Monitor_Nginx {
+ script "/etc/keepalived/monitor_nginx.sh" #根据自己的实际路径放置monitor_nginx.sh    
+ interval 2
+ weight 2
+}
+vrrp_instance VI_1 {
+ state MASTER
+ interface eno16777736
+ virtual_router_id 51
+ priority 100
+ advert_int 1
+ authentication {
+ auth_type PASS
+ auth_pass 123456
+}
+ track_script {
+ Monitor_Nginx
+}
+ virtual_ipaddress {
+ 192.168.1.174/24  dev  eno16777736  label  eno16777736:0
+ }
+}
+*************************************************************************************************
+! Configuration File for keepalived
+ 
+global_defs {
+ router_id LVS_DEVEL
+}
+vrrp_script Monitor_Nginx {
+ script "/etc/keepalived/monitor_nginx.sh" #根据自己的实际路径放置monitor_nginx.sh    
+ interval 2
+ weight 2
+}
+vrrp_instance VI_1 {
+ state BACKUP
+ interface eno16777736
+ virtual_router_id 51
+ priority 99
+ advert_int 1
+ authentication {
+ auth_type PASS
+ auth_pass 123456
+}
+ track_script {
+ Monitor_Nginx
+}
+ virtual_ipaddress {
+ 192.168.1.174/24  dev  eno16777736  label  eno16777736:0
+ }
+}
+****************************************************************************************
+监控脚本
+#!/bin/bash
+if [ "$(ps -ef | grep "nginx: master process"| grep -v grep )" == "" ]
+then
+ /usr/sbin/nginx
+ sleep 5
+ if [ "$(ps -ef | grep "nginx: master process"| grep -v grep )" == "" ]
+ then
+ killall keepalived
+ fi
+fi
+**********************************************
+要把网卡改成混乱模式
+ifconfig  eno16777736  promisc 
 
 
 

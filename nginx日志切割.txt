@@ -1,0 +1,7 @@
+#!/bin/bash
+PATH_LOGS="/usr/local/nginx/logs"
+YEAR=`date -d "-1 days" +"%Y"`
+MONTH=`date -d "-1 days" +"%m"`
+mkdir -p $PATH_LOGS/$YEAR/$MONTH
+mv $PATH_LOGS/access.log $PATH_LOGS/$YEAR/$MONTH/access_$(date -d "-1 days" +"%Y%m%d").log
+kill -USR1 `cat $PATH_LOGS/nginx.pid
