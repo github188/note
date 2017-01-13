@@ -13,12 +13,13 @@ Xtrabackup是由percona提供的mysql数据库备份工具，据官方介绍，�
 (5)还原速度快；
 
 2、安装
-yum -y install perl perl-devel libaio libaio-devel perl-Time-HiRes perl-DBD-MySQL
+yum -y install perl perl-devel libaio libaio-devel perl-Time-HiRes perl-DBD-MySQL   
+yum  -y install   perl-Digest-MD5
 yum -y install libev
 yum -y install libev-devel
 
- wget ftp://rpmfind.net/linux/atrpms/el6-x86_64/atrpms/stable/libev-4.04-2.el6.x86_64.rpm
-  yum -y install glibc
+wget ftp://rpmfind.net/linux/atrpms/el6-x86_64/atrpms/stable/libev-4.04-2.el6.x86_64.rpm
+yum -y install glibc
 其最新版的软件可从 http://www.percona.com/software/percona-xtrabackup/ 获得。本文基于RHEL5.8的系统，因此，直接下载相应版本的rpm包安装即可，这里不再演示其过程。
 
 二、备份的实现
