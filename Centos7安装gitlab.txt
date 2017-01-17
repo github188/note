@@ -45,6 +45,7 @@ Centos7 安装Gtilab
 6.安装GitLab
     cd /home/git
     sudo -u git -H git clone https://gitlab.com/gitlab-org/gitlab-ce.git -b 7-10-stable gitlab
+	sudo -u git -H git clone https://gitlab.com/gitlab-org/gitlab-ce.git -b 8-16-stable gitlab
     $ cd /home/git/gitlab
     $ sudo -u git -H cp config/gitlab.yml.example config/gitlab.yml
 
