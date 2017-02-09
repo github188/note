@@ -26,6 +26,7 @@ SELINUX=disabled
 mysql> use mysql;
 mysql>create database zabbix character set utf8;
 mysql>grant all privileges on zabbix.* to zabbix_user@localhost identified by '123456';
+mysql>grant all privileges on zabbix.* to zabbix_user@192.168.1.151 identified by '123456';
 *******************************************************************************************************
 （5）启动httpd和mysql，并设置开机启动
 
@@ -43,13 +44,16 @@ mysql>grant all privileges on zabbix.* to zabbix_user@localhost identified by '1
 
 #tar -zxvf zabbix-3.0.4.tar.gz
 #cd zabbix-3.0.4/database/mysql/
+#cd  /root/zabbix-3.2.1/database/mysql
 #mysql -uroot –p123456 zabbix < schema.sql
-#mysql -uroot - p123456 zabbix < images.sql 
-#mysql -uroot - p123456 zabbix < data.sql
+#mysql -uroot -p123456 zabbix < images.sql 
+#mysql -uroot -p123456 zabbix < data.sql
 *************************************************************************************************************
 （8）编译安装zabbix
-
+#cd  /root/zabbix-3.2.1
 #./configure --prefix=/usr/local/zabbix --with-mysql --with-net-snmp --with-libcurl --enable-server --enable-agent --enable-proxy --enable-java
+#yum  -y  install  net-snmp-devel
+#yum -y   install  curl-devel
 # make install
 ***************************************************************************************************************************************
 （9）修改server配置文件， zabbix数据库配置与步骤4中设置一致
@@ -57,15 +61,17 @@ mysql>grant all privileges on zabbix.* to zabbix_user@localhost identified by '1
 #vi /usr/local/zabbix/etc/zabbix_server.conf
 LogFile=/tmp/zabbix_server.log
 PidFile=/tmp/zabbix_server.pid
+DBHost=192.168.1.179
 DBName=zabbix
 DBUser=zabbix_user
 DBPassword=123456     #指定zabbix数据库密码
-ListenIP= ip.ip.ip.ip   #服务器IP地址
+ListenIP= 127.0.0.1   #服务器IP地址
 ****************************************************************************************************************************************
 （10）添加前端文件
 
 # mkdir /var/www/html/zabbix
 # cp -rf zabbix-3.0.4/frontends/php/* /var/www/html/zabbix
+# cp -rf /root/zabbix-3.2.1/frontends/php/* /var/www/html/zabbix
 
 **************************************************************************************************************************************
 （11）修改php相关参数
@@ -74,19 +80,26 @@ ListenIP= ip.ip.ip.ip   #服务器IP地址
 max_execution_time = 300
 max_input_time = 300
 memory_limit = 128M
-post_max_size = 32M
+post_max_size = 16M
 date.timezone = Asia/Shanghai
 **********************************************************************************************************************************
 （12）将zabbix添加到系统路径，并建立软链接
 
-#cp zabbix-3.0.4/misc/init.d/tru64/zabbix_server /etc/init.d/
+#cp zabbix-3.2.1/misc/init.d/tru64/zabbix_server /etc/init.d/
+#vim  /etc/init.d/zabbix_server
+加入
+# chkconfig: 2345 20 90
+# description: zabbix server
+
 # chmod +x /etc/init.d/zabbix_server
+#chkconfig  --add  zabbix_server
+#chkconfig  zabbix_server  on
 # ln -s /usr/local/zabbix/sbin/* /usr/local/sbin/
 # ln -s /usr/local/zabbix/bin/* /usr/local/bin/
 ******************************************************************************************************************************
 （13）启动zabbix
 
-# systemctl restart zabbix_server
+# service zabbix_server start
 ***********************************************************************************************************************************
 （15）创建zabbix配置文件
 
