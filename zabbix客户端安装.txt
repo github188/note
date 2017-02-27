@@ -36,3 +36,16 @@ Hostname=client1             #必须与创建主机时的hostname一致
 #chkconfig --add zabbix_agentd
 #chkconfig zabbix_agentd on
 #systemctl restart zabbix_ agentd
+*****************************************************************************************
+rpm  包安装
+rpm  -ivh  zabbix-agent-3.2.3-1.el7.x86_64.rpm
+vim /etc/zabbix/zabbix_agentd.conf
+Server=192.168.0.50
+ServerActive=192.168.0.50
+
+ps –ef | grep zabbix
+netstat -n | grep 10050   （默认使用 100050 端口）
+启动并开机：
+
+#systemctl start zabbix-agent
+#systemctl enable zabbix-agent

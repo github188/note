@@ -1,0 +1,59 @@
+1.安装 Java gateway
+找到zabbix 安装的目录，看你的目录下是否有zabbix_java这个目录，如果没有说明你zabbix编译的时候没有加--enable-java
+ls /usr/local/zabbix/sbin/zabbix_java  //查看编译--enable-java，编译成功会有以下5个文件
+bin  lib  settings.sh  shutdown.sh  startup.sh
+2.配置Java gateway
+ cd  /usr/local/zabbix/sbin/zabbix_java
+ vim  settings.sh
+改成以下
+LISTEN_IP="0.0.0.0"
+LISTEN_PORT=10052
+PID_FILE="/tmp/zabbix_java.pid"
+START_POLLERS=5
+
+vim /usr/local/zabbix/etc/zabbix_server.conf
+ JavaGateway=127.0.0.1
+ JavaGatewayPort=10052
+ StartJavaPollers=5
+
+重启zabbix_server
+service zabbix_server restart
+cd  usr/local/zabbix/sbin/zabbix_java/
+执行startup.sh
+netstat -antlp|grep 10052
+3.zabbix客户端（tomcat）配置
+首先安装tomcat 并且启动成功启动脚本在/bin/start.sh
+下载 这个软件 wget http://archive.apache.org/dist/t ... lina-jmx-remote.jar  //下载tomcat对应的jmx版本放到$tomcat/lib/
+
+vim  catalina.sh
+在/bin/bash下面添加这行
+CATALINA_OPTS="-Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false -Djava.rmi.server.hostname=客户端IP（tomcat的ip）"
+vim  server.xml
+在该文件末尾添加一行：如下
+<Listener className="org.apache.catalina.mbeans.JmxRemoteLifecycleListener"  rmiRegistryPortPlatform="8090" rmiServerPortPlatform="8090"/> ##（这个端口可以自定义，默认zabbix监听的端口是12345
+重启tomcat
+测试
+java -jar /root/cmdline-jmxclient-0.10.3.jar - 192.168.234.128:8090 java.lang:type=Memory NonHeapMemoryUsage
+出现 
+12/19/2015 03:17:04 +0800 org.archive.jmx.Client NonHeapMemoryUsage:
+committed: 25296896
+init: 2555904
+max: -1
+used: 24194184
+4.添加模板
+关联至主机
+5.修改页面字符编码
+我们可以通过进入windows机器内：c:\windows\fonts 选择其中任意一种中文字体
+
+上传到  /var/www/html/zabbix/fonts  文件夹中
+
+我们将上传过来的字体格式修改为小写的，如果大写的话修改配置后，会出现不显示字体的现象
+cd  /var/www/html/zabbix/include 
+vim  defines.inc.php
+
+将：define('ZBX_FONT_NAME', 'DejaVuSans');
+替换成：define('ZBX_FONT_NAME', 'SIMHEI');
+将define('ZBX_GRAPH_FONT_NAME', 'DejaVuSans');
+替换成:define('ZBX_GRAPH_FONT_NAME', 'simhei');
+
+保存退出，刷新页面即可
