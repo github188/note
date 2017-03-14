@@ -33,16 +33,69 @@ Node2:
 # ssh-keygen -t rsa
 # ssh-copy-id -i ~/.ssh/id_rsa.pub root@node1
 
+
+安装配置corosync
+
+安装如下rpm包
+yum  -y install  cluster-glue*  corosync  corosynclib   heartbeat   heartbeatlib  libesmtp pacemaker   packmaker-lib  pacemaker-cts resource-agents
+
+
+yum  -y install  cluster-glue*  
+yum  -y install  corosync 
+yum  -y install  corosynclib 
+yum  -y install  heartbeat   heartbeatlib    
+yum  -y install  libesmtp 
+yum -y  install  pacemaker   packmaker-lib  
+yum -y  install  pacemaker-cts   
+yum -y  install  resource-agents
+
 2、配置corosync，（以下命令在node1.magedu.com上执行）
 
 # cd /etc/corosync
 # cp corosync.conf.example corosync.conf
 
+[root@node1 coorosync]# cp /etc/corosync/corosync.conf.example /etc/corosync/corosync.conf
+[root@node1 coorosync]# grep -vE "^([[:space:]]*#)|^$" /etc/corosync/corosync.conf
+compatibility: whitetank    #表示是否支持0.8之前的版本
+totem {    #图腾，这是用来定义集群中各节点中是怎么通信的
+        version: 2    #各节点互相通信的协议的版本
+        secauth: on    #各节点间通信是否需要认证
+        threads: 0    #使用多少线程进行加密和发送多播信息
+        interface {
+                ringnumber: 0    #环号码，避免消息环路产生
+                bindnetaddr: 192.168.220.0    #绑定的网络地址
+                mcastaddr: 239.255.1.1    #多播地址
+                mcastport: 5405    #多播端口
+                ttl: 1    
+        }
+}
+logging {    #日志相关
+        fileline: off
+        to_stderr: no
+        to_logfile: yes
+        logfile: /var/log/cluster/corosync.log
+        to_syslog: no
+        debug: off
+        timestamp: on
+        logger_subsys {
+                subsys: AMF
+                debug: off
+        }
+}
+service {    #定义启动corosync时启动pacemaker
+        ver: 0
+        name: pacemaker
+}
+aisexec {    #定义以哪个用户和组启动corosync
+        user: root
+        group: root
+}
+
 接着编辑corosync.conf，添加如下内容：
 service {
   ver:  0
   name: pacemaker
-  # use_mgmtd: yes
+  
 }
 
 aisexec {

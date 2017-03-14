@@ -1,3 +1,17 @@
+﻿Centos7  安装drbd
+首先确保两台机器时间同步，配置ssh。
+方法一通过yum源安装：yum安装默认路径是/etc/drbd.d/下
+# rpm --import http://elrepo.org/RPM-GPG-KEY-elrepo.org
+# rpm -Uvh http://www.elrepo.org/elrepo-release-7.0-2.el7.elrepo.noarch.rpm
+# yum -y install drbd84-utils kmod-drbd84
+tar xzf drbd-8.4.6.tar.gz 
+cd drbd-8.4.6  
+--#开始编译安装drbd，和8.4.5之前版本有所不同，这里不用./configure,直接make就可以了 
+make KDIR=/usr/src/kernels/$(uname -r)/
+#make install  
+
+
+
 
 
 前提：
@@ -210,5 +224,32 @@ resource mydrbd {
         }
 }
 
+问题1:
+
+创建设备元数据时提示操作失败:
+
+# drbdadm -c /etc/drbd.conf create-md all
+md_offset 314568704
+al_offset 314535936
+bm_offset 314523648
+
+Found ext3 filesystem
+      307200 kB data area apparently used
+      307152 kB left usable by current configuration
+
+Device size would be truncated, which
+would corrupt data and result in
+'access beyond end of device' errors.
+You need to either
+   * use external meta data (recommended)
+   * shrink that filesystem first
+   * zero out the device (destroy the filesystem)
+Operation refused.
+
+Command 'drbdmeta 1 v09 /dev/sdb1 internal create-md 1' terminated with exit code 40
+
+**********************************************************************************
+# dd if=/dev/zero of=/dev/sdb1 bs=1M count=100
 
 
+[root@filer01 ~]#  drbdadm attach all （解决diskless问题）
