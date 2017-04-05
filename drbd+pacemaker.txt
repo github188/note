@@ -1,4 +1,4 @@
-本文系统作者原创，任何转载必须经过作者同意，否则将保留追究一切责任的权利。 
+﻿本文系统作者原创，任何转载必须经过作者同意，否则将保留追究一切责任的权利。 
 
 前提：
 1）本配置共有两个测试节点，分别node1.a.org和node2.a.org，相的IP地址分别为192.168.0.5和192.168.0.6；
@@ -21,6 +21,7 @@ property $id="cib-bootstrap-options" \
 在如上输出的信息中，请确保有stonith-enabled和no-quorum-policy出现且其值与如上输出信息中相同。否则，可以分别使用如下命令进行配置：
 # crm configure property stonith-enabled=false
 # crm configure property no-quorum-policy=ignore
+rsc_defaults   resource-stickiness=100
 
 2、将已经配置好的drbd设备/dev/drbd0定义为集群服务；
 
@@ -75,6 +76,8 @@ drbd需要同时运行在两个节点上，但只能有一个节点（primary/se
 [root@node1 ~]# crm
 crm(live)# configure
 crm(live)configure# primitive webdrbd ocf:linbit:drbd params drbd_resource=web op monitor role=Master interval=50s timeout=30s op monitor role=Slave interval=60s timeout=30s
+
+                    primitive webdrbd ocf:linbit:drbd params drbd_resource=mydrbd op  start  timeout=240 op stop  timeout=100  op monitor role=Master interval=10s timeout=30s op monitor role=Slave interval=20s timeout=30s
 crm(live)configure# master MS_Webdrbd webdrbd meta master-max="1" master-node-max="1" clone-max="2" clone-node-max="1" notify="true"
 
 crm(live)configure# show webdrbd

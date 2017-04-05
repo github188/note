@@ -35,3 +35,13 @@ vi /etc/selinux/config
 SELINUX=disabled #增加
 :wq! #保存退出
 setenforce 0 #使配置立即生效
+
+
+
+查看逻辑cpu个数：cat /proc/cpuinfo | grep "processor" | wc -l
+
+查看物理cpu个数：cat /proc/cpuinfo | grep "physical id" | sort | uniq | wc -l
+
+查看每个物理cpu的核数cores：cat /proc/cpuinfo | grep "cpu cores"
+
+如果所有物理cpu的cores个数加起来小于逻辑cpu的个数，则该cpu使用了超线程技术。查看每个物理cpu中逻辑cpu的个数：cat /proc/cpuinfo | grep "siblings"

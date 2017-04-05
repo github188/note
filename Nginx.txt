@@ -1,4 +1,4 @@
-
+﻿
 nginx
 
 Nginx is a free, open-source, high-performance HTTP server and reverse proxy, as well as an IMAP/POP3 proxy server. Igor Sysoev started development of Nginx in 2002, with the first public release in 2004. Nginx now hosts nearly 7.67% (35.5M) of all domains worldwide.
@@ -268,14 +268,9 @@ esac
 [root@localhost nginx]# chkconfig nginx on
 
 
-ab
 
-webbench
-http_load
 
-Loadrunner
 
-Jmeter
 用户限制：
  auth_basic "Restricted Area...";
  auth_basic_user_file /etc/nginx/.users;
@@ -283,6 +278,446 @@ Jmeter
 2.htpasswd -cm  /etc/nginx/.users tom
 3. htpasswd -m  /etc/nginx/.users  wang
  
+web service
+ 	nginx：web server（static contents）web reverse proxy（http）,cache
+ 	varnish,squid (cache),web,http headers 
+ 	haproxy:基于应用层和tcp层的反向代理，http revers proxy
+ 	keeplived：HA
+ 	ats：apache traffic server
+
+可扩展的web架构
+ 	MogileFS：图片存储
+ 	NoSQL（MongoDB）
+
+ Nginx：engine x
+ 	apache：MPM（prefork，event）
+ 	c10k，lighttpd，nginx
+
+ 	http protcol
+ 		request --> respone
+ 		请求报文
+ 			<method><URL><version>
+ 			<headers>
+
+
+ 			<body>
+ 		响应报文
+ 			<version><status code> <reason phrase>
+ 			<headers>
+
+
+ 			<body>
+ 		响应码
+ 			1XX
+ 			2XX:成功响应码
+ 				200
+ 			3XX：重定向
+ 				301
+ 				302
+ 				304
+ 			4XX:客户端错误
+ 			5XX：服务器端错误
+
+LNMP:php必须工作与fpm模式
+
+stateless：无状态
+	web page：web object
+	http：80/tcp
+	 	tcp 三次握手，四次断开
+
+	 	keepalive：
+	 		时间：timeout
+	 		数量：
+	 	
+	 	cookie：
+	 		session 保存
+	 			session 绑定
+	 				反均衡
+	 				session无高可用
+	 			session复制
+	 				服务器资源消耗过大
+	 				网络资源
+	 			session服务器
+	 				服务器自身的高可用
+
+	 		lvs session绑定
+	 			sh算法：基于源IP做绑定
+	 			persitent connection：持久连接
+	 			cookie均衡：Tengine
+
+web I/O模型
+	同步
+		阻塞
+		非阻塞
+	I/O复用
+		select(),
+		poll()
+		prefork:基于select()
+
+	时间通知
+	异步
+
+	mmap：数据以磁盘直接以页面方式映射进内存中
+
+（并发编程）处理并发用户请求：
+		单进程模型：串行方式模式
+		多进程模型：prefox，一个进程响应一个用户请求，并发使用多个进程实现
+		多线程模型：worker，一个进程生成多个线程，一个线程响应一个用户请求；并发使用多个线程实现：n进程，n*m个线程
+		线程（事件）模型：event。一个线程响应多个用户请求，基于事件驱动机制来维持多个用户请求
+
+nginx的特性：
+	基本功能：
+		实现与服务静态文件（静态资源的web服务器），能缓存打开的文件描述符
+		反向代理服务器，缓存、负载均衡、健康状态检测
+		支持FastCGI
+		模块化机制，非DSO机制，支持多种过滤器gzip，SSI和图像的模块完成图形大小调整等
+		支持SSL
+
+	扩展功能：
+		基于名称和IP做虚拟主机
+		支持keeplive
+		支持平滑配置更新或程序版本升级
+		定制访问日志，支持使用日志缓存以提高性能
+		支持URL rewrite
+		支持路径别名
+		支持基于IP及用户的认证：
+		支持速率限制，并发数限制等
+
+	nginx的基本架构
+		一个master 生成一个或多个worker
+		事件驱动：kqueue，epoll，/dev/poll
+			消息通知：select，poll，rt rignals
+		支持sendfile，sendfile64
+		文件AIO（异步I/O）
+		支持mmap
+
+	nginx：非阻塞、事件驱动，一个master多个worker，一个worker响应多个用户请求
+
+
+	比cpu的核心进程少一个即可以
+
+nginx的模块类别
+	核心模块
+	标准http模块
+	可选的http模块
+	邮件模块
+	第三方扩展模块
+
+
+安装方法：
+	编译安装
+	rpm包安装
+		epel源
+
+Nginx的配置文件
+	main配置段
+	http{
+
+	}
+	mail{
+
+	}
+
+	配置参数需要以分号结尾，语法格式：
+		参数名 值1[值2...];
+
+		还支持使用变量
+			模块内置变量
+			用户自定义变量
+				set var_name value
+
+Nginx基本核心配置的类别
+	用于调试、定位问题
+	正常运行的必备配置
+	优化性能的配置
+	事件类的配置
+
+worker进程应该以普通用户身份运行。nginx用户，nginx组
+	http的方法：GET，HEAD，POST,PUT,DELETE OPTIONS TRACE
+
+配置文件
+	正常运行的必备配置：
+		1.user username [groupname]；
+		以那个用户身份运行,以在configure指定的用户为准
+		2.pid /path/to/pid_filename;
+		指定nginx的pid文件
+		3.worker_rlimit_nofile #;
+		指定一个worker进程所能够打开的句柄数
+		4.worker_rlimit_sigpending #;
+		设定每个用户能够发往worker进程的信号的数量；
+
+	优化性能相关的配置
+		1.worker_procrsses #
+			work进程的个数 ，通常其数值应该为cpu的物理核心数减1
+		2.worker_cpu_affinity cpumask ....;
+		0000
+		0001
+		0010
+		0100
+		1000
+		对应位上使用cpu，要做单独绑定
+		work_procrsses 6
+		worker_cpu_affinity 00000001 00000010 00000100 00001000
+		00010000 00100000
+		
+		3.ssl_engine device;
+		在存在ssl硬件加速器的服务器上，指定所使用的ssl硬件加速设备
+		4.timer_resolution t
+		每次内核事件调用返回时，都会使用gettimeday（）来更新nginx缓存时钟；timer_resolution用于定义每隔多久才会由gettimeday（）更新一次缓存时钟；x86-64系统上，gettimeday()代价已经很小，可以忽略此配置
+		5.worker_priority nice;
+		 -20到19之间的值，值越小越优先调用
+
+	跟事件相关的配置
+		1.accept_mutex [on|off]
+		 是否打开nginx的负载均衡锁；此锁能够让多个worker进行轮流地、序列化地与新的客户端建立连接；而通常当一个worker进程的负载达到其上限的7/8，master就尽可能不将请求调度至worker
+		2.lock_file /path/to/lock_file；
+		锁文件
+		3.accept_mutex_delay #ms
+		 使用accept锁以后，只有一个worker能取得锁，一个worker进程为取得accept锁的等待时长，即用户建立等待的时间，如果某worker进程在某次试图取得锁时失败了，至少要等待#ms才能在一次请求锁
+		4.multi_accept on|off
+		是否允许一次性地响应多个用户请求，默认为off
+		5.use [epoll|rtsig|select|poll]
+		指定使用那种模型,建议让nginx自动选择
+		6.worker_commections # 
+		每个worker能够并发响应的最大请求数，如果为代理服务器的话，worker_rlimit_nofile=worker_commections*2
+
+	用于调试、定位问题：只调试nginx时使用
+		1.daemon [on|off];
+		 关闭提供守护进程的模式，是否让nignx运行于后台；调试时应该为off，使得所有信息直接输出在控制台，默认为on
+		2.master_process on|off
+		 是否以master/worker模式运行nginx，默认为on，调试时可以设置为off以方便追踪
+		3.error_log /path/to/error_log level
+		错误日志文件及其级别，调试时可以使用debug级别，但要求在编译时必须使用--with-debug启用debug功能，默认通常为error级别
+
+nginx的http web功能
+	必须使用虚拟机来配置站点:每个虚拟主机使用一个server{}段来配置
+	   server{
+
+	   }
+	非虚拟主机的配置和公共选项，需要定义在server之外，http之内
+		http{
+			directive value;
+			....
+
+			server{
+
+			}
+			server{
+
+			}
+			......
+		}
+
+	1.server{}
+	  定义一个虚拟主机：nginx支持使用基于主机名或IP的虚拟主机
+	2.listen
+	   listen address[:port]
+	   listen prot
+	   listen unix:socket
+
+	   default_server:定义此server为http中默认的server；如果所有的server中任何一个listen使用此参数，那么第一个server即为默认server
+
+	   rcvbuf=SIZE：接收缓存大小
+	   sndbuf=SIZE: 发送缓存大小
+	   ssl：https server：必须以ssl连接
+	3.server_name [...];
+	   server_name可以跟多个主机名，名称可以使用通配符和正则表达式（通常以~开头）：当nginx收到一个请求时，会取出其首部的server的值，而后跟众server_name进行比较：比较方式
+	   	 (1) 先做精确匹配
+	   	 (2) 左侧通配符匹配
+	   	 (3) 右侧通配符匹配
+	   	 (4) 正则表达式匹配
+	4.server_name_hash_bucket_size 32|64|128
+	   为了实现快速主机查找，nginx使用hash表来保存主机名
+	5.location [ =|~|~*|^~] uri { ... }
+	  location @name { ... }
+	    功能：允许根据用户请求的URI来匹配指定的各location以进行访问配置；匹配到时，将被location块中的配置所处理
+	    =：精确匹配
+	    ~：正则表达式模式匹配，匹配时区分字符大小写
+	    ~*：正则表达式模式匹配，匹配时忽略字符大小写
+	    ^~:只需要前半部分与uri匹配即可，不检查正则表达式
+
+	    匹配优先级：
+	    	字符字面量最精确匹配、正则表达式检索（由多个时，由第一个匹配到的所处理），按字符字面量
+
+文件路径定义
+	1.root path
+		设置web资源路径，用于指定请求的根文档目录，从跟开始匹配
+		root：root/URI
+	2.alias path
+		指定路径别名，只能用于location中，从最后一个/开始匹配
+		alias：alias/
+	3.index file....
+	     定义默认页面，可以跟多个值。自左向右匹配
+	4.error_page code ... [=[response]] uri
+		当对于某个请求发回错误时，如果匹配上了error_page指令中设定的code，则从定向至新的新URI中 
+		错误重定向
+	5.try_files path1 [path2...] uri;
+		自左向右尝试读取有path所指定路径，在第一找到即停止并返回，如果所有path均不存在，则返回最后一个uri
+	location ~* ^/document/(.*)${
+		root /www/htdocs
+		try_files $uri /docu/$1 /temp.html
+	}
+
+	http://www.wangfeng7399.com/documents/a.html
+	http://www.wangfeng7399.com/docu/a.html
+	http://www.wangfeng7399.com/temp.html
+
+网络连接相关的设置
+	1.keepalive_timeout time;
+		保持连接的超时时长，默认为75s
+	2.keepalive_requests n
+		在一次长连接上允许承载的最大请求数
+	3.keepalive_disable [msie6|safari |none]
+		对指定的浏览器禁止使用长连接
+	4.tcp_nodelay on|off
+		对keepalive连接是否使用tcp_nodelay选项
+	5.client_header_timeout time
+		读取http请求首部的超时时长
+	6.client_body_timeout time
+		读取http请求包体的超时时间
+	7.save_timeout time
+		发送响应的超时时长
+
+对客户端请求的限制：
+	1.limit_except method ...{ ... }
+	    指定范围之外的其他方法的访问控制，只能用于location中
+	2.client_max_body_size size
+	     http请求包体的最大值，常用于限定客户端所能够请求的最大包体，根据请求首部中的Content-Length来检查，以避免无用的传输
+	3.limit_rate speed
+		 限制客户端每秒传输的字节数，默认为0，表示没有限制
+	4.limit_rate_after time
+		nginx向客户端发送响应报文时，如果时长超过了此处指定的时长，则后续的发送过程开始限速
+
+文件操作的优化
+	1.sendfile on|off
+		是否启用sendfile功能
+	2.aio on|off
+		是否启用aio功能
+	3.open_file_cache man=N [incative=time]|off
+		是否打开文件缓存功能
+		max：用于缓存条目的最大值，允许打开的缓存条目最大数，当满两类以后将根据LRU（最小最少连接数）算法进行置换
+		inactive：某缓存条目在指定时长内没有被访问过时，将自动被删除；通常默认为60s
+
+		缓存的信息包括：
+			文件句柄、文件大小和上次修改时间
+			已经打开的目录结构：
+			没有找到或没有访问权限的信息
+	4.open_file_cache_errors on|off
+		是否缓存文件找不到或没有权限访问等相关信息
+	5.open_file_cache_valid time
+		多长时间检查一次缓存中的条目是否超出非活动时长，默认为60s
+	6.open_file_cache_min_use #
+		在inactive指定的时长内被访问超过此处指定的次数时，才不会被删除
+
+对客户端请求的特殊处理
+	1.ignore_invalid_headers on|off
+		是否忽略不合法的http首部，默认为on，off意味着请求首部中出现不合规的首部将拒绝响应，只能用于server和http
+	2.log_not_found on|off
+		用户访问的文件不存在时，是否将其记录到错误日志中
+	3.resolver address：
+	 	指定nginx使用的dns服务器地址
+	 4.resolve timeout
+	 	指定DNS解析超时时长，默认为30s
+	 5.server_tokens on|off
+	 	是否在错误页面中显示nginx的版本号
+
+http核心模块的内置变量：
+	$uri:当前请求的uri，不带参数
+	$request_uri：请求的uri，带完整参数
+	$host：http请求报文中host首部；如果请求中没有host首部，则以处理此请求的主机的主机名代替
+	$hostname：nginx服务运行所在主机的主机名
+	$remote_addr：客户端IP
+	$remote_port: 客户端port
+	$remote_user：使用用户认证时客户端用户输入的用户名
+	$request_filename：用户请求中的URI经过本地root或alias转换后映射的本地的文件路径
+	$request_method：请求方法
+	$server_addr：服务器地址
+	$server_name: 服务器名称
+	$server_port：服务器端口
+	$server_protocol：服务器向客户端发送响应时的协议，如http/1.1，http/1.0
+	$scheme:在请求中使用的scheme 映射协议本身的协议
+	$http_HEADER:匹配请求报文中指定的HEADER，$http_host匹配请求报文中的host首部
+	$sent_http_HEADER:匹配响应报文中指定的HERDER，例如$http_content_type匹配相应报文中的content-type首部
+	$document_root：当前请求映射到的root配置
+
+
+配置使用nginx
+	1.nginx虚拟主机
+		server{
+			listen
+			server_name
+			root
+		}
+	2.访问控制access模块
+		allow
+		deny
+		至上而下依次认证，默认为通过
+	3.基于用户认证 
+		location /admin/ {
+			root
+			auth_basic "" 标题
+			auth_basic_user_file "" 密码的存放位置
+		}
+		使用htpasswd创建密码
+	4，建立下载站点autoindex下载列表
+		location /download/{
+			root
+			autoindex on
+		}
+	5.防盗链
+		(1)定义和规定额引用
+		valid_referers none |blocked |server_names|string ...
+		(2)判断不合规的引用
+		if ($invaild_referer) {
+			rewrite ^/.*$ http://www.a.com/403.html
+		}
+	6.URL rewrite
+		rewrite regex replacement [flag];
+
+		location / {
+			root
+			rewrite ^/imgages/(.*)$ /imgs/$1
+		}
+		
+		flag:标志位
+			 last:一旦被当前规则匹配并重写后立即停止检查后续饿的其他rewrite的规则，而后通过重写后的规则重新发起请求
+			 break：一旦被当前规则匹配并重写后立即停止检查后续饿的其他rewrite的规则，而后继续由nginx进行后续的操作
+			 redirect：返回302临时重定向代码
+			 permanent：返回301永久重定向
+
+		nginx最多循环10次，超出之后返回500错误
+
+			括号不需要转移
+		注意：一般将rewrite写在location中时都使用break标志，或者将rewrite卸载if上下文中
+
+		rewrite_log on|off
+			是否将重写过程记录在错误日志中，默认为notice级别；默认为off
+
+		return code：
+			用于结束rewrite规则，并且为客户返回状态码：可以使用的状态码有204，400，402-406，500-504等
+		if (condition) {
+
+		}
+			用于检测条件是否成立
+	7.状态页
+		location{
+			stub-status on
+		}
+
+			当下处于活动状态的总数
+
+			接受的总数 已经建立和处理总数 请求的总数
+			
+			正在接受的并发请求个数，正在读取的个数或发往客户端的 ，长连接中的处于活动状态的值
+	8.压缩：
+		gzip
+		  gzip on|off
+		  gzip_buffer 使用的缓存大小
+		  gzip_comp_level 压缩的级别
+		  gzip_disable 不压缩的类型或浏览器
+		  gzip_min_length 最少压缩的大小
+		  gzip_http_version 压缩完成以后发送http的版本
+		  gzip_types：只压缩的格式
 
 
 

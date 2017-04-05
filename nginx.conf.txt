@@ -41,9 +41,9 @@ http {
 
     gzip  on;
     gzip_min_length 512k;
-    gzip_buffers    4 2048k;
-    gzip_http_version 1.0;
-    gzip_comp_level 2;
+    gzip_buffers    4 2048k; #指定nginx申请缓存空间的个数   缓存空间的大小
+    gzip_http_version 1.0;  对于什么版本的httpd协议进行相应
+    gzip_comp_level 2;      #压缩级别1-9
     gzip_types text/plain application/x-javascript text/css application/xml;
     gzip_vary on;
     gzip_disable "MSIE [1-6]\.";
@@ -107,7 +107,7 @@ http {
             proxy_buffer_size 4096k;       #设置代理服务器（nginx）保存用户头信息的缓冲区大小
             proxy_buffers 4 4096k;        #proxy_buffers缓冲区，网页平均在32k以下的话，这样设置
             proxy_busy_buffers_size 4096k; #高负荷下缓冲大小（proxy_buffers*2）
-            proxy_temp_file_write_size 4096k; #设定缓存文件夹大小，大于这个值，将从upstream服务器传
+            proxy_temp_file_write_size 4096k ; #设定缓存文件夹大小，大于这个值，将从upstream服务器传
             proxy_next_upstream error timeout invalid_header http_500 http_503 http_404; 
             proxy_max_temp_file_size 128m;
         }

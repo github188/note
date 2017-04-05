@@ -1,4 +1,4 @@
-
+﻿
 
 
 CentOS6 PXE的实现：
@@ -39,6 +39,7 @@ Cobbler:
 
 前提：cobbler由epel源提供，故此需要事先配置指向epel的yum源方可进行类似下面的安装过程。
 
+# yum install tftp-server dhcp vsftpd syslinux
 # yum install cobbler cobbler-web pykickstart debmirror
 
 # service httpd start
