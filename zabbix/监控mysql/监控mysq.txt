@@ -11,6 +11,9 @@ show engine myisam status\G    查看MyISAM存储引擎状态
 2.添加MySQL监控账号
 GRANT USAGE,PROCESS,SUPER,REPLICATION CLIENT,REPLICATION SLAVE ON *.* TO 'zabbixagent'@'localhost' IDENTIFIED BY  'zabbixagent';
 flush privileges;
+
+GRANT USAGE ON *.* TO 'zabbix'@'localhost' IDENTIFIED BY 'zabbix123456';
+##########简单监控
 在/usr/local/zabbix/etc/目录下创建一个 .my.cnf 文件
 3.添加zabbix子配置文件mysql_status.conf
  ### MySQL DB Infomation

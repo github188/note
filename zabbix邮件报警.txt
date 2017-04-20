@@ -1,0 +1,105 @@
+一、关闭sendmail或者postfix
+service sendmail stop #关闭
+chkconfig sendmail off #禁止开机启动
+service postfix stop
+chkconfig postfix off
+备注：使用外部邮箱账号时，不需要启动sendmail或者postfix；如果在sendmail或者postfix启动的同时使用外部邮箱发送报警邮件，首先会读取外部邮箱配置信息。
+二、安装邮件发送工具mailx
+yum remove mailx #卸载系统自带的旧版mailx
+下载mailx：
+wget  http://ftp.debian.org/debian/pool/main/h/heirloom-mailx/heirloom-mailx_12.5.orig.tar.gz
+tar -zxvf heirloom-mailx_12.5.orig.tar.gz#解压
+cd heirloom-mailx-12.5/#进入目录
+make#编译
+make install UCBINSTALL=/usr/bin/install#安装
+tar jxvf mailx-12.5.tar.bz2 #解压
+ln -s /usr/local/bin/mailx /bin/mail #创建mailx到mail的软连接
+ln -s /etc/nail.rc /etc/mail.rc #创建mailx配置文件软连接
+whereis mailx #查看安装路径
+mailx -V #查看版本信息
+三、配置Zabbix服务端外部邮箱
+vi /etc/mail.rc #编辑，添加以下信息
+set from=xxx@163.com smtp=smtp.163.com
+set smtp-auth-user=xxx@163.com smtp-auth-password=123456
+set smtp-auth=login
+:wq! #保存退出
+echo "zabbix test mail" |mail -s "zabbix" yyy@163.com
+#测试发送邮件，标题zabbix，邮件内容：zabbix test mail，发送到的邮箱：yyy@163.com
+#这时候，邮箱yyy@163.com会收到来自xxx@163.com的测试邮件
+四、配置Zabbix服务端邮件报警
+管理-示警媒介类型-创建媒体类型
+脚本名称：sendmail.sh
+添加以下3个参数，分别对应sendmail.sh脚本需要的3个参数：收件人地址、主题、详细内容
+{ALERT.SENDTO}
+{ALERT.SUBJECT}
+{ALERT.MESSAGE}
+设置Zabbix用户报警邮箱地址
+设置Zabbix触发报警的动作
+名称：Action-Email
+默认接收人：故障{TRIGGER.STATUS},服务器:{HOSTNAME1}发生: {TRIGGER.NAME}故障!
+默认信息：
+告警主机:{HOSTNAME1}
+告警时间:{EVENT.DATE} {EVENT.TIME}
+告警等级:{TRIGGER.SEVERITY}
+告警信息: {TRIGGER.NAME}
+告警项目:{TRIGGER.KEY1}
+问题详情:{ITEM.NAME}:{ITEM.VALUE}
+当前状态:{TRIGGER.STATUS}:{ITEM.VALUE1}
+事件ID:{EVENT.ID}
+恢复信息：打钩
+恢复主旨：恢复{TRIGGER.STATUS}, 服务器:{HOSTNAME1}: {TRIGGER.NAME}已恢复!
+恢复信息：
+告警主机:{HOSTNAME1}
+告警时间:{EVENT.DATE} {EVENT.TIME}
+告警等级:{TRIGGER.SEVERITY}
+告警信息: {TRIGGER.NAME}
+告警项目:{TRIGGER.KEY1}
+问题详情:{ITEM.NAME}:{ITEM.VALUE}
+当前状态:{TRIGGER.STATUS}:{ITEM.VALUE1}
+事件ID:{EVENT.ID}
+已启用：打钩
+
+*********************************************
+STATUS:{TRIGGER.STATUS}       HOSTNAME:{HOSTNAME1}      TRIGGER:{TRIGGER.NAME}
+ 
+Alarm Host: {HOSTNAME1}
+Alert Time: {EVENT.DATE} {EVENT.TIME}
+Alarm Class: {TRIGGER.SEVERITY}
+Alert Information: {TRIGGER.NAME}
+Alarm Item: {TRIGGER.KEY1}
+Problem Details: {ITEM.NAME}: {ITEM.VALUE}
+Current Status: {TRIGGER.STATUS}: {ITEM.VALUE1}
+Event ID:{EVENT.ID}
+
+
+STATUS:{TRIGGER.STATUS}       HOSTNAME:{HOSTNAME1}      TRIGGER:{TRIGGER.NAME}  Has Been Recover
+
+Alarm Host: {HOSTNAME1}
+Alert Time: {EVENT.DATE} {EVENT.TIME}
+Alarm Class: {TRIGGER.SEVERITY}
+Alert Information: {TRIGGER.NAME}
+Alarm Item: {TRIGGER.KEY1}
+Problem Details: {ITEM.NAME}: {ITEM.VALUE}
+Current Status: {TRIGGER.STATUS}: {ITEM.VALUE1}
+Event ID:{EVENT.ID}
+5、添加Zabbix服务端邮件发送脚本
+yum  -y install  dos2unix
+cd /usr/local/zabbix/share/zabbix/alertscripts #进入脚本存放目录
+#!/bin/bash
+#
+#echo "$3" | mail -s "$2" $1
+export.UTF-8         #解决发送的中文变成了乱码的问题
+MAILLOG=/tmp/zabbix_mail.log #  写入日志
+FILE=/tmp/mailtmp.txt
+echo "$3" >>$MAILLOG
+echo "***************************************" >> $MAILLOG
+echo "$3" >$FILE
+/usr/bin/dos2unix -k $FILE     #解决了发送的邮件内容变成附件的问题。
+/usr/bin/mail -s "$2" $1 < $FILE
+
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+chown  zabbix.zabbix  /tmp/mailtmp.txt 
+chown  zabbix.zabbix  /tmp/zabbix_mail.log
+chown  zabbix.zabbix  /usr/local/zabbix/share/zabbix/alertscripts/sendmail.sh 
+chmod +x  /usr/local/zabbix/share/zabbix/alertscripts/sendmail.sh 
+
