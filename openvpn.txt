@@ -196,7 +196,7 @@ Data Base Updated
 
  log        /var/log/openvpn/openvpn.log
 
- verb 3
+ verb 3   #日志级别
 **************************************************************************************************************************
 server.conf配置如下
 
@@ -281,7 +281,7 @@ explicit-exit-notify 0
  key client1.key   
  ns-cert-type server
  comp-lzo
- verb 3
+ verb 3  
  ********************************************************************************************
 
 注意：客户端配置文件要与客户端用户名称相同
@@ -307,3 +307,334 @@ OpenVPN客户端配置
 
 cd   /etc/openvpn   
 执行  openvpn    /etc/openvpn/client1.ovpn      拨号上网即可
+
+************************************************************************************************************************
+以下是网上文档没用过
+一.环境简述
+
+之前一直使用公网ip来连接各个机房的服务器,现在ip不太够用了,而且有些机器也不需要用到公网ip.通过openvpn将多个机房连接起来,组成一个局域网,机器ip可以做到唯一性,便于标识.既节省了ip.又方便管理.
+
+本例环境如下,服务器使用的系统为centos 7.1 
+这里写图片描述
+
+北京机房内网网段 172.16.2.0/24,服务器公网ip 20.20.20.20,内网网关172.16.2.1 
+广州机房内网网段 172.16.1.0/24,服务器公网ip 10.10.10.10,内网网关172.16.1.1 
+公司内网网段 172.16.3.0/24,防火墙公网ip 30.30.30.30,内网网关172.16.3.1,内网服务器ip 172.16.3.88
+
+实现思路: 
+1.在广州机房搭建一个openvpn服务端,北京和公司内网各选一台服务器做openvpn的客户端连接广州. 
+2.openvpn使用桥接模式,开启client-to-client.北京和公司都连上后,这3台机器默认就能互访. 
+3.各内网网段的互通使用静态路由.
+二.广州安装openvpn服务端
+
+安装前需注意服务器的系统时间要一致,可按如下方法同步:
+
+/usr/sbin/ntpdate cn.pool.ntp.org
+
+1.安装openvpn.如果没epel源,先添加下
+
+wget  http://dl.fedoraproject.org/pub/epel/7/x86_64/e/epel-release-7-5.noarch.rpm
+rpm -Uvh epel-release-7-5.noarch.rpm
+yum -y install openvpn easy-rsa 
+
+2.创建证书等:
+
+cp -r /usr/share/easy-rsa/ /etc/openvpn/
+cd /etc/openvpn/easy-rsa/2.*/
+
+vim vars
+#设置如下内容
+export KEY_COUNTRY="CN"
+export KEY_PROVINCE="GD"
+export KEY_CITY="guangzhou"
+export KEY_ORG="test"
+export KEY_EMAIL="me@myhost.mydomain"
+export KEY_OU="MyOrganizationalUnit"
+# X509 Subject Field
+export KEY_NAME="EasyRSA"
+
+#产生证书
+source ./vars
+./clean-all
+./build-ca
+
+./build-key-server server
+./build-dh
+./build-key client
+
+cd /etc/openvpn/easy-rsa/2.0/
+cp -r keys/ /etc/openvpn/
+
+3.配置openvpn
+
+vim /etc/openvpn/server.conf
+
+#关键配置如下:
+port 1194
+proto udp
+dev tap0
+ca /etc/openvpn/keys/ca.crt
+cert /etc/openvpn/keys/server.crt
+key /etc/openvpn/keys/server.key
+dh /etc/openvpn/keys/dh2048.pem
+ifconfig-pool-persist ipp.txt
+server-bridge 172.16.1.1 255.255.255.0 172.16.1.2 172.16.1.10
+client-config-dir ccd
+client-to-client
+duplicate-cn
+keepalive 10 120
+comp-lzo
+user nobody
+group nobody
+persist-key
+persist-tun
+status openvpn-status.log
+verb 4
+mute 20
+script-security 3 
+auth-user-pass-verify /etc/openvpn/checkpsw.sh via-env #开启用户名和密码验证,用于服务端分配固定ip
+username-as-common-name
+client-config-dir /etc/openvpn/ccd #用于服务端分配固定ip
+
+设置用户名和密码，并设置固定分配ip
+
+cd /etc/openvpn
+vim psw-file
+#这里设置用于连接openvpn的用户名和密码,格式为用户名 + 空格 +密码，例如
+bj test123456
+com test123456
+
+#在该目录下再新建一个ccd文件夹
+mkdir ccd
+cd ccd
+#在该目录下新建两个文件，把用户名作为文件名的命名
+vi bj
+#添加如下内容
+ifconfig-push 172.16.1.2 255.255.255.0
+
+vi com
+#添加如下内容
+ifconfig-push 172.16.1.3 255.255.255.0
+
+４,添加相关脚本 
+添加密码验证脚本 
+vi /etc/openvpn/checkpsw.sh 
+内容如下
+
+#!/bin/sh
+###########################################################
+# checkpsw.sh (C) 2004 Mathias Sundman <mathias@openvpn.se>
+#
+# This script will authenticate OpenVPN users against
+# a plain text file. The passfile should simply contain
+# one row per user with the username first followed by
+# one or more space(s) or tab(s) and then the password.
+
+PASSFILE="/etc/openvpn/psw-file"
+LOG_FILE="/var/log/openvpn-password.log"
+TIME_STAMP=`date "+%Y-%m-%d %T"`
+
+###########################################################
+
+if [ ! -r "${PASSFILE}" ]; then
+  echo "${TIME_STAMP}: Could not open password file \"${PASSFILE}\" for reading." >> ${LOG_FILE}
+  exit 1
+fi
+
+CORRECT_PASSWORD=`awk '!/^;/&&!/^#/&&$1=="'${username}'"{print $2;exit}' ${PASSFILE}`
+
+if [ "${CORRECT_PASSWORD}" = "" ]; then 
+  echo "${TIME_STAMP}: User does not exist: username=\"${username}\", password=\"${password}\"." >> ${LOG_FILE}
+  exit 1
+fi
+
+if [ "${password}" = "${CORRECT_PASSWORD}" ]; then 
+  echo "${TIME_STAMP}: Successful authentication: username=\"${username}\"." >> ${LOG_FILE}
+  exit 0
+fi
+
+echo "${TIME_STAMP}: Incorrect password: username=\"${username}\", password=\"${password}\"." >> ${LOG_FILE}
+exit 1
+
+添加启动桥接脚本 
+vim bridge-start.sh
+
+#!/bin/bash
+#################################
+# Set up Ethernet bridge on Linux
+# Requires: bridge-utils
+#################################
+# Define Bridge Interface
+br="br0"
+# Define list of TAP interfaces to be bridged,
+# for example tap="tap0 tap1 tap2".
+tap="tap0"
+# Define physical ethernet interface to be bridged
+# with TAP interface(s) above.
+eth="ens9" #这里注意下网卡名
+eth_ip="172.16.1.1"
+eth_netmask="255.255.255.0"
+eth_broadcast="172.16.1.255"
+for t in $tap; do
+   /usr/sbin/openvpn --mktun --dev $t
+done
+brctl addbr $br
+brctl addif $br $eth
+for t in $tap; do
+    brctl addif $br $t
+done
+for t in $tap; do
+    ifconfig $t 0.0.0.0 promisc up
+done
+ifconfig $eth 0.0.0.0 promisc up
+ifconfig $br $eth_ip netmask $eth_netmask broadcast $eth_broadcast
+route add -net 172.16.2.0/24 gw 172.16.1.2
+route add -net 172.16.3.0/24 gw 172.16.1.3
+
+添加停止桥接脚本 
+vim bridge-stop.sh
+
+#!/bin/bash
+####################################
+# Tear Down Ethernet bridge on Linux
+####################################
+# Define Bridge Interface
+br="br0"
+# Define list of TAP interfaces to be bridged together
+tap="tap0"
+ifconfig $br down
+brctl delbr $br
+for t in $tap; do
+    /usr/sbin/openvpn --rmtun --dev $t
+done
+
+5.设置iptables
+
+nat链添加如下规则
+-A POSTROUTING -s 10.8.0.0/24 -o eth1 -j MASQUERADE
+-A POSTROUTING -s 172.16.0.0/16 -j MASQUERADE
+
+filter链添加如下规则
+-A INPUT -s 20.20.20.0/24  -j ACCEPT
+-A INPUT -s ３0.３0.３0.0/24  -j ACCEPT
+-A INPUT -s 172.16.0.0/16 -j ACCEPT
+-A FORWARD -j ACCEPT
+
+6.启动openvpn
+
+echo 'net.ipv4.ip_forward = 1' >> /etc/sysctl.conf
+sysctl -p
+systemctl -f enable openvpn@server.service
+systemctl start openvpn@server
+
+三．北京,公司内网连接广州openvpn，打通内网
+
+以北京20.20.20.20服务器为例 
+１.安装openvpn,步骤同上 
+２.将openvpn服务端(10.10.10.10)的三个证书文件ca.crt client.crt client.key（路径/etc/openvpn/keys）拷贝到/etc/openvpn/下 
+３.添加openvpn启动脚本
+
+cd /etc/openvpn
+
+vi client.sh
+＃添加如下内容
+#!/bin/sh
+case "$1" in
+start)
+    /usr/sbin/openvpn /etc/openvpn/client.ovpn > /dev/null &
+    sleep 5
+    route add -net 172.16.3.0/24 gw 172.16.2.1
+;;
+stop)
+    pkill openvpn
+;;
+restart)
+    pkill openvpn
+    sleep 2
+    /usr/sbin/openvpn /etc/openvpn/client.ovpn > /dev/null &
+;;
+esac
+
+vi psw.conf
+＃添加如下内容
+bj
+test123456
+
+vi client.ovpn
+#添加如下内容
+client
+dev tap
+proto udp
+remote 10.10.10.10 1194
+resolv-retry infinite
+nobind
+persist-key
+persist-tun
+mute-replay-warnings
+ca ca.crt
+cert client.crt
+key client.key
+ns-cert-type server
+comp-lzo
+auth-user-pass psw.conf
+
+添加执行权限
+chmod +x client.sh
+
+＃加入系统启动项
+echo '(cd /etc/openvpn; ./client.sh start)' >> /etc/rc.local
+
+4.设置iptables
+
+nat链添加如下规则
+-A POSTROUTING -d 172.16.0.0/16 -o tap0 -j MASQUERADE
+
+filter链添加如下规则
+-A FORWARD -i eth0 -o tap0 -j ACCEPT
+-A FORWARD -i tap0 -o eth0 -j ACCEPT
+
+５.设置完成后，重启下防火墙，启动openvpn
+
+systemctl restart iptables
+(cd /etc/openvpn; ./client.sh start)
+
+ping下广州内网网关172.16.1.1,如果ping通说明北京与广州可以互通了．
+＃ping 172.16.1.1 -c 4
+PING 172.16.1.1 (172.16.1.1) 56(84) bytes of data.
+64 bytes from 172.16.1.1: icmp_seq=1 ttl=64 time=37.1 ms
+64 bytes from 172.16.1.1: icmp_seq=2 ttl=64 time=37.0 ms
+64 bytes from 172.16.1.1: icmp_seq=3 ttl=64 time=37.2 ms
+64 bytes from 172.16.1.1: icmp_seq=4 ttl=64 time=37.0 ms
+
+--- 172.16.1.1 ping statistics ---
+4 packets transmitted, 4 received, 0% packet loss, time 3040ms
+rtt min/avg/max/mdev = 37.053/37.133/37.268/0.083 ms
+
+６.公司内网openvpn连接设置与北京一样，注意用户名密码及路由的不同：
+
+公司内网的openvpn的启动脚本如下：
+vi client.sh
+＃添加如下内容
+#!/bin/sh
+case "$1" in
+start)
+    /usr/sbin/openvpn /etc/openvpn/client.ovpn > /dev/null &
+    sleep 5
+    route add -net 172.16.２.0/24 gw 172.16.１.２
+;;
+stop)
+    pkill openvpn
+;;
+restart)
+    pkill openvpn
+    sleep 2
+    /usr/sbin/openvpn /etc/openvpn/client.ovpn > /dev/null &
+;;
+esac
+
+7.北京，公司内网的openvpn都连接上后，在广州openvpn的服务器上添加如下路由
+
+route add -net 172.16.2.0/24 gw 172.16.1.2
+route add -net 172.16.3.0/24 gw 172.16.1.3
+
+８.以上步骤成功完成后，北京内网，广州内网，公司内网即可互相访问．在任意的一台服务器上都可以访问其他节点的服务器，实现了内网互通的需求．
