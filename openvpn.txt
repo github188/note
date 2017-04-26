@@ -1,0 +1,309 @@
+OpenVPN是一个用于创建虚拟专用网络(Virtual Private Network)加密通道的免费开源软件。
+使用OpenVPN可以方便地在家庭、办公场所、住宿酒店等不同网络访问场所之间搭建类似于局域网的专用网络通道。
+OpenVPN使用方便，运行性能优秀，支持Solaris、Linux 2.2+(Linux 2.2+表示Linux 2.2及以上版本，下同)、OpenBSD 3.0+、FreeBSD、NetBSD、Mac OS X、Android和Windows 2000+的操作系统，
+并且采用了高强度的数据加密，再加上其开源免费的特性，使得OpenVPN成为中小型企业及个人的VPN首选产品。
+使用OpenVPN配合特定的代理服务器，可用于访问Youtube、FaceBook、Twitter等受限网站，也可用于突破公司的网络限制。
+************************************************
+服务器端：CentOS6.5
+客  户  端：Windows7
+服务器端软件：epel-release-6-8.noarch.rpm，openvpn，easy-rsa
+客户端软件： openvpn-install-2.3.4
+***************************************************
+服务器端安装及配置
+1. 关闭SELINUX
+ setenforce 0            //暂时关闭
+ sed  -i  '^SELINUX=/c\SELINUX=disabled'   /etc/selinux/config           //重启有效
+2. 安装"EPEL"源
+ wget  http://dl.fedoraproject.org/pub/epel/6/i386/epel-release-6-8.noarch.rpm          //下载centos6 32位的EPEL源
+ rpm -ivh epel-release-6-8.noarch.rpm          //安装EPEL源
+ yum makecache          //更新本地缓存
+3. 安装openvpn
+yum -y install openvpn easy-rsa
+********************************************************************************************************************
+4. easy-rsa配置
+ mkdir -p /etc/openvpn/easy-rsa/keys
+ cp -rf/usr/share/easy-rsa/2.0/* /etc/openvpn/easy-rsa/
+5.  创建CA证书和密钥
+ vi /etc/openvpn/easy-rsa/vars                  //更改你自己的国家，省份，城市，邮箱等...
+ source   ./vars                 //初始化证书的授权中心
+ ./clean-all                      //清除keys目录下面的文件
+ ./build-ca                  //创建ca证书
+
+Generating a 1024 bit RSA private key
+.++++++
+......................++++++
+writing new private key to 'ca.key'
+-----
+You are about to be asked to enter information that will be incorporated
+into your certificate request.
+What you are about to enter is what is called a Distinguished Name or a DN.
+There are quite a few fields but you can leave some blank
+For some fields there will be a default value,
+If you enter '.', the field will be left blank.
+-----
+Country Name (2 letter code) [CN]:
+State or Province Name (full name) [CA]:
+Locality Name (eg, city) [HZ]:
+Organization Name (eg, company) [HZ]:
+Organizational Unit Name (eg, section) [changeme]:
+Common Name (eg, your name or your server's hostname) [changeme]:
+Name [changeme]:
+Email Address [mail@host.domain]:
+********************************************************************************
+6.  创建服务端的证书和密钥
+./build-key-server server
+
+Generating a 1024 bit RSA private key
+.....++++++
+.................++++++
+writing new private key to 'server.key'
+-----
+You are about to be asked to enter information that will be incorporated
+into your certificate request.
+What you are about to enter is what is called a Distinguished Name or a DN.
+There are quite a few fields but you can leave some blank
+For some fields there will be a default value,
+If you enter '.', the field will be left blank.
+-----
+Country Name (2 letter code) [CN]:
+State or Province Name (full name) [CA]:
+Locality Name (eg, city) [HZ]:
+Organization Name (eg, company) [HZ]:
+Organizational Unit Name (eg, section) [changeme]:
+Common Name (eg, your name or your server's hostname) [server]:
+Name [changeme]:
+Email Address [mail@host.domain]:
+  
+Please enter the following 'extra' attributes
+to be sent with your certificate request
+A challenge password []:
+An optional company name []:
+Using configuration from /etc/easy-rsa/2.0/openssl.cnf
+Check that the request matches the signature
+Signature ok
+The Subject's Distinguished Name is as follows
+countryName           :PRINTABLE:'CN'
+stateOrProvinceName   :PRINTABLE:'CA'
+localityName          :PRINTABLE:'HZ'
+organizationName      :PRINTABLE:'HZ'
+organizationalUnitName:PRINTABLE:'changeme'
+commonName            :PRINTABLE:'server'
+name                  :PRINTABLE:'changeme'
+emailAddress          :IA5STRING:'mail@host.domain'
+Certificate is to be certified until Mar 28 03:05:21 2022 GMT (3650 days)
+Sign the certificate? [y/n]:y
+   
+  1 out of 1 certificate requests certified, commit? [y/n]y
+  Write out database with 1 new entries
+Data Base Update
+********************************************************************************
+7. 创建客户端的证书和密钥
+./build-key client1
+
+Generating a 1024 bit RSA private key
+...++++++
+...............++++++
+writing new private key to 'client1.key'
+-----
+You are about to be asked to enter information that will be incorporated
+into your certificate request.
+What you are about to enter is what is called a Distinguished Name or a DN.
+There are quite a few fields but you can leave some blank
+For some fields there will be a default value,
+If you enter '.', the field will be left blank.
+-----
+Country Name (2 letter code) [CN]:
+State or Province Name (full name) [CA]:
+Locality Name (eg, city) [HZ]:
+Organization Name (eg, company) [HZ]:
+Organizational Unit Name (eg, section) [changeme]:
+Common Name (eg, your name or your server's hostname) [client1]:
+Name [changeme]:
+Email Address [mail@host.domain]:
+  
+Please enter the following 'extra' attributes
+to be sent with your certificate request
+A challenge password []:
+An optional company name []:
+Using configuration from /etc/easy-rsa/2.0/openssl.cnf
+Check that the request matches the signature
+Signature ok
+The Subject's Distinguished Name is as follows
+countryName           :PRINTABLE:'CN'
+stateOrProvinceName   :PRINTABLE:'CA'
+localityName          :PRINTABLE:'HZ'
+organizationName      :PRINTABLE:'HZ'
+organizationalUnitName:PRINTABLE:'changeme'
+commonName            :PRINTABLE:'client1'
+name                  :PRINTABLE:'changeme'
+emailAddress          :IA5STRING:'mail@host.domain'
+Certificate is to be certified until Mar 28 03:21:06 2022 GMT (3650 days)
+Sign the certificate? [y/n]:y
+  
+ 1 out of 1 certificate requests certified, commit? [y/n]y
+  Write out database with 1 new entries
+Data Base Updated
+8. 创建迪菲霍尔曼密钥交换参数
+ ./build-dh
+9. 拷贝服务端证书、秘钥等
+ cp /etc/openvpn/easy-rsa/keys/{server.crt,server.key,dh2048.pem,ca.crt} /etc/openvpn
+*******************************************************************************************************
+10. 配置VPN服务端
+ cp /usr/share/doc/openvpn-2.3.*/sample/sample-config-files/server.conf/etc/openvpn/     //复制配置文件到/etc/openvpn
+修改服务端配置文件：
+ cat server.conf | grep "^[^#|^;]"                           //列出未注释的内容
+ local 192.168.21.200    #监听地址
+
+ port 8088      #监听端口
+
+ proto tcp      #监听协议
+
+ dev tun      #采用路由隧道模式
+
+ ca ca.crt  #ca证书路径
+
+ cert server.crt    #服务器证书
+
+ key server.key    # This file should be kept secret 服务器密钥
+
+ dh dh2048.pem  #密钥交换协议文件
+
+ server 10.8.0.0 255.255.255.0        #给客户端分配地址池，注意：不能和VPN服务器内网网段有相同，不用更改I!!!!!!!!!!
+
+ ifconfig-pool-persist ipp.txt
+
+ push "route 192.168.20.0 255.255.255.0"  #允许客户端访问内网 20.0 的网段。
+
+ push"dhcp-option DNS 8.8.8.8"              #dhcp分配dns
+
+ client-to-client    #客户端之间互相通信
+
+ keepalive 10 120  #存活时间，10秒ping一次,120 如未收到响应则视为断线
+
+ comp-lzo        #传输数据压缩
+
+ max-clients 100  #最多允许 100 客户端连接
+
+ user nobody        #用户
+
+ group nobody      #用户组
+
+ persist-key
+
+ persist-tun
+
+ status        /var/log/openvpn/openvpn-status.log
+
+ log        /var/log/openvpn/openvpn.log
+
+ verb 3
+**************************************************************************************************************************
+server.conf配置如下
+
+local 192.168.21.200
+port 8088
+proto tcp
+push "route 192.168.50.0 255.255.255.0" 
+client-to-client
+keepalive 10 120
+comp-lzo
+max-clients 100 
+dev tun
+log        /var/log/openvpn/openvpn.log
+ca ca.crt
+cert server.crt
+dh dh2048.pem
+server 10.8.0.0 255.255.255.0
+ifconfig-pool-persist ipp.txt
+cipher AES-256-CBC
+persist-key
+persist-tun
+status openvpn-status.log
+verb 3
+key server.key 
+explicit-exit-notify 0
+******************************************************************************************************
+11. iptables配置
+ 清空iptables配置：
+
+ iptables -F
+
+ iptables -X
+
+ 配置openvpn的nat功能，将所有网段的包转发到eth0口：
+
+ iptables -t nat -A POSTROUTING  -o eth0 -j MASQUERADE
+
+ 添加FORWARD白名单：
+
+ iptables -A FORWARD -i tun+ -j ACCEPT
+
+ 开启系统的路由功能：
+
+ echo "1" > /proc/sys/net/ipv4/ip_forward
+
+ service iptables save               //保存iptables配置
+
+ service iptables restart 
+*********************************************************************************************
+12. 启动openvpn
+ service openvpn start
+13. 配置客户端
+复制客户端配置文件client.ovpn：
+ cp /usr/share/doc/openvpn-2.3.*/sample/sample-config-files/client.conf   /etc/openvpn/client.ovpn
+修改客户端配置文件：
+ cat server.conf | grep "^[^#|^;]"
+ client
+ dev tun
+ proto tcp     //改为tcp
+ remote 203.195.xxx.xxx 1194       //OpenVPN服务器的外网IP和端口
+ resolv-retry infinite
+ nobind
+ persist-key
+ persist-tun
+ ca ca.crt    //client1的证书
+ cert client.crt
+ key client.key    //client1的密钥
+ ns-cert-type server
+ comp-lzo
+ verb 3
+ *******************************************************************************************
+ client
+ dev tun
+ proto tcp    
+ remote 192.168.21.200 8088     
+ resolv-retry infinite
+ nobind
+ persist-key
+ persist-tun
+ ca ca.crt   
+ cert client1.crt
+ key client1.key   
+ ns-cert-type server
+ comp-lzo
+ verb 3
+ ********************************************************************************************
+
+注意：客户端配置文件要与客户端用户名称相同
+*************************************************************************************
+如果想通过openvpnserver    连接内网服务器
+1.给内网服务器添加默认网关且网关为openvpn  server
+route   add    default  gw  192.168.50.2
+2.给内网服务器添加网络路由
+route  add   -net 10.8.0.0/24     gw    192.168.50.2
+3.用iptables    做网络地址转换
+iptables   -t   nat    -A  POSTROUTING  -s 10.8.0.0/24   -o  eth2   -j   SNAT  --to-source  192.168.50.2 
+
+*********************************************************************************
+OpenVPN客户端配置
+1. 拷贝服务器端/etc/openvpn/easy-rsa/keys/{ca.crt,client.crt,client,key}和/etc/openvpn/client.ovpn到Windows7客户端
+2. 下载openvpn客户端安装
+下载地址： http://pan.baidu.com/s/1ZsgpS
+3. 把刚才复制过来的几个文件拷贝到openvpn客户端安装目录下面的config目录里面（C:\Program Files\OpenVPN\config）
+4. 启动OpenVPN GUI
+在电脑右下角的openvpn图标上右击，选择“Connect”。正常情况下应该能够连接成功，分配正常的IP。
+
+在linux客户端时将密钥证书拷贝到/etc/openvpn 
+
+cd   /etc/openvpn   
+执行  openvpn    /etc/openvpn/client1.ovpn      拨号上网即可

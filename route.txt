@@ -1,0 +1,127 @@
+考试题一：linux下如何添加路由(百度面试题)
+以上是原题，老男孩老师翻译成如下3道题。
+a.如何用命令行方式给linux机器添加一个默认网关，假设网关地址为10.0.0.254？
+b. 192.168.1.0网段， 192.168.1.1网关的某一服务器想连入172.16.1.0/24段,该如何添加路由（奇虎360）
+c.如果添加一个主机路由？
+请分别解答。
+解答：route -net 172.16.1.0/24 gw 192.168.1.1
+route 命令使用方法：
+a.缺省网关路由
+    默认网关就是数据包不匹配任何设定的路由规则，最后流经的地址关口！网关按字面意思就是网络的关口，就相当于我们家里房子的门一样，如果外出就要经过房门，数据包也是一样。
+本题的答案：
+route del default gw 10.0.0.254
+解答实践：
+[root@oldboy ~]# route -n #==>查看路由表，netstat -rn也可以。
+Kernel IP routing table
+Destination     Gateway         Genmask         Flags Metric Ref    Use Iface
+10.0.0.0        0.0.0.0         255.255.255.0   U     0      0        0 eth0
+169.254.0.0     0.0.0.0         255.255.0.0     U     0      0        0 eth0
+0.0.0.0         10.0.0.254      0.0.0.0         UG    0      0        0 eth0
+#==>这里就是系统的默认网关信息，表示去任何地方（0.0.0.0），都发给10.0.0.254，因为是默认网关，所以，放在了最后一条。路由也是有顺序的，如果不符合任何一条规则就交给默认网关处理。
+[root@oldboy ~]# route del default gw 10.0.0.254 #==>这个命令是删除默认的网关。
+[root@oldboy ~]# route -n
+Kernel IP routing table
+Destination     Gateway         Genmask         Flags Metric Ref    Use Iface
+10.0.0.0        0.0.0.0         255.255.255.0   U     0      0        0 eth0
+169.254.0.0     0.0.0.0         255.255.0.0     U     0      0        0 eth0
+[root@oldboy ~]# route add default gw 10.0.0.254    #==>这个命令是添加默认的网关，也是本题的答案。
+[root@oldboy ~]# netstat -rn
+Kernel IP routing table
+Destination     Gateway         Genmask         Flags   MSS Window  irtt Iface
+10.0.0.0        0.0.0.0         255.255.255.0   U         0 0          0 eth0
+169.254.0.0     0.0.0.0         255.255.0.0     U         0 0          0 eth0
+0.0.0.0         10.0.0.254      0.0.0.0         UG    0      0        0 eth0 #==>又回来了
+[root@oldboy ~]# route -n
+Kernel IP routing table
+Destination     Gateway         Genmask         Flags Metric Ref    Use Iface
+10.0.0.0        0.0.0.0         255.255.255.0   U     0      0        0 eth0
+169.254.0.0     0.0.0.0         255.255.0.0     U     0      0        0 eth0
+0.0.0.0         10.0.0.254      0.0.0.0         UG    0      0        0 eth0 #这里就是添加的默认网关记录。
+特别强调：实际上route add default gw 10.0.0.254 就相当于route add -net 0.0.0.0 netmask 0.0.0.0 gw 10.0.0.254
+b.网络路由：即去往某一网络或网段的路由
+    一般多网段之间互相通信，希望建立一条优先路由，而不是通过默认网关时就可以配置网络路由。还是拿房子比喻，你现在不是要出门，而是卧室，卫生间，去卧室就要经过卧室的门，去卫生间也要经过卫生间的门，这里的卧室和卫生间的门就可以认为是去往某一网段的路由，而不是默认路由（即房子的门。）
+    实际工作中会有需求，两个不同的内部网络之间互访，而不是出网访问，就是上面例子的情况。
+    本题的答案：
+route add -net 192.168.1.0 netmask 255.255.255.0 gw 192.168.1.1
+解答实践：
+[root@oldboy ~]# route add -net 192.168.1.0 netmask 255.255.255.0 gw 192.168.1.1
+SIOCADDRT: 网络不可达 #==>当连不通地址192.168.1.1时，无法添加路由。
+[root@oldboy ~]# ifconfig eth0:0 192.168.1.1/24 up #==>添加一个IP别名用于临时测试，如果永久生效最好加双网卡或写入到配置文件。
+[root@oldboy ~]# ifconfig eth0:0 #==>查看添加的IP别名（网络里把这种多IP的方式称为子接口）
+eth0:0    Link encap:Ethernet  HWaddr 00:0C:29:65:A4:FD 
+          inet addr:192.168.1.1  Bcast:192.168.1.255  Mask:255.255.255.0
+          UP BROADCAST RUNNING MULTICAST  MTU:1500  Metric:1
+再来添加去192.168.1.0的数据包，交给192.168.1.1处理。
+[root@oldboy ~]# route add -net 192.168.1.0 netmask 255.255.255.0 gw 192.168.1.1
+[root@oldboy ~]# netstat -rn   #==>和route -n很像。
+Kernel IP routing table
+Destination     Gateway         Genmask         Flags   MSS Window  irtt Iface
+10.0.0.0        0.0.0.0         255.255.255.0   U         0 0          0 eth0
+192.168.1.0     192.168.1.1     255.255.255.0   UG        0 0          0 eth0 #==>这就是网络路由
+192.168.1.0     0.0.0.0         255.255.255.0   U         0 0          0 eth0
+169.254.0.0     0.0.0.0         255.255.0.0     U         0 0          0 eth0
+0.0.0.0         10.0.0.254      0.0.0.0         UG        0 0          0 eth0
+拓展：其他写法
+[root@oldboy ~]# route add -net 192.168.1.0 netmask 255.255.255.0 dev eth0  #==>指定设备而不是地址。
+[root@oldboy ~]# route -n
+Kernel IP routing table
+Destination     Gateway         Genmask         Flags Metric Ref    Use Iface
+10.0.0.0        0.0.0.0         255.255.255.0   U     0      0        0 eth0
+192.168.1.0     0.0.0.0         255.255.255.0   U     0      0        0 eth0
+192.168.1.0     192.168.1.1     255.255.255.0   UG    0      0        0 eth0
+192.168.1.0     0.0.0.0         255.255.255.0   U     0      0        0 eth0
+169.254.0.0     0.0.0.0         255.255.0.0     U     0      0        0 eth0
+0.0.0.0         10.0.0.254      0.0.0.0         UG    0      0        0 eth0
+[root@oldboy ~]# route del -net 192.168.1.0/24 dev eth0   
+[root@oldboy ~]# route add -net 192.168.1.0/24 dev eth0   
+[root@oldboy ~]# route -n
+Kernel IP routing table
+Destination     Gateway         Genmask         Flags Metric Ref    Use Iface
+10.0.0.0        0.0.0.0         255.255.255.0   U     0      0        0 eth0
+192.168.1.0     0.0.0.0         255.255.255.0   U     0      0        0 eth0
+192.168.1.0     0.0.0.0         255.255.255.0   U     0      0        0 eth0
+169.254.0.0     0.0.0.0         255.255.0.0     U     0      0        0 eth0
+0.0.0.0         10.0.0.254      0.0.0.0         UG    0      0        0 eth0
+总结：
+route add -net 192.168.1.0 netmask 255.255.255.0 gw 192.168.1.1
+route add -net 192.168.1.0 netmask 255.255.255.0 dev eth0
+route add -net 192.168.1.0/24 dev eth0 
+route del -net 192.168.1.0/24 dev eth0  
+特别强调：以上配置在重启网络时都会失效，那么如何让它永久生效呢？
+如果要是永久生效，有如下几种方法：
+方法一：
+vi /etc/sysconfig/network-scripts/route-eth0  #默认不存在此文件
+加入如下内容：
+192.168.1.0/24 via 192.168.1.1
+提示：写到配置里，重启网络服务和重启系统都会生效！
+ 
+方法二：
+vi /etc/sysconfig/static-routes  #默认不存在此文件
+加入如下内容:
+any net 192.168.1.0/24 gw 192.168.1.1
+提示：写到配置里，重启网络服务和重启系统都会生效！
+ 
+方法三：
+vi /etc/rc.local
+加入如下内容：
+route add -net 192.168.1.0/24 gw 192.168.1.1
+PS: 方法一推荐生产环境使用
+提示：方法三写到/etc/rc.local里只在开机时加载，当手工重启网络后会失效，但是重启系统后会生效！
+ 
+如果是配置默认路由网关可以再网卡配置里：
+[root@oldboy ~]# grep GATEWAY /etc/sysconfig/network-scripts/ifcfg-eth0
+GATEWAY=10.0.0.254
+c.主机路由：就是去往某个主机地址如何配置路由
+/sbin/route add -host 192.168.2.13 dev eth2
+/sbin/route add -host 202.81.11.91 dev lo
+例如：keepalived或heartbeat高可用服务器对之间的使用单独网卡接心跳线通信就会用到以上主机路由。
+route命令拓展：
+删除一条默认路由：
+route del default gw 10.0.0.254
+删除一条静态路由：
+route del &ndash;net 目标网络 netmask
+如：route del -net 192.168.1.0/24 或route del -net 192.168.1.0 netmask 255.225.255.0
+删除一条主机路由：
+route del -host 192.168.1.10 dev eth0
+有关route命令更详细的内容需要大家执行man route查看帮助，并仔细总结。
+有关此题，我们谈下多网段生产环境网段划分及路由的解决方案（1000台机器划分网段方案）。我们能感受到route命令不同功能应用案例。
