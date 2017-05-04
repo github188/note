@@ -35,3 +35,9 @@ cat  /proc/cpuinfo |grep "physical id"|sort |uniq|wc -l
 更改centos7主机名：
      hostnamectl set-hostname typecodes
 wget -O /etc/yum.repos.d/CentOS-Base.repo http://mirrors.aliyun.com/repo/Centos-7.repo
+***********************************************************************
+Linux服务器上监控网络带宽的18个常用命令
+3. iptraf
+iptraf是一款交互式、色彩鲜艳的IP局域网监控工具。它可以显示每个连接以及主机之间传输的数据量。下面是屏幕截图。
+yum  -y install  iptraf
+执行 iptraf-ng
