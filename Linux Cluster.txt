@@ -1,4 +1,4 @@
-
+﻿
 
 LVS、Heartbeat、Corosync, cman+rgmanager、keepalived
 
@@ -789,12 +789,17 @@ ha.cf配置文件部分参数详解：
 资源文件(/etc/ha.d/haresources)
 node1   IPaddr::192.168.1.100/24/eth0   httpd
 
+如果想两台主机互为备机
+node1   IPaddr::192.168.1.100/24/eth0   httpd
+node2   IPaddr::192.168.1.101/24/eth0   httpd
+只有当另一台机器挂了，他的ip就会切换过来
 认证文件(/etc/ha.d/authkeys)
 auth 1
 1 crc
 
 
-
+心跳线  路由  route   add   -host       192.168.51.200 dev  eth1
+              route   add   -host       192.168.51.201 dev  eth1
 
 
 

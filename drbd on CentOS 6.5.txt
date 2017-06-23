@@ -253,3 +253,25 @@ Command 'drbdmeta 1 v09 /dev/sdb1 internal create-md 1' terminated with exit cod
 
 
 [root@filer01 ~]#  drbdadm attach all （解决diskless问题）
+
+
+************************************************************************************
+heartbeat  配合drbd   一起工作 老男孩
+  cat   /etc/ha.d/haresource
+
+node1   IPAaddr::192.168.12.200/24/eth0  drbddisk::data  Filesystem::/dev/drbd0::/data::ext4
+
+
+
+
+drbd   裂脑解决办法
+从节点
+drbdadm  secondary  data
+drbdadm   up  data
+drbdadm   disconnect  data
+drbdadm   -- --discard-my-data  connect  data
+主节点
+drbdadm  connect   data
+
+
+

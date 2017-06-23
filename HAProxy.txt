@@ -826,6 +826,28 @@ backend dynamic_servers
     server websrv3 172.16.200.9:80 check maxconn 1000 cookie websrv3
 
 
+开始编译安装
+（MAKE 参数请参考文件中的README）
+[plain] view plain copy 在CODE上查看代码片派生到我的代码片
+[root@localhost haproxy-1.4.25]# make TARGET=linux26 PREFIX=/usr/local/haproxy  
+[root@localhost haproxy-1.4.25]# make install PREFIX=/usr/local/haproxy  
+[root@localhost haproxy-1.4.25]# install -d /usr/local/sbin  
+[root@localhost haproxy-1.4.25]# install haproxy /usr/local/sbin  
+[root@localhost haproxy-1.4.25]# install -d /usr/local/share/man/man1  
+[root@localhost haproxy-1.4.25]# install -m 644 doc/haproxy.1 /usr/local/share/man/man1  
+[root@localhost haproxy-1.4.25]# install -d /usr/local/doc/haproxy  
+[root@localhost haproxy-1.4.25]# for x in configuration architecture haproxy-en haproxy-fr; do install -m 644 doc/$x.txt /usr/local/doc/haproxy ; done  
+[root@localhost haproxy-1.4.25]#  
+
+安装完成，
+我们检测 一下是否安装成功
+[plain] view plain copy 在CODE上查看代码片派生到我的代码片
+[root@localhost haproxy-1.4.25]# haproxy -v  
+HA-Proxy version 1.4.25 2014/03/27  
+Copyright 2000-2014 Willy Tarreau <w@1wt.eu>  
+则安装成功
+
+
 
 
 
