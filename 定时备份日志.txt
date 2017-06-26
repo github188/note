@@ -1,0 +1,6 @@
+#!/bin/bash
+#
+
+/usr/bin/cp  /home/app/tomcat_sports/logs/catalina.out   /home/app/tomcat_sports/logs/catalina.out.$(date +%Y%m%d).log
+[ $? != 0 ]&& exit  1
+/usr/bin/echo "">/home/app/tomcat_sports/logs/catalina.out
