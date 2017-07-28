@@ -1,0 +1,43 @@
+MAVEN 远程部署已经打好包的jar包（不需要pom.xml）
+mvn:deploy在整合或者发布环境下执行，将最终版本的包拷贝到远程的repository，使得其他的开发者或者工程可以共享。
+
+以将ojdbc14传到nexus中的thirdparty为例
+一 配置settings.xml
+因为nexus是需要登陆操作，当然可以通过配置免登陆，这是后话。
+在settings.xml的<servers></servers>
+<server>   
+  <id>thirdparty</id>   
+    <username>admin</username>
+    <password>admin123</password>   
+</server>
+
+当然如果要上传包去其他仓库，可依照此例，如
+<server>   
+<id>central</id>   
+<username>admin</username>   
+<password>admin123</password>   
+</server>
+如果进行deploy时返回Return code is: 401错误，则需要进行用户验证或者已经验证的信息有误。
+
+二 cmd输入命令
+mvn deploy:deploy-file -DgroupId=com.xy.Oracle -DartifactId=ojdbc14 -Dversion=10.2.0.4.0 -Dpackaging=jar -Dfile=E:\ojdbc14.jar -Durl=http://localhost:9090/nexus-2.2-01/content/repositories/thirdparty/ -DrepositoryId=thirdparty
+DgroupId和DartifactId构成了该jar包在pom.xml的坐标，项目就是依靠这两个属性定位。自己起名字也行。
+Dfile表示需要上传的jar包的绝对路径。
+Durl私服上仓库的位置，打开nexus——>repositories菜单，可以看到该路径。
+DrepositoryId服务器的表示id，在nexus的configuration可以看到
+Dversion表示版本信息(注意如果是上传release或者thirdty直接写版本号即可，但是如果要是上传Snapshots版本的包，必须在版本号后面加入-SNAPSHOT 例如:1.0.4-SNAPSHOT )
+怎样得到一个jar包准确的版本：
+	解压该包，会发现一个叫MANIFEST.MF的文件，这个文件就有描述该包的版本信息。
+	比如Manifest-Version: 1.0可以知道该包的版本了。
+三 
+在敲击该命令的时候，有时候看到提示需要POM文件，但上传包是不需要pom文件的。
+可能原因
+最大可能是语句打错了如多了一个空格和换行，这样语句直接截断到换行前面，cmd就找它可以认识的语句执行，比如直接执行
+ 
+
+使用mvn deploy发布到远程仓库时报错 Return code is: 400
+   可能远程仓库中已经存在这个版本的包了，snapshots可以进行覆盖，但是release版本是不能覆盖的，只能更改版本号
+如果进行deploy时返回Return code is: 401错误，则需要进行用户验证或者已经验证的信息有误。或者远程仓库Durl或者DrepositoryId不正确
+
+例：上传jd图片jar包到服务器
+   mvn deploy:deploy-file -DgroupId=com.jd.image -DartifactId=image-common -Dversion=1.0.4-SNAPSHOT -Dpackaging=jar -Dfile=C:/Users/wangchunyu/Desktop/JdCode/image-common-1.0.4-SNAPSHOT.jar -Durl=http://113.4.12.13:8081/nexus/content/repositories/snapshots/ -DrepositoryId=snapshots
