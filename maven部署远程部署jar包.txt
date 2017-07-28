@@ -1,4 +1,4 @@
-MAVEN 远程部署已经打好包的jar包（不需要pom.xml）
+MAVEN 远程部署已经打好包的jar包（不需要pom.xml********）
 mvn:deploy在整合或者发布环境下执行，将最终版本的包拷贝到远程的repository，使得其他的开发者或者工程可以共享。
 
 以将ojdbc14传到nexus中的thirdparty为例
