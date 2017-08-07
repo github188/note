@@ -1,0 +1,1540 @@
+﻿#!/bin/bash
+export GRADLE_HOME=/home/admin/softs/gradle-2.10
+export PATH=$GRADLE_HOME/bin:$PATH
+&&$('#ip').val()&&$('#idc_jg').val()&&$('#idc_name').val()&&$('#service').val()&&$('#ip_lan').val()&&$('#servicecode').val()
+
+
+#!/bin/bash
+export ANDROID_HOME='/home/admin/softs/android-sdk-linux'  
+export PATH=$ANDROID_HOME/tools:$PATH 
+
+
+JAVA_HOME=/usr/local/jdk8
+JRE_HOME=$JAVA_HOME/jre
+PATH=$PATH:$JAVA_HOME/bin:$JRE_HOME/bin
+CLASSPATH=:$JAVA_HOME/lib/dt.jar:$JAVA_HOME/lib/tools.jar:$JRE_HOME/lib
+export JAVA_HOME JRE_HOME PATH CLASSPATH
+
+安卓hljtcp最新版本下载地址：113.6.251.97:8016/hljtcp/hljtcp.apk
+
+运动管家测试后台地址:http://222.171.119.76:8300/venueadmin/
+
+运动小管家h5版地址：http://222.171.119.76:8023/sportsmwap/
+
+113.6.251.97:8016/hljtcp/hljtcp_v1.0.00.apk
+113.6.251.97:8016/apk_test/v1.0.00/hljtcp_v1.0.00_yingyongbao.apk
+MATCH_ALL
+MATCH_CRS
+MATCH_DATE
+MATCH_HAD
+MATCH_HAFU
+MATCH_HDC
+MATCH_HHAD
+MATCH_HILO
+MATCH_LIST
+MATCH_MNL
+MATCH_RESULT
+MATCH_RESULT_STATUS
+MATCH_SALE_DATE
+MATCH_TTG
+MATCH_TYPE
+MATCH_WNM
+TEAM_NAME
+
+
+[   "x${proj}" = "xhljtcpadm" -o  "x${proj}" = "xhljtcpapi" -o    "x${proj}" = "xfbcpdata" -o  "x${proj}" = "xtcjfweb" -o "x${proj}" =
+"xtcjfadmin" -o  "x${proj}" = "xlongtiweb" -o  "x${proj}" = "xsportsmapi" -o "x${proj}" = "xvenueadmin" -o "x${proj}" = "xvenuemanage"
+-o "x${proj}" = "xvenstocks" ] && git checkout -- src/main/resources/jdbc.properties
+[    "x${proj}" = "xcpstoreapi" -o   "x${proj}" = "xuserwebservice" -o  "x${proj}" = "xvenueappapi" -o "x${proj}" = "xvinfoservice" -o
+"x${proj}" = "xorderservice" -o "x${proj}" = "xventimer" -o "x${proj}" = "xjdorder" ] && git checkout -- src/main/java/jdbc.properties
+[   "x${proj}" = "xtcjfweb" -o "x${proj}" = "xsportsmapi" -o "x${proj}" = "xhljtcpapi"   ] && git checkout -- src/main/resources/user.p
+roperties
+[   "x${proj}" = "xhljtcpadm"  -o  "x${proj}" = "xtcjfweb"  -o  "x${proj}" = "xtcjfadmin" -o "x${proj}" = "xvenueadmin"    ] && git che
+ckout -- src/main/resources/sms.properties
+[   "x${proj}" = "xvenuemanage"  ]   && git checkout -- src/main/resources/leshi.properties
+
+[   "x${proj}" = "xvenueappapi" ]  && git checkout -- src/main/java/peizhi.properties
+[   "x${proj}" = "xvenstocks" ]  && git checkout -- src/main/resources/send.properties
+[  "x${proj}" = "xventimer"  ]   && git checkout -- src/main/java/leshi.properties
+[  "x${proj}" = "xuserwebservice"  ]   && git checkout -- src/main/java/user.properties
+
+
+
+
+
+
+
+
+UnsafeUserParameters=1
+UserParameter=mysql.size[*]  echo "select sum($(case "$3" in both|"") echo "data_length+index_length";; data|index) echo "$3_length";; free) echo "data_free";; esac)) from information_schema.tables$([[ "$1" = "all" || ! "$1" ]] || echo " where table_schema='$1'")$([[ "$2" = "all" || ! "$2" ]] || echo "and table_name='$2'");" | HOME=/usr/local/zabbix/etc  /usr/local/mysql/bin/mysql    --defaults-file=/etc/zabbix/.my.cnf  -N
+UserParameter=mysql.ping  HOME=/usr/local/zabbix/etc /usr/local/mysql/bin/mysqladmin  --defaults-file=/etc/zabbix/.my.cnf   ping | grep -c alive
+UserParameter=mysql.version  /usr/local/mysql/bin/mysql  --defaults-file=/etc/zabbix/.my.cnf   -V
+UserParameter=mysql.status[*]  echo "show global status where Variable_name='$1';" | HOME=/usr/local/zabbix/etc  /usr/local/mysql/bin/mysql   --defaults-file=/etc/zabbix/.my.cnf    -N | awk '{print $$2}'
+
+
+ip:113.6.251.121 ｜ 数据库名称：xinhuashe      ｜ 用户名：xinhuashelt  ｜ 密码：mysqladminxinhuashe
+cpufreq=xen   dom0_max_vcpus=2  dom0_vcpus_pin
+
+
+113.9.247.194
+
+
+route   add    default  gw  192.168.50.2
+route  add   -net 10.8.0.0/24     gw    192.168.50.2
+
+
+
+
+android {
+    compileSdkVersion 24
+    buildToolsVersion "26 rc1"
+
+    defaultConfig {
+        applicationId "com.longti.tycp"
+        minSdkVersion 14
+        targetSdkVersion 23
+        versionCode 1
+
+        versionName "1.0.00"
+    }
+    aaptOptions {         cruncherEnabled = false     }
+    buildTypes {
+        release {
+            minifyEnabled true
+            zipAlignEnabled true
+            shrinkResources true
+            proguardFiles getDefaultProguardFile('proguard-android.txt')   'proguard-rules.pro'
+            // 自定义输出配置
+            applicationVariants.all { variant ->
+                variant.outputs.each { output ->
+                    def outputFile = output.outputFile
+                    if (outputFile != null && outputFile.name.endsWith('.apk')) {
+                        // 输出apk名称为wooyun_v1.0_wandoujia.apk
+                        def fileName = "hljtcp_v${defaultConfig.versionName}_${variant.productFlavors[0].name}.apk"
+                        //def fileName = "hljtcp_v${defaultConfig.versionName}.apk"
+                        output.outputFile = new File(outputFile.parent   fileName)
+                    }
+                }
+            }
+        }
+    }
+    productFlavors {
+        yingyongbao {}
+       // huawei {}
+       // anzhi {}
+       // lianxiangleshangdian {}
+       // qh360 {}
+       // baidu {}
+       // wandoujia {}
+    }
+    productFlavors.all {
+        flavor -> flavor.manifestPlaceholders = [UMENG_CHANNEL_VALUE: name]
+    }
+    sourceSets {
+        main {
+            jniLibs.srcDir 'libs'
+        }
+    }
+}
+
+dependencies {
+    compile fileTree(include: ['*.jar']   dir: 'libs')
+    testCompile 'junit:junit:4.12'
+    compile 'com.android.support:appcompat-v7:24.2.1'
+    compile 'com.android.support:design:24.2.1'
+    compile 'com.jakewharton:butterknife:7.0.1'
+    compile 'pl.droidsonroids.gif:android-gif-drawable:1.0.+'
+    compile 'com.nostra13.universalimageloader:universal-image-loader:1.9.4'
+    compile 'com.android.support:cardview-v7:24.2.1'
+    compile 'com.longti.commonforandroid:httptoolsaar:1.0.6-SNAPSHOT'
+    compile 'com.longti.commonforandroid:crachaar:1.0.3-SNAPSHOT'
+    compile 'com.orhanobut:logger:1.15'
+    //    compile 'com.github.mcxtzhang:all-base-adapter:V1.4.0'
+    compile project(':library')
+    compile project(':swipemenulib')
+    compile files('libs/baidumapapi_cloud_v4_0_0.jar')
+    compile files('libs/baidumapapi_map_v4_0_0.jar')
+    compile files('libs/baidumapapi_radar_v4_0_0.jar')
+    compile files('libs/baidumapapi_search_v4_0_0.jar')
+    compile files('libs/baidumapapi_util_v4_0_0.jar')
+    compile files('libs/locSDK_6.13.jar')
+    compile 'org.greenrobot:eventbus:3.0.0'
+    compile files('libs/zxing.jar')
+    compile 'com.android.support:support-v4:+'
+}
+
+buildscript {
+    repositories {
+        jcenter()
+        maven {
+            credentials {
+                username NEXUS_USERNAME
+                password NEXUS_PASSWORD
+            }
+            url 'http://222.171.119.77:8081/nexus/content/repositories/snapshots/'
+        }
+    }
+    dependencies {
+
+        classpath 'com.android.tools.build:gradle:2.1.0'
+        
+        // NOTE: Do not place your application dependencies here; they belong
+        // in the individual module build.gradle files
+        classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.0'
+        classpath 'com.github.dcendents:android-maven-gradle-plugin:1.3'
+    }
+}
+
+allprojects {
+    repositories {
+        jcenter()
+        maven {
+            credentials {
+                username NEXUS_USERNAME
+                password NEXUS_PASSWORD
+            }
+            url 'http://222.171.119.77:8081/nexus/content/repositories/snapshots/'
+//            url 'http://192.168.1.121:8081/nexus/content/repositories/snapshots/'
+        }
+    }
+}
+
+//android {  
+//    signingConfigs {  
+//        debug {  
+//            storeFile file("hljtcp.jks")
+//            storePassword '123456'
+//            keyAlias 'hljtcp'
+//            keyPassword '123456'
+//        }          
+//    }      
+//}
+
+android {
+
+    //签名    
+    signingConfigs {    
+      myConfig {    
+      storeFile file("../hljtcp.jks")      //签名文件    
+      storePassword "123456"        
+      keyAlias "hljtcp"                 
+      keyPassword "123456"  //签名密码    
+  }
+    }
+    
+    
+  buildTypes{
+     release {
+      signingConfig  signingConfigs.myConfig
+      //混淆
+      //runProguard true
+     // proguardFile '/an/android-sdk-linux/tools/proguard/proguard-android.txt'
+      minifyEnabled true  // false表示不混淆   true表示混淆  
+      shrinkResources true //移除无用的resource文件  
+      //如果用eclipse里面的proguard.cfg   直接替换 proguard-rules.pro 即可  
+      proguardFiles getDefaultProguardFile('proguard-android.txt')   'proguard-rules.pro'  
+      //混淆
+     }
+    
+
+}
+
+}
+
+
+android {
+	    lintOptions {
+	        abortOnError false
+	    }
+}
+
+
+iptables   -t   nat    -A  POSTROUTING  -s 10.8.0.0/24   -o  eth2   -j   SNAT  --to-source  192.168.50.2 
+
+
+下载地址：http://mirrors.neusoft.edu.cn/android/repository/ 
+这是一个神奇的网站   Android开发最新的包和工具都在这里面可以下到。
+
+Gradle Distributions下载网址：http://services.gradle.org/distributions
+
+
+hljmatch访问地址： http://222.171.119.76:8024/hljmat ch
+
+
+
+  	工作空间根目录     ${JENKINS_HOME}/workspace/${ITEM_FULLNAME}
+
+
+SET GLOBAL event_scheduler = ON;
+SET @@global.event_scheduler = ON;
+SET GLOBAL event_scheduler = 1;
+SET @@global.event_scheduler = 1;
+
+
+event_scheduler = 1   在配置文件中
+
+61.167.205.65
+
+44:00:10:8A:FC:BE
+
+
+
+CREATE DATABASE yundongguanjia_new
+ DEFAULT CHARACTER SET utf8
+ DEFAULT COLLATE utf8_general_ci ;
+
+GRANT ALL PRIVILEGES ON yundongguanjia_new.* to 'ydgjlt'@'%' ; 
+
+GRANT ALL PRIVILEGES ON yundongguanjia_new.* to 'ydgjlt'@'localhost' ;
+
+ydgjlt
+
+运动管家新开发数据库：ip:221.208.170.174  ｜ 数据库名称：yundongguanjia_new ｜ 用户名：ydgjlt       ｜ 密码：ydgjltmysqladmin
+
+
+运动小管家项目文档库
+ssh://git@222.171.119.77:20022/projectdocs/actmanager.git
+刘荣山 2017/5/9 15:27:15
+产品需求   设计文档、测试报告、项目计划、发布文档以及项目过程中产生的文档   存放在上面仓库
+15:29:12
+刘荣山 2017/5/9 15:29:12
+运动小管家后台管理项目代码库
+ssh://git@222.171.119.77:20022/actmanager/actmadm.git
+运动小管家app android版代码库
+ssh://git@222.171.119.77:20022/actmanager/actmandroid.git
+运动小管家app ios版代码库
+ssh://git@222.171.119.77:20022/actmanager/actmios.git
+运动小管家 数据接口代码库
+ssh://git@222.171.119.77:20022/actmanager/actmapi.git
+
+
+
+grant create routine on init.* to initialization@'%';
+
+
+select `nextval` from mysql.proc where db = 'init' and `type` = 'FUNCTION' //函数 
+
+
+
+
+
+由于明天1206机房停电一天   git代码服务器和禅道都暂时无法使用   请各位同事做好相关准备   运动小管家临时测试地址:http://221.208.170.176:8023/sportsmwap/     hljmatch临时测试地址为:http://221.208.170.176:8024/hljmatch/index.html
+
+
+
+INSERT INTO `V_COMMODITY` VALUES ('BUS000004_5_20161122134406'   '特惠2小时'   '0'   'f10fdd7258ac41b6af4293748959def3'   '0'   'BUS000004'   '1'   '2016-12-01 00:00:19'   'd0556393e2144209af0be58cd02fe7e0');
+INSERT INTO `V_COMMODITY` VALUES ('BUS000005_1_20161123104045'   '傲娇游'   '2'   'f10fdd7258ac41b6af4293748959def3'   '1'   'BUS000005'   '2'   '2017-01-11 00:30:00'   null);
+INSERT INTO `V_COMMODITY` VALUES ('BUS000005_1_20161123163903'   '羽毛去'   '2'   'f10fdd7258ac41b6af4293748959def3'   '0'   'BUS000005'   '2'   '2017-01-11 00:30:00'   null);
+INSERT INTO `V_COMMODITY` VALUES ('BUS000008_1_20161128132923'   '健身运动3选1'   '3'   'c265cca638d8458ea02548d160e4d3c8'   '0'   'BUS000008'   '2'   null   null);
+INSERT INTO `V_COMMODITY` VALUES ('BUS000008_1_20161128133450'   '健身3选1'   '3'   'c265cca638d8458ea02548d160e4d3c8'   '0'   'BUS000008'   '2'   null   null);
+INSERT INTO `V_COMMODITY` VALUES ('BUS000008_1_20161128134000'   '111'   '3'   'c265cca638d8458ea02548d160e4d3c8'   '0'   'BUS000008'   '2'   null   null);
+INSERT INTO `V_COMMODITY` VALUES ('BUS000008_1_20161128134047'   '咕咕咕'   '3'   'c265cca638d8458ea02548d160e4d3c8'   '0'   'BUS000008'   '2'   null   null);
+INSERT INTO `V_COMMODITY` VALUES ('BUS000008_1_20161205143356'   '22'   '3'   '424a3e22fd5046c9a2c2cc8b0e7a41ab'   '0'   'BUS000008'   '2'   null   '9ec962d3335b424b99c2cbff0caa053d');
+INSERT INTO `V_COMMODITY` VALUES ('BUS000008_1_20161205143615'   '2121'   '3'   '424a3e22fd5046c9a2c2cc8b0e7a41ab'   '0'   'BUS000008'   '1'   null   '9ec962d3335b424b99c2cbff0caa053d');
+INSERT INTO `V_COMMODITY` VALUES ('BUS000010_1_20161129103232'   '场地使用费/时'   '2'   '7271b61adeb44edd8b6c4600eb767f29'   '1'   'BUS000010'   '1'   '2016-12-05 15:24:30'   null);
+INSERT INTO `V_COMMODITY` VALUES ('BUS000011_1_20161205145938'   '滑雪票'   '2'   '4cdc1fbce5354113ab43506b86c441df'   '0'   'BUS000011'   '1'   '2017-01-04 00:30:00'   'cfcdcf089fee47a9817a924802f14a7a');
+INSERT INTO `V_COMMODITY` VALUES ('BUS000012_1_20161226134835'   '27号过期订场'   '0'   '7271b61adeb44edd8b6c4600eb767f29'   '0'   'BUS000012'   '2'   '2016-12-27 10:41:51'   '2a49748f2fe44f8ca86c35a885dcdec2');
+INSERT INTO `V_COMMODITY` VALUES ('BUS000012_1_20161226141409'   '普通订场'   '2'   '7271b61adeb44edd8b6c4600eb767f29'   '0'   'BUS000012'   '2'   '2017-02-07 11:00:00'   '2a49748f2fe44f8ca86c35a885dcdec2');
+INSERT INTO `V_COMMODITY` VALUES ('BUS000012_1_20161226141555'   '50元跨月订场'   '2'   '7271b61adeb44edd8b6c4600eb767f29'   '0'   'BUS000012'   '2'   '2017-02-07 11:00:00'   '2a49748f2fe44f8ca86c35a885dcdec2');
+INSERT INTO `V_COMMODITY` VALUES ('BUS000012_1_20170105102242'   '15订场测试'   '0'   '7271b61adeb44edd8b6c4600eb767f29'   '0'   'BUS000012'   '2'   '2017-04-01 00:00:11'   '2a49748f2fe44f8ca86c35a885dcdec2');
+INSERT INTO `V_COMMODITY` VALUES ('BUS000012_1_20170106090438'   '凯斯顿场地预订'   '2'   '7271b61adeb44edd8b6c4600eb767f29'   '0'   'BUS000012'   '2'   '2017-05-03 13:29:16'   '59f4f3791fbf4fb08072adbc53d11ddd');
+INSERT INTO `V_COMMODITY` VALUES ('BUS000012_1_20170328133608'   '自动接单0.01元'   '2'   '7271b61adeb44edd8b6c4600eb767f29'   '0'   'BUS000012'   '2'   '2017-05-03 13:29:13'   '2a49748f2fe44f8ca86c35a885dcdec2');
+INSERT INTO `V_COMMODITY` VALUES ('BUS000012_1_20170331150856'   '订场 2分'   '2'   '7271b61adeb44edd8b6c4600eb767f29'   '0'   'BUS000012'   '2'   '2017-05-03 13:29:10'   '2a49748f2fe44f8ca86c35a885dcdec2');
+INSERT INTO `V_COMMODITY` VALUES ('BUS000012_1_20170503114144'   '网球订场'   '2'   '7271b61adeb44edd8b6c4600eb767f29'   '0'   'BUS000012'   '2'   '2017-05-03 13:29:07'   '2a49748f2fe44f8ca86c35a885dcdec2');
+INSERT INTO `V_COMMODITY` VALUES ('BUS000012_1_20170503114554'   '网球 订场'   '1'   '7271b61adeb44edd8b6c4600eb767f29'   '0'   'BUS000012'   '2'   '2017-05-03 11:47:01'   '59f4f3791fbf4fb08072adbc53d11ddd');
+INSERT INTO `V_COMMODITY` VALUES ('BUS000012_5_20161226135018'   '可可儿童场门票'   '2'   '7271b61adeb44edd8b6c4600eb767f29'   '0'   'BUS000012'   '1'   '2017-02-07 11:00:00'   '2a49748f2fe44f8ca86c35a885dcdec2');
+INSERT INTO `V_COMMODITY` VALUES ('BUS000012_5_20161227095026'   '28号过期门票'   '0'   '7271b61adeb44edd8b6c4600eb767f29'   '0'   'BUS000012'   '1'   '2016-12-28 00:00:19'   '2a49748f2fe44f8ca86c35a885dcdec2');
+INSERT INTO `V_COMMODITY` VALUES ('BUS00001
+
+
+ip:221.208.170.174  ｜ 数据库名称：hljmatch     ｜ 用户名：hljmatch     ｜ 密码：mysqladminhljmatch170174
+
+
+
+
+JAVA_OPTS="-server -Xms2048m -Xmx2048m  -XX:PermSize=1024M -XX:MaxNewSize=1024m -XX:MaxPermSize=2048m -Djava.awt.headless=true"  
+
+
+
+
+
+
+useBodyEncodingForURI="true" URIEncoding="UTF-8" maxHttpHeaderSize="10240000" 
+
+
+人事  wifi  mac   34-96-72-AF-D3-76
+
+
+
+CREATE DATABASE  hljmatch
+ DEFAULT CHARACTER SET utf8
+ DEFAULT COLLATE utf8_general_ci ;
+
+GRANT ALL PRIVILEGES ON hljmatch.* to 'hljmatch'@'%' IDENTIFIED BY 'mysqladminhljmatch170170';
+
+GRANT ALL PRIVILEGES ON hljmatch.* to 'hljmatch'@'localhost' IDENTIFIED BY 'mysqladminhljmatch170170';
+
+
+
+删除192.168.66.107  的二进制日志 purge   master  logs  to  ' master-bin.000300'; 
+
+
+ echo "/sbin/route   add    -host  192.168.12.202  dev  eth1  " >>/etc/rc.local 
+
+
+ DROP VIEW `V_CRS`;
+CREATE VIEW `V_CRS` AS select `l`.`ALIASNUM` AS `ALIASNUM`  `l`.`MATCHID` AS `MATCHID`  `l`.`LEAGUEID` AS `LEAGUEID`  `l`.`LEAGUENAME` AS `LEAGUENAME`  `l`.`LEAGUECOLOR` AS `LEAGUECOLOR`  `l`.`STARTSALETIME` AS `STARTSALETIME`  `l`.`MATCHTIME` AS `MATCHTIME`  `l`.`HOMETEAMINDEX` AS `HOMETEAMINDEX`  `l`.`GUESTTEAMINDEX` AS `GUESTTEAMINDEX`  `l`.`MATCHSTATUS` AS `MATCHSTATUS`  `l`.`SPORTTYPE` AS `SPORTTYPE`  `l`.`SALEDAY` AS `SALEDAY`  `o`.`POOLID` AS `POOLID`  `o`.`ODDSTYPE` AS `ODDSTYPE`  `o`.`SINGLE` AS `SINGLE`  `o`.`ALLUP` AS `ALLUP`  `o`.`ODDTYPE` AS `ODDTYPE`  `o`.`CRS_A` AS `CRS_A`  `o`.`CRS_D` AS `CRS_D`  `o`.`CRS_H` AS `CRS_H`  `o`.`CRS_00` AS `CRS_00`  `o`.`CRS_01` AS `CRS_01`  `o`.`CRS_02` AS `CRS_02`  `o`.`CRS_03` AS `CRS_03`  `o`.`CRS_04` AS `CRS_04`  `o`.`CRS_05` AS `CRS_05`  `o`.`CRS_10` AS `CRS_10`  `o`.`CRS_11` AS `CRS_11`  `o`.`CRS_12` AS `CRS_12`  `o`.`CRS_13` AS `CRS_13`  `o`.`CRS_14` AS `CRS_14`  `o`.`CRS_15` AS `CRS_15`  `o`.`CRS_20` AS `CRS_20`  `o`.`CRS_21` AS `CRS_21`  `o`.`CRS_22` AS `CRS_22`  `o`.`CRS_23` AS `CRS_23`  `o`.`CRS_24` AS `CRS_24`  `o`.`CRS_25` AS `CRS_25`  `o`.`CRS_30` AS `CRS_30`  `o`.`CRS_31` AS `CRS_31`  `o`.`CRS_32` AS `CRS_32`  `o`.`CRS_33` AS `CRS_33`  `o`.`CRS_40` AS `CRS_40`  `o`.`CRS_41` AS `CRS_41`  `o`.`CRS_42` AS `CRS_42`  `o`.`CRS_50` AS `CRS_50`  `o`.`CRS_51` AS `CRS_51`  `o`.`CRS_52` AS `CRS_52`  `o`.`POOLSTATUS` AS `POOLSTATUS`  `l`.`HOMETEAMNAME` AS `HOMETEAMNAME`  `l`.`GUESTTEAMNAME` AS `GUESTTEAMNAME` from (`MATCH_LIST` `l` join `MATCH_CRS` `o` on(((`l`.`MATCHID` = `o`.`MATCHID`) and (`l`.`SPORTTYPE` = `o`.`SPORTTYPE`)))) where ((`l`.`MATCHSTATUS` in ('Selling'  'SellStop')) and (`o`.`POOLSTATUS` in ('Selling'  'SellStop')));
+DROP VIEW `V_HAD`;
+CREATE VIEW `V_HAD` AS select `MATCH_LIST`.`ALIASNUM` AS `ALIASNUM`  `MATCH_LIST`.`MATCHID` AS `MATCHID`  `MATCH_LIST`.`LEAGUEID` AS `LEAGUEID`  `MATCH_LIST`.`LEAGUENAME` AS `LEAGUENAME`  `MATCH_LIST`.`LEAGUECOLOR` AS `LEAGUECOLOR`  `MATCH_LIST`.`STARTSALETIME` AS `STARTSALETIME`  `MATCH_LIST`.`MATCHTIME` AS `MATCHTIME`  `MATCH_LIST`.`HOMETEAMNAME` AS `HOMETEAMNAME`  `MATCH_LIST`.`HOMETEAMINDEX` AS `HOMETEAMINDEX`  `MATCH_LIST`.`GUESTTEAMNAME` AS `GUESTTEAMNAME`  `MATCH_LIST`.`GUESTTEAMINDEX` AS `GUESTTEAMINDEX`  `MATCH_LIST`.`MATCHSTATUS` AS `MATCHSTATUS`  `MATCH_LIST`.`SPORTTYPE` AS `SPORTTYPE`  `MATCH_LIST`.`SALEDAY` AS `SALEDAY`  `MATCH_HAD`.`POOLID` AS `POOLID`  `MATCH_HAD`.`ODDSTYPE` AS `ODDSTYPE`  `MATCH_HAD`.`SINGLE` AS `SINGLE`  `MATCH_HAD`.`ALLUP` AS `ALLUP`  `MATCH_HAD`.`ODDTYPE` AS `ODDTYPE`  `MATCH_HAD`.`A` AS `A`  `MATCH_HAD`.`D` AS `D`  `MATCH_HAD`.`H` AS `H`  `MATCH_HAD`.`POOLSTATUS` AS `POOLSTATUS` from (`MATCH_LIST` join `MATCH_HAD` on(((`MATCH_LIST`.`MATCHID` = `MATCH_HAD`.`MATCHID`) and (`MATCH_LIST`.`SPORTTYPE` = `MATCH_HAD`.`SPORTTYPE`)))) where ((`MATCH_LIST`.`MATCHSTATUS` in ('Selling'  'SellStop')) and (`MATCH_HAD`.`POOLSTATUS` in ('Selling'  'SellStop')));
+DROP VIEW `V_HAFU`;
+CREATE VIEW `V_HAFU` AS select `MATCH_LIST`.`ALIASNUM` AS `ALIASNUM`  `MATCH_LIST`.`MATCHID` AS `MATCHID`  `MATCH_LIST`.`LEAGUEID` AS `LEAGUEID`  `MATCH_LIST`.`LEAGUENAME` AS `LEAGUENAME`  `MATCH_LIST`.`LEAGUECOLOR` AS `LEAGUECOLOR`  `MATCH_LIST`.`STARTSALETIME` AS `STARTSALETIME`  `MATCH_LIST`.`MATCHTIME` AS `MATCHTIME`  `MATCH_LIST`.`HOMETEAMNAME` AS `HOMETEAMNAME`  `MATCH_LIST`.`HOMETEAMINDEX` AS `HOMETEAMINDEX`  `MATCH_LIST`.`GUESTTEAMNAME` AS `GUESTTEAMNAME`  `MATCH_LIST`.`GUESTTEAMINDEX` AS `GUESTTEAMINDEX`  `MATCH_LIST`.`MATCHSTATUS` AS `MATCHSTATUS`  `MATCH_LIST`.`SPORTTYPE` AS `SPORTTYPE`  `MATCH_LIST`.`SALEDAY` AS `SALEDAY`  `MATCH_HAFU`.`POOLID` AS `POOLID`  `MATCH_HAFU`.`ODDSTYPE` AS `ODDSTYPE`  `MATCH_HAFU`.`SINGLE` AS `SINGLE`  `MATCH_HAFU`.`ALLUP` AS `ALLUP`  `MATCH_HAFU`.`ODDTYPE` AS `ODDTYPE`  `MATCH_HAFU`.`AA` AS `AA`  `MATCH_HAFU`.`AD` AS `AD`  `MATCH_HAFU`.`AH` AS `AH`  `MATCH_HAFU`.`DA` AS `DA`  `MATCH_HAFU`.`DD` AS `DD`  `MATCH_HAFU`.`DH` AS `DH`  `MATCH_HAFU`.`HA` AS `HA`  `MATCH_HAFU`.`HD` AS `HD`  `MATCH_HAFU`.`HH` AS `HH`  `MATCH_HAFU`.`POOLSTATUS` AS `POOLSTATUS` from (`MATCH_HAFU` join `MATCH_LIST` on(((`MATCH_LIST`.`SPORTTYPE` = `MATCH_HAFU`.`SPORTTYPE`) and (`MATCH_LIST`.`MATCHID` = `MATCH_HAFU`.`MATCHID`)))) where ((`MATCH_LIST`.`MATCHSTATUS` in ('Selling'  'SellStop')) and (`MATCH_HAFU`.`POOLSTATUS` in ('Selling'  'SellStop')));
+DROP VIEW `V_HDC`;
+CREATE VIEW `V_HDC` AS select `MATCH_LIST`.`ALIASNUM` AS `ALIASNUM`  `MATCH_LIST`.`MATCHID` AS `MATCHID`  `MATCH_LIST`.`LEAGUEID` AS `LEAGUEID`  `MATCH_LIST`.`LEAGUENAME` AS `LEAGUENAME`  `MATCH_LIST`.`LEAGUECOLOR` AS `LEAGUECOLOR`  `MATCH_LIST`.`STARTSALETIME` AS `STARTSALETIME`  `MATCH_LIST`.`MATCHTIME` AS `MATCHTIME`  `MATCH_LIST`.`HOMETEAMNAME` AS `HOMETEAMNAME`  `MATCH_LIST`.`HOMETEAMINDEX` AS `HOMETEAMINDEX`  `MATCH_LIST`.`GUESTTEAMNAME` AS `GUESTTEAMNAME`  `MATCH_LIST`.`GUESTTEAMINDEX` AS `GUESTTEAMINDEX`  `MATCH_LIST`.`MATCHSTATUS` AS `MATCHSTATUS`  `MATCH_LIST`.`SPORTTYPE` AS `SPORTTYPE`  `MATCH_LIST`.`SALEDAY` AS `SALEDAY`  `MATCH_HDC`.`POOLID` AS `POOLID`  `MATCH_HDC`.`ODDSTYPE` AS `ODDSTYPE`  `MATCH_HDC`.`SINGLE` AS `SINGLE`  `MATCH_HDC`.`ALLUP` AS `ALLUP`  `MATCH_HDC`.`ODDTYPE` AS `ODDTYPE`  `MATCH_HDC`.`A` AS `A`  `MATCH_HDC`.`H` AS `H`  `MATCH_HDC`.`POOLSTATUS` AS `POOLSTATUS`  `MATCH_HDC`.`LETCOUNT` AS `LETCOUNT` from (`MATCH_LIST` join `MATCH_HDC` on(((`MATCH_LIST`.`SPORTTYPE` = `MATCH_HDC`.`SPORTTYPE`) and (`MATCH_LIST`.`MATCHID` = `MATCH_HDC`.`MATCHID`)))) where ((`MATCH_LIST`.`MATCHSTATUS` in ('Selling'  'SellStop')) and (`MATCH_HDC`.`POOLSTATUS` in ('Selling'  'SellStop')));
+DROP VIEW `V_HHAD`;
+CREATE VIEW `V_HHAD` AS select `MATCH_LIST`.`ALIASNUM` AS `ALIASNUM`  `MATCH_LIST`.`MATCHID` AS `MATCHID`  `MATCH_LIST`.`LEAGUEID` AS `LEAGUEID`  `MATCH_LIST`.`LEAGUENAME` AS `LEAGUENAME`  `MATCH_LIST`.`LEAGUECOLOR` AS `LEAGUECOLOR`  `MATCH_LIST`.`STARTSALETIME` AS `STARTSALETIME`  `MATCH_LIST`.`MATCHTIME` AS `MATCHTIME`  `MATCH_LIST`.`HOMETEAMNAME` AS `HOMETEAMNAME`  `MATCH_LIST`.`HOMETEAMINDEX` AS `HOMETEAMINDEX`  `MATCH_LIST`.`GUESTTEAMNAME` AS `GUESTTEAMNAME`  `MATCH_LIST`.`GUESTTEAMINDEX` AS `GUESTTEAMINDEX`  `MATCH_LIST`.`MATCHSTATUS` AS `MATCHSTATUS`  `MATCH_LIST`.`SPORTTYPE` AS `SPORTTYPE`  `MATCH_LIST`.`SALEDAY` AS `SALEDAY`  `MATCH_HHAD`.`POOLID` AS `POOLID`  `MATCH_HHAD`.`ODDSTYPE` AS `ODDSTYPE`  `MATCH_HHAD`.`SINGLE` AS `SINGLE`  `MATCH_HHAD`.`ALLUP` AS `ALLUP`  `MATCH_HHAD`.`ODDTYPE` AS `ODDTYPE`  `MATCH_HHAD`.`A` AS `A`  `MATCH_HHAD`.`D` AS `D`  `MATCH_HHAD`.`H` AS `H`  `MATCH_HHAD`.`LETCOUNT` AS `LETCOUNT`  `MATCH_HHAD`.`POOLSTATUS` AS `POOLSTATUS` from (`MATCH_LIST` join `MATCH_HHAD` on(((`MATCH_LIST`.`MATCHID` = `MATCH_HHAD`.`MATCHID`) and (`MATCH_LIST`.`SPORTTYPE` = `MATCH_HHAD`.`SPORTTYPE`)))) where ((`MATCH_LIST`.`MATCHSTATUS` in ('Selling'  'SellStop')) and (`MATCH_HHAD`.`POOLSTATUS` in ('Selling'  'SellStop')));
+DROP VIEW `V_HILO`;
+CREATE VIEW `V_HILO` AS select `MATCH_LIST`.`ALIASNUM` AS `ALIASNUM`  `MATCH_LIST`.`MATCHID` AS `MATCHID`  `MATCH_LIST`.`LEAGUEID` AS `LEAGUEID`  `MATCH_LIST`.`LEAGUENAME` AS `LEAGUENAME`  `MATCH_LIST`.`LEAGUECOLOR` AS `LEAGUECOLOR`  `MATCH_LIST`.`STARTSALETIME` AS `STARTSALETIME`  `MATCH_LIST`.`MATCHTIME` AS `MATCHTIME`  `MATCH_LIST`.`HOMETEAMNAME` AS `HOMETEAMNAME`  `MATCH_LIST`.`HOMETEAMINDEX` AS `HOMETEAMINDEX`  `MATCH_LIST`.`GUESTTEAMNAME` AS `GUESTTEAMNAME`  `MATCH_LIST`.`GUESTTEAMINDEX` AS `GUESTTEAMINDEX`  `MATCH_LIST`.`MATCHSTATUS` AS `MATCHSTATUS`  `MATCH_LIST`.`SPORTTYPE` AS `SPORTTYPE`  `MATCH_LIST`.`SALEDAY` AS `SALEDAY`  `MATCH_HILO`.`POOLID` AS `POOLID`  `MATCH_HILO`.`ODDSTYPE` AS `ODDSTYPE`  `MATCH_HILO`.`SINGLE` AS `SINGLE`  `MATCH_HILO`.`ALLUP` AS `ALLUP`  `MATCH_HILO`.`ODDTYPE` AS `ODDTYPE`  `MATCH_HILO`.`H` AS `H`  `MATCH_HILO`.`L` AS `L`  `MATCH_HILO`.`POOLSTATUS` AS `POOLSTATUS`  `MATCH_HILO`.`PRESETSCORE` AS `PRESETSCORE` from (`MATCH_LIST` join `MATCH_HILO` on(((`MATCH_LIST`.`SPORTTYPE` = `MATCH_HILO`.`SPORTTYPE`) and (`MATCH_LIST`.`MATCHID` = `MATCH_HILO`.`MATCHID`)))) where ((`MATCH_LIST`.`MATCHSTATUS` in ('Selling'  'SellStop')) and (`MATCH_HILO`.`POOLSTATUS` in ('Selling'  'SellStop')));
+DROP VIEW `V_MNL`;
+CREATE VIEW `V_MNL` AS select `MATCH_LIST`.`ALIASNUM` AS `ALIASNUM`  `MATCH_LIST`.`MATCHID` AS `MATCHID`  `MATCH_LIST`.`LEAGUEID` AS `LEAGUEID`  `MATCH_LIST`.`LEAGUENAME` AS `LEAGUENAME`  `MATCH_LIST`.`LEAGUECOLOR` AS `LEAGUECOLOR`  `MATCH_LIST`.`STARTSALETIME` AS `STARTSALETIME`  `MATCH_LIST`.`MATCHTIME` AS `MATCHTIME`  `MATCH_LIST`.`HOMETEAMNAME` AS `HOMETEAMNAME`  `MATCH_LIST`.`HOMETEAMINDEX` AS `HOMETEAMINDEX`  `MATCH_LIST`.`GUESTTEAMNAME` AS `GUESTTEAMNAME`  `MATCH_LIST`.`GUESTTEAMINDEX` AS `GUESTTEAMINDEX`  `MATCH_LIST`.`MATCHSTATUS` AS `MATCHSTATUS`  `MATCH_LIST`.`SPORTTYPE` AS `SPORTTYPE`  `MATCH_LIST`.`SALEDAY` AS `SALEDAY`  `MATCH_MNL`.`POOLID` AS `POOLID`  `MATCH_MNL`.`ODDSTYPE` AS `ODDSTYPE`  `MATCH_MNL`.`SINGLE` AS `SINGLE`  `MATCH_MNL`.`ALLUP` AS `ALLUP`  `MATCH_MNL`.`ODDTYPE` AS `ODDTYPE`  `MATCH_MNL`.`A` AS `A`  `MATCH_MNL`.`H` AS `H`  `MATCH_MNL`.`POOLSTATUS` AS `POOLSTATUS` from (`MATCH_LIST` join `MATCH_MNL` on(((`MATCH_LIST`.`SPORTTYPE` = `MATCH_MNL`.`SPORTTYPE`) and (`MATCH_LIST`.`MATCHID` = `MATCH_MNL`.`MATCHID`)))) where ((`MATCH_LIST`.`MATCHSTATUS` in ('Selling'  'SellStop')) and (`MATCH_MNL`.`POOLSTATUS` in ('Selling'  'SellStop')));
+DROP VIEW `V_TTG`;
+CREATE VIEW `V_TTG` AS select `MATCH_LIST`.`ALIASNUM` AS `ALIASNUM`  `MATCH_LIST`.`MATCHID` AS `MATCHID`  `MATCH_LIST`.`LEAGUEID` AS `LEAGUEID`  `MATCH_LIST`.`LEAGUENAME` AS `LEAGUENAME`  `MATCH_LIST`.`LEAGUECOLOR` AS `LEAGUECOLOR`  `MATCH_LIST`.`STARTSALETIME` AS `STARTSALETIME`  `MATCH_LIST`.`MATCHTIME` AS `MATCHTIME`  `MATCH_LIST`.`HOMETEAMNAME` AS `HOMETEAMNAME`  `MATCH_LIST`.`HOMETEAMINDEX` AS `HOMETEAMINDEX`  `MATCH_LIST`.`GUESTTEAMNAME` AS `GUESTTEAMNAME`  `MATCH_LIST`.`GUESTTEAMINDEX` AS `GUESTTEAMINDEX`  `MATCH_LIST`.`MATCHSTATUS` AS `MATCHSTATUS`  `MATCH_LIST`.`SPORTTYPE` AS `SPORTTYPE`  `MATCH_LIST`.`SALEDAY` AS `SALEDAY`  `MATCH_TTG`.`POOLID` AS `POOLID`  `MATCH_TTG`.`ODDSTYPE` AS `ODDSTYPE`  `MATCH_TTG`.`SINGLE` AS `SINGLE`  `MATCH_TTG`.`ALLUP` AS `ALLUP`  `MATCH_TTG`.`ODDTYPE` AS `ODDTYPE`  `MATCH_TTG`.`S0` AS `S0`  `MATCH_TTG`.`S1` AS `S1`  `MATCH_TTG`.`S2` AS `S2`  `MATCH_TTG`.`S3` AS `S3`  `MATCH_TTG`.`S4` AS `S4`  `MATCH_TTG`.`S5` AS `S5`  `MATCH_TTG`.`S6` AS `S6`  `MATCH_TTG`.`S7` AS `S7`  `MATCH_TTG`.`POOLSTATUS` AS `POOLSTATUS` from (`MATCH_LIST` join `MATCH_TTG` on(((`MATCH_LIST`.`MATCHID` = `MATCH_TTG`.`MATCHID`) and (`MATCH_LIST`.`SPORTTYPE` = `MATCH_TTG`.`SPORTTYPE`)))) where ((`MATCH_LIST`.`MATCHSTATUS` in ('Selling'  'SellStop')) and (`MATCH_TTG`.`POOLSTATUS` in ('Selling'  'SellStop')));
+DROP VIEW `V_WNM`;
+CREATE VIEW `V_WNM` AS select `MATCH_LIST`.`ALIASNUM` AS `ALIASNUM`  `MATCH_LIST`.`MATCHID` AS `MATCHID`  `MATCH_LIST`.`LEAGUEID` AS `LEAGUEID`  `MATCH_LIST`.`LEAGUENAME` AS `LEAGUENAME`  `MATCH_LIST`.`LEAGUECOLOR` AS `LEAGUECOLOR`  `MATCH_LIST`.`STARTSALETIME` AS `STARTSALETIME`  `MATCH_LIST`.`MATCHTIME` AS `MATCHTIME`  `MATCH_LIST`.`HOMETEAMNAME` AS `HOMETEAMNAME`  `MATCH_LIST`.`HOMETEAMINDEX` AS `HOMETEAMINDEX`  `MATCH_LIST`.`GUESTTEAMNAME` AS `GUESTTEAMNAME`  `MATCH_LIST`.`GUESTTEAMINDEX` AS `GUESTTEAMINDEX`  `MATCH_LIST`.`MATCHSTATUS` AS `MATCHSTATUS`  `MATCH_LIST`.`SPORTTYPE` AS `SPORTTYPE`  `MATCH_LIST`.`SALEDAY` AS `SALEDAY`  `MATCH_WNM`.`POOLID` AS `POOLID`  `MATCH_WNM`.`ODDSTYPE` AS `ODDSTYPE`  `MATCH_WNM`.`SINGLE` AS `SINGLE`  `MATCH_WNM`.`ALLUP` AS `ALLUP`  `MATCH_WNM`.`ODDTYPE` AS `ODDTYPE`  `MATCH_WNM`.`W1` AS `W1`  `MATCH_WNM`.`W2` AS `W2`  `MATCH_WNM`.`W3` AS `W3`  `MATCH_WNM`.`W4` AS `W4`  `MATCH_WNM`.`W5` AS `W5`  `MATCH_WNM`.`W6` AS `W6`  `MATCH_WNM`.`L1` AS `L1`  `MATCH_WNM`.`L2` AS `L2`  `MATCH_WNM`.`L3` AS `L3`  `MATCH_WNM`.`L4` AS `L4`  `MATCH_WNM`.`L5` AS `L5`  `MATCH_WNM`.`L6` AS `L6`  `MATCH_WNM`.`POOLSTATUS` AS `POOLSTATUS` from (`MATCH_LIST` join `MATCH_WNM` on(((`MATCH_LIST`.`SPORTTYPE` = `MATCH_WNM`.`SPORTTYPE`) and (`MATCH_LIST`.`MATCHID` = `MATCH_WNM`.`MATCHID`)))) where ((`MATCH_LIST`.`MATCHSTATUS` in ('Selling'  'SellStop')) and (`MATCH_WNM`.`POOLSTATUS` in ('Selling'  'SellStop')));
+
+在107数据库上执行
+
+fbcpdata  发布正式环境
+
+
+ip:221.208.170.175  ｜ 数据库名称：yundongguanjia ｜ 用户名：ydgjlt    ｜ 密码：ydgjltmysqladminhljsport
+
+
+
+CREATE DATABASE  hljbcn
+ DEFAULT CHARACTER SET utf8
+ DEFAULT COLLATE utf8_general_ci ;
+
+GRANT ALL PRIVILEGES ON hljbcn.* to 'hljbcn'@'%' IDENTIFIED BY 'mysqladminhljbcn170174';
+
+GRANT ALL PRIVILEGES ON hljbcn.* to 'hljbcn'@'localhost' IDENTIFIED BY 'mysqladminhljbcn170174';
+
+
+221.208.170.170  	hljmatch	mysqladminhljmatch170170
+代码平滑上线
+负载均衡集群
+    首先将一台机器在负载均衡器上剔除   用剔除的机器记性代码升级   经过公司的测试后   没有问题后   在负载均衡器上将此机器加入   然后升级下一台机器
+
+
+SET PASSWORD FOR 'root'@'localhost' = PASSWORD('newpass');
+
+SET PASSWORD FOR 'root'@'localhost' = PASSWORD('mysqladminroot170176');
+
+useradd  hljbcn
+passwd  hljbcn
+tc999888!@#170176hljbcln
+
+
+ACCEPT     tcp  --  192.168.88.109      anywhere             state NEW tcp dpts:zabbix-agent:zabbix-trapper
+ACCEPT     udp  --  192.168.88.109      anywhere             state NEW udp dpts:zabbix-agent:zabbix-trapper
+
+
+
+-A INPUT -s 192.168.88.109 -m state --state NEW -m tcp -p tcp --dport 10050:10051 -j ACCEPT
+-A INPUT -s 192.168.88.109 -m state --state NEW -m udp -p udp --dport 10050:10051 -j ACCEPT
+
+
+*******************************************************************************************************
+
+CREATE DATABASE  hljbcn
+ DEFAULT CHARACTER SET utf8
+ DEFAULT COLLATE utf8_general_ci ;
+
+GRANT ALL PRIVILEGES ON hljbcn.* to 'hljbcn'@'%' IDENTIFIED BY 'mysqladminhljbcn88103';
+
+GRANT ALL PRIVILEGES ON hljbcn.* to 'hljbcn'@'localhost' IDENTIFIED BY 'mysqladminhljbcn88103';
+
+
+
+*******************************************************************************************************
+
+./vdep_test_new.sh   barcelonaentry   v1.0.00
+
+ $request_uri
+
+ $request_uri
+
+ if ( $request_uri=='sportsmwap' ) {
+     proxy_cookie_path  /home/app/tomcat_venueadmin/webapps/sportsmwap/    /;
+}
+
+
+sticky_cookie_insert srv_id expires=1h domain=hljsporto2o.com path=/;
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+# wget http://nginx.org/download/nginx-1.0.6.tar.gz
+# tar -czvf nginx-1.0.6
+# cd nginx-1.0.6
+# ./configure --prefix=/home/apps/nginx-1.8.1 --with-http_stub_status_module   --with-http_flv_module --with-http_gzip_static_module  --with-pcre --with-http_ssl_module --with-http_realip_module --add-module=/home/app/softs/nginx-goodies-nginx-sticky-module-ng-08a395c66e42
+# make
+# make install
+
+
+ ./configure --prefix=/home/apps/nginx-1.8.1 --with-http_stub_status_module   --with-http_flv_module --with-http_gzip_static_module  --with-pcre --with-http_ssl_module --with-http_realip_module --add-module=/home/app/softs/nginx-goodies-nginx-sticky-module-ng-08a395c66e42
+
+
+ ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+/etc/passwd has been changed on {HOST.NAME}
+
+{Template OS Linux:vfs.file.cksum[/etc/passwd].diff(0)}>0
+{jfsc09_192.168.88.108:vfs.file.cksum[/tmp/test.log].diff(0)}>0
+
+
+
+
+
+
+ip:221.208.170.175  ｜ 数据库名称：hljbcn ｜ 用户名：hljbcn    ｜ 密码：mysqladminhljbcn88103
+
+
+头指针分离于 v1.0.00.201705151748   正式运动关h5  好用版
+
+
+
+jfsc_user_appver_192.168.88.103
+
+jfsc_ftp-192.168.88.109
+
+
+2017/5/22 10:00						
+tcjfweb	王博	2017/5/15 10:30	业务要求修改客服联系电话	 v1.0.00.201705220937.release	origin  ssh://git@222.171.119.77:20022/markstore/tcjfweb.git (fetch)	http://jf.hljtcp.com/index.html
+
+
+
+
+commit b1990641d2eb9350bc9158c718de949e19f91dbf
+Author: wangbo <44833927@qq.com>
+Date:   Mon May 15 17:48:13 2017 +0800
+
+    替换长阳修改的样式表和通用js文件代码
+
+
+
+
+1. 使用Git log命令查看所有的历史版本   获取某个历史版本的id   假设查到历史版本的id是139dcfaa558e3276b30b6b2e5cbbb9c00bbdca96。
+2. git reset --hard 139dcfaa558e3276b30b6b2e5cbbb9c00bbdca96  
+3. 把修改推到远程服务器
+   git push -f -u origin master
+4.Git的版本回退速度非常快   因为Git在内部有个指向当前版本的HEAD指针   当你回退版本的时候   Git仅仅是把HEAD从指向“append GPL”：
+
+关掉了电脑   第二天早上就后悔了   想恢复到新版本怎么办？   Git提供了一个命令git reflog用来记录你的每一次命令
+
+
+0f031b2084f98bd73b9646d0575c77b79524df16
+
+
+commit 0f031b2084f98bd73b9646d0575c77b79524df16
+Author: zhaojiatao@itengcai.com <zhaojiatao@itengcai.com>
+Date:   Tue May 23 10:59:02 2017 +0800
+
+    如果支付使用第三方支付还使用积分支付的话的处理   增加此情况下的积分支付
+
+
+  ;; AUTHORITY SECTION:
+a.shifen.com.		600	IN	SOA	ns1.a.shifen.com. baidu_dns_master.baidu.com. 1705230077 5 5 86400 3600
+                                                master主机名                                   序列号    刷新频率    失败次数
+
+
+dns  域名解析   bind  internet  name    domian 伯克利
+
+domain  name   server   
+主机名   FQDN  完全合格域名
+背后查询过程
+
+顶级域   分为三类 
+           组织域  .COM    .NET   .ORG
+	   国家域  .CN   .TW  .hk
+	   反向域
+
+
+
+
+www.hljsporto2o.com
+
+
+用友服务器
+IP：192.168.32.120 | MAC：F8-DB-88-FF-A4-7F |
+
+
+
+F8-DB-88-FF-A4-7F
+
+ZHAOZS-PC
+
+IP：192.168.22.122 | MAC：74-29-af-4c-b1-25 | 无线连接
+
+
+
+行政打印机   打印机
+IP：192.168.33.109 | MAC：f4-81-39-7e-a3-c3 | 无线连接
+
+赵忠山	74-29-af-4c-b1-25
+用友服务器	F8-DB-88-FF-A4-7F
+行政打印机	f4-81-39-7e-a3-c3
+
+一个fqdn 可以有两台主机。起到负载均衡的目的
+查询  递归
+      迭代
+上级只知道直接下级
+  接受本地客户端查询请求递归
+
+13个根节点服务器
+dns  主从   辅助dns服务器   请求数据同步   拉取得机制
+缓存器
+转发器数据库中的每一个条目都称作资源记录    resource   record   rr
+定义格式 
+      名称      ttl   IN  资源记录类型 rrt    value
+      
+
+      www.lanqi.com.    IN  A     192.168.33.11
+      1.1.1.1           IN    PTR	www.lanqi.com   
+
+
+资源记录类型
+SOA   起始授权记录
+A   FQDN  -->IPADDR
+PTR  IPADDR  -->FQDN
+AAAA  FQDN  -->IPV6
+NS    name server      
+CNAME  别名
+MX   邮件服务器  优先级  00-99   值越小优先级越高
+TXT
+SRV
+CHAOS
+
+域   domain    逻辑概念
+区域   zone    物理概念
+
+
+正向    没法比较 baidu.com    192.168.12.0/24  
+
+反向
+
+
+ifconfig  
+date  
+由于gitlab 地址发生变化   首先进入项目目录   然后进入.git目录   用记事本打开config文件   将222.171.119.77改为113.4.12.13 保存   然后git就可以正常提交和拉取
+
+sed -i   s#222.171.119.76#113.4.12.12#g  sms.properties.hljtcpadm
+sed -i   s#222.171.119.77#113.4.12.13#g  *
+
+给数据库增加   计划任务
+
+
+
+dig  domain  infomation  gerofer
+
+ip:192.168.66.103  ｜ 数据库名称：yundongguanjia ｜ 用户名：ydgjlt    ｜ 密码：ydgjltmysqladminhljsport
+
+
+2017年6月1日
+2017年6月2日
+2017年6月5日
+2017年6月6日
+2017年6月7日
+2017年6月8日
+2017年6月9日
+2017年6月12日
+2017年6月13日
+2017年6月14日
+2017年6月15日
+2017年6月16日
+2017年6月19日
+2017年6月20日
+2017年6月21日
+2017年6月22日
+2017年6月23日
+2017年6月26日
+2017年6月27日
+2017年6月28日
+2017年6月29日
+2017年6月30日
+
+
+"26 rc1"
+
+
+邮箱地址：http://mail.itengcai.com:8000/extmail
+用户名：gaoxinyu
+密码：gaoxinyu123
+
+b4-0b-44-0b-3a-92  锤子手机
+
+machine_type
+api_status
+os_type
+
+zicai_code
+
+machine_type:$('#machine_type').val()  api_status:$('#api_status').val()  os_type:$('#api_status').val()  zicai_code:$('#zicai_code')
+
+
+
+
+name = request.GET['name']
+        ip = request.GET['ip']
+        ip_lan = request.GET['ip_lan']
+        servicecode = request.GET['servicecode']
+        machine_type = request.GET['machine_type']
+        api_status = request.GET['api_status']
+        os_type = request.GET['os_type']
+        zicai_code = request.GET['zicai_code']
+        idc_name = request.GET['idc_name']
+        service = request.GET['service']
+        idc_bh = request.GET['idc_jg']
+        mac_add = HostList(ip=ip  hostname=name  application=service  idc_name=idc_name  bianhao=idc_bh  ip_lan=ip_lan  fast_server_code=servicecode  host_type=machine_type  jiekou_status=api_status  os_type=os_type  zicai_code=zicai_code)
+
+
+锤子  94-92-bc-ea-dd-7e
+
+
+
+
+ gardle 版本与gadle 插件版本不一样
+
+
+
+ ip_lan:$('#ip_lan').val()  servicecode:$('#servicecode').val()  machine_type:$('#machine_type').val()  os_type:$('#os_type').val()  api_status:$('#api_status').val()  zicai_code:$('#zicai_code').val()
+
+
+
+
+ ip = request.GET['ip']
+        ip_q=request.POST.get('ip_q')
+        print   ip_q
+        name=request.GET['name']
+        ip_lan = request.GET['ip_lan']
+        servicecode = request.GET['servicecode']
+        machine_type = request.GET['machine_type']
+        api_status = request.GET['api_status']
+        os_type = request.GET['os_type']
+        zicai_code = request.GET['zicai_code']
+        idc_name = request.GET['idc_name']
+        service = request.GET['service']
+        idc_bh = request.GET['idc_jg']
+
+
+mac_update = HostList.objects.filter(id=id).update(ip=ip  hostname=name  application=service  idc_name=idc_name  bianhao=idc_bh  ip_lan=ip_lan  fast_server_code=servicecode  host_type=machine_type  jiekou_status=api_status  os_type=os_type  zicai_code=zicai_code)
+
+
+
+
+
+<script>
+$('#tipModal').on('hide.bs.modal'  function(){
+    location.reload()
+})
+$(function(){
+       var oLanguage={
+    "oAria": {
+        "sSortAscending": ": 升序排列"  
+        "sSortDescending": ": 降序排列"
+    }  
+    "oPaginate": {
+        "sFirst": "首页"  
+        "sLast": "末页"  
+        "sNext": "下页"  
+        "sPrevious": "上页"
+    }  
+    "sEmptyTable": "没有相关记录"  
+    "sInfo": "第 _START_ 到 _END_ 条记录   共 _TOTAL_ 条"  
+    "sInfoEmpty": "第 0 到 0 条记录   共 0 条"  
+    "sInfoFiltered": "(从 _MAX_ 条记录中检索)"  
+    "sInfoPostFix": ""  
+    "sDecimal": ""  
+    "sThousands": "  "  
+    "sLengthMenu": "每页显示条数: _MENU_"  
+    "sLoadingRecords": "正在载入..."  
+    "sProcessing": "正在载入..."  
+    "sSearch": "搜索:"  
+    "sSearchPlaceholder": ""  
+    "sUrl": ""  
+    "sZeroRecords": "没有相关记录"
+}
+$.fn.dataTable.defaults.oLanguage=oLanguage;
+$('#dataTables-example').DataTable({
+        responsive: true  
+        // iDisplayLength:3
+});
+});
+var pro = 10
+var timer = null
+timer = setInterval(function(){
+    if (pro<100) {
+
+    pro = pro*1.5
+
+    $('#progress-reboot').css('width'  pro+'%')
+    }else{
+        clearInterval(timer)
+        $('#progress-reboot').addClass('hide')
+    }
+
+}  100)
+var is_right = true
+setInterval(function(){
+    var t = $('#alertText')
+    var left = parseInt(t.css('left'))
+    var val
+    if (is_right) {
+        if (left<300) {
+            val = left+1
+            t.css('left'  val)
+        }else{
+            is_right = false
+        }
+    }else{
+        if (left>250) {
+            val = left-1
+            t.css('left'  val)
+        }else{
+            is_right = true
+        }
+
+    }
+    // if (left<300&&left>250) {
+    //     t.css('left'  left+1)
+    // };
+}  50)
+</script>
+
+
+<script>
+$('#addmacBtn').click(function(){
+$('#addmacModal').modal('show')
+})
+    $(document).on('click'  '.deletemac'  function(){
+      var id = $(this).data('id')
+      $.get('/deletemac?id='+id  function(res){
+        if (res == 'ok') {
+          location.reload()
+        };
+      })
+    })
+$('#confirmAddmacBtn').click(function(){
+var is_val = true
+$('#addmacForm').find('input').each(function(i  v){
+  if (!$(v).val()) {
+    $(v).after('<span class="text-danger">必填字段</span>')
+    is_val = false
+  }else{
+    $(v).next().remove()
+  }
+})
+if (is_val) {
+
+$.get('/add_net_dev'  $('#addmacForm').serialize()  function(data){
+  if (data=='ok') {
+    $('#tipModal').find('.modal-body').html('添加成功').end().modal('show')
+  };
+})
+};
+
+})
+
+</script>
+<script type="text/javascript">
+
+function netadd(ele){
+if($('#name').val()&&$('#ip').val()&&$('#idc_jg').val()&&$('#idc_name').val()&&$('#service').val()&&$('#ip_lan').val()&&$('#servicecode').val()){
+ var id=$(ele).attr("id");
+$.ajax({
+url:"/add_net_dev/"  
+data:{name:$('#name').val()  ip:$('#ip').val()  idc_jg:$('#idc_jg').val()  idc_name:$('#idc_name').val()  service:$('#service').val()  ip_lan:$('#ip_lan').val()  servicecode:$('#servicecode').val()  machine_type:$('#machine_type').val()  os_type:$('#os_type').val()  api_status:$('#api_status').val()  zicai_code:$('#zicai_code').val()}  
+success:function(data){
+ if (data=='ok') {
+ $('#tipModal').find('.modal-body').html('添加成功').end().modal('show')
+       }
+  }
+});
+}}
+</script>
+
+
+
+v1.0.00.201706061932   
+
+
+
+六月 07   2017 9:32:15 上午 org.apache.catalina.startup.Catalina start
+
+
+安卓hljtcp最新版本下载地址：113.6.251.97:8016/hljtcp/hljtcp.apk
+
+安卓运动管家最新版本测试下载地址：113.6.251.97:8016/sports/ydxgj_v1.0.04.apk
+
+
+./vdep_test_new.sh   barcelonaentry   v1.0.00
+
+Site.objects.create(pk=1   domain='www.lanqi.com'   name='www.lanqi.com')
+
+&&$('#model_num').val()&&$('#type').val()&&$('#addr').val()&&$('#idc_name').val()
+
+insert into `users_customuser` (`id`   `password`   `last_login`   `is_superuser`   `email`   `username`   `first_name`   `last_name`   `department_id`   `mobile`   `session_key`   `user_key`   `menu_status`   `user_active`   `uuid`   `is_staff`   `is_active`   `date_joined`) values('1'  'pbkdf2_sha256$15000$uM1f5HMxHOqE$zPzKtNJMheQe62Q592V5l0m60nq/5Vj4rgzlVf5nXYs='  '2016-08-04 14:12:56'  '1'  '1073707152@qq.com'  'admin'  ''  ''  NULL  ''  'ff3a3s4vj7ivjl7km1teqhxrizwbdrek'  NULL  '1'  '0'  '3eceb1e9-df90-38ed-9960-03183bc85cce'  '0'  '1'  '2017-06-29 14:05:50');
+CREATE DATABASE yundongguanjia_prodouct
+ DEFAULT CHARACTER SET utf8
+ DEFAULT COLLATE utf8_general_ci ;
+
+GRANT ALL PRIVILEGES ON yundongguanjia_prodouct.* to 'ydgjlt'@'%' ; 
+
+GRANT ALL PRIVILEGES ON yundongguanjia_prodouct.* to 'ydgjlt'@'localhost' ;
+
+
+
+***********************************
+ <div class="form-group">
+    <label for="exampleInputName2">机房类型</label>
+    <input type="text" class="form-control" id="type">
+  </div>
+     <div class="form-group">
+    <label for="exampleInputName2">联系人</label>
+    <input type="text" class="form-control" id="connect">
+  </div>
+    <div class="form-group">
+    <label for="exampleInputName2">电话</label>
+    <input type="text" class="form-control" id="phone">
+  </div>
+    <div class="form-group">
+    <label for="exampleInputName2">地址</label>&nbsp;&nbsp;&nbsp;
+    <input type="text" class="form-control" id="address">
+  </div>
+
+
+  service.companytel=0451-82625751 
+
+  select count(*) from ACTIVITY_ORDER t where 1 = 1 AND t.HDSP_ID = 'HDSP160953152904' AND t.PERIODS = '1' AND t.ORDER_STATUS in (1  2  4  7) 
+==> Parameters: HDSP160953152904(String)   1(String)
+scp -P 20022 admin@113.4.12.13:/home/admin/works/sportsmapi/target/sportsmapi.war  .
+scp -P 20022 admin@113.4.12.13:/home/admin/works/venueadmin/target/venueadmin.war .
+scp -P 20022 admin@113.4.12.13:/home/admin/works/ventimer/target/ventimerService.war  .
+
+
+
+
+刚刚给博客加了一个500px相册插件   lightbox引入了很多js文件和css文件   页面一下子看起来非常臃肿   所以还是把Gzip打开了。
+
+环境：Debian 6
+
+1、Vim打开Nginx配置文件
+
+vim /usr/local/nginx/conf/nginx.conf
+
+2、找到如下一段   进行修改
+
+gzip on;
+gzip_min_length 1k;
+gzip_buffers 4 16k;
+#gzip_http_version 1.0;
+gzip_comp_level 2;
+gzip_types text/plain application/x-javascript text/css application/xml text/javascript application/x-httpd-php image/jpeg image/gif image/png;
+gzip_vary off;
+gzip_disable "MSIE [1-6]\.";
+
+3、解释一下
+
+第1行：开启Gzip
+
+第2行：不压缩临界值   大于1K的才压缩   一般不用改
+
+第3行：buffer   就是   嗯   算了不解释了   不用改
+
+第4行：用了反向代理的话   末端通信是HTTP/1.0   有需求的应该也不用看我这科普文了；有这句的话注释了就行了   默认是HTTP/1.1
+
+第5行：压缩级别   1-10   数字越大压缩的越好   时间也越长   看心情随便改吧
+
+第6行：进行压缩的文件类型   缺啥补啥就行了   JavaScript有两种写法   最好都写上吧   总有人抱怨js文件没有压缩   其实多写一种格式就行了
+
+第7行：跟Squid等缓存服务有关   on的话会在Header里增加"Vary: Accept-Encoding"   我不需要这玩意   自己对照情况看着办吧
+
+第8行：IE6对Gzip不怎么友好   不给它Gzip了
+
+ 
+
+4、:wq保存退出   重新加载Nginx
+
+/usr/local/nginx/sbin/nginx -s reload
+
+
+
+阿里云主机	118.190.60.100		20022	root	tc999888!@#60100 		app	tc999888!@#60100app
+
+
+
+systemctl start salt-minion.service
+aliyun-118.190.60.100
+
+
+dd if=/dev/zero of=/data/swap bs=512 count=4194308
+
+
+
+天融信防火墙	superman	Sg@)!@2012
+
+
+
+-A INPUT -s 120.52.149.0/24 -p tcp --dport 8080 -j ACCEPT
+-A INPUT -s 111.206.226.0/24 -p tcp --dport 8080 -j ACCEPT
+-A INPUT -s 36.110.179.0/24 -p tcp --dport 8080 -j ACCEPT
+-A INPUT -s 36.110.177.0/24 -p tcp --dport 8080 -j ACCEPT
+-A INPUT -s 106.39.177.0/24 -p tcp --dport 8080 -j ACCEPT
+
+
+
+113.4.12.12:8300/venuesfiles/html/2780c5754ad942fb9f9804a90bb44994.html
+shiqian<shiqian@itengcai.com>
+lihong<lihong@itengcai.com>
+jiapeijie<jiapeijie@itengcai.com>
+
+
+
+
+CREATE DATABASE markstore3
+ DEFAULT CHARACTER SET utf8
+ DEFAULT COLLATE utf8_general_ci ;
+
+GRANT ALL PRIVILEGES ON markstore3.* to 'jfsc'@'%' ; 
+
+GRANT ALL PRIVILEGES ON markstore3.* to 'jfsc'@'localhost' ;
+
+
+scp  -r -P  20022  admin@113.4.12.13:/home/admin/softs/tomcat_hljtcpapi  .
+
+
+
+
+
+CREATE DATABASE  jdmatchplay
+ DEFAULT CHARACTER SET utf8
+ DEFAULT COLLATE utf8_general_ci ;
+
+GRANT ALL PRIVILEGES ON jdmatchplay.* to 'jdmatch'@'%' IDENTIFIED BY 'mysqladminjdmatch170174';
+
+GRANT ALL PRIVILEGES ON jdmatchplay.* to 'jdmatch'@'localhost' IDENTIFIED BY 'mysqladminjdmatch170174';
+
+
+ip:221.208.170.174  ｜ 数据库名称： jdmatchplay    ｜ 用户名：jdmatch    ｜ 密码：mysqladminjdmatch170174
+
+
+
+****************************
+
+ mkdir  tcjffiles/html   -pv
+ mkdir  -pv  tcjffiles/pics/upload
+*****************************
+
+
+AB3WIYMW5EUWDWFOZNWR35DVRJN7ULIS6
+
+
+
+
+{
+      "secret" : "AB3WIYMW5EUWDWFOZNWR35DVRJN7ULIS6"   // * required field
+      "dir" : "/home/app/tomcat_hljtcpapi/webapps" // * required field
+    }
+
+
+
+
+  221.208.170.175  ssh  端口 20022 用户名 app  密码：tc999888!@
+  221.208.170.162  ssh  端口 20022  用户名  app  密码 tc999888!@#Sg@)!@2012
+  221.208.170.170   ssh  端口 20022  用户名  app   密码  app:Tc999888!@#Sg@)!@2012
+
+
+
+
+
+
+***************************************************************************************
+
+scp -P 20022 admin@113.4.12.13:/home/admin/works/tcjfweb/target/tcjfweb.war .
+
+scp  -P 20022 admin@113.4.12.13:/home/admin/works/hljtcpapi/target/hljtcp_api.war   .
+
+scp  -P 20022 admin@113.4.12.13:/home/admin/works/hljtcpadm/target/hljtcpadm.war  .
+
+scp -P 20022 admin@113.4.12.13:/home/admin/works/tcpcron/target/hljtcpcron.war    .
+****************************************************************************************
+
+scp  -r  -P  20022  app@192.168.88.109:/home/app/jfsc_staticfiles/tcjffiles  .
+
+************************************************************
+tcjfweb  d182265b79eab8f2bc5cb995ac9f13cfde9d16e4
+
+hljtcpapi  68796f6db2c03a7e484a8d1cf0392955fbffe985
+
+hljtcpadm   0c516db085809e77033d179e1570491756a46ddd
+
+**************************************************************
+积分商城web页面正式地址：http://www.hljtcjf.com/index.html
+积分商城后台正式地址：http://www.hljtcjf.com/hljtcpadm/
+体彩app接口正式地址: http://www.hljtcjf.com:8023/hljtcp_api
+
+ www.hljtcjf.com:8023/hljtcp_api
+
+
+
+ ip:113.6.251.96  ｜ 数据库名称：tcdata    ｜ 用户名：tcgwdata｜ 密码：mysqladmintcgwdata25196
+
+
+ 新华社web：http://xhcp.itengcai.com:8020/xhcpweb/index.html
+ 新华社adm：http://xhcp.itengcai.com:8020/xhcpadm
+
+ commit d182265b79eab8f2bc5cb995ac9f13cfde9d16e4
+Author: wuyt <412808371@qq.com>
+Date:   Wed Jun 7 14:35:58 2017 +0800
+
+    修改客服电话为82625753；
+
+
+2017年7月3日
+2017年7月4日
+2017年7月5日
+2017年7月6日
+2017年7月7日
+2017年7月10日
+2017年7月11日
+2017年7月12日
+2017年7月13日
+2017年7月14日
+2017年7月17日
+2017年7月18日
+2017年7月19日
+2017年7月20日
+2017年7月21日
+2017年7月24日
+2017年7月25日
+2017年7月26日
+2017年7月27日
+2017年7月28日
+2017年7月31日
+
+
+164  fbcpdata   程序有报错  杨哥看一下
+
+Creating a new SqlSession
+Registering transaction synchronization for SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@2367a78d]
+JDBC Connection [jdbc:mysql://113.6.251.96:3306/tcdata?useUnicode=true&characterEncoding=UTF-8   UserName=tcgwdata@221.208.170.164   MySQL Connector Java] will be managed by Spring
+==>  Preparing: replace into MATCH_HDC(MATCHID  SPORTTYPE  POOLID  ODDSTYPE  SINGLE  ALLUP  ODDTYPE  A  H  LETCOUNT  POOLSTATUS) values 
+==> Parameters: 
+Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@2367a78d]
+Transaction synchronization committing SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@2367a78d]
+Transaction synchronization deregistering SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@2367a78d]
+Transaction synchronization closing SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@2367a78d]
+[2017-07-04 13:54:03] [ERROR] - org.quartz.core.JobRunShell.run(JobRunShell.java:211) - Job DEFAULT.oddsTimerFactory threw an unhandled Exception: 
+org.springframework.scheduling.quartz.JobMethodInvocationFailedException: Invocation of method 'catchOdds' on target class [class com.tengcai.vims.timer.SportteryTimer2] failed; nested exception is org.springframework.jdbc.BadSqlGrammarException: com.tengcai.vims.sporttery.entity.MATCH_HDC.addList (batch index #1) failed. Cause: java.sql.BatchUpdateException: You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near '' at line 2
+; bad SQL grammar []; nested exception is java.sql.BatchUpdateException: You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near '' at line 2
+	at org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean$MethodInvokingJob.executeInternal(MethodInvokingJobDetailFactoryBean.java:320)
+	at org.springframework.scheduling.quartz.QuartzJobBean.execute(QuartzJobBean.java:113)
+	at org.quartz.core.JobRunShell.run(JobRunShell.java:202)
+	at org.quartz.simpl.SimpleThreadPool$WorkerThread.run(SimpleThreadPool.java:573)
+Caused by: org.springframework.jdbc.BadSqlGrammarException: com.tengcai.vims.sporttery.entity.MATCH_HDC.addList (batch index #1) failed. Cause: java.sql.BatchUpdateException: You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near '' at line 2
+; bad SQL grammar []; nested exception is java.sql.BatchUpdateException: You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near '' at line 2
+	at org.springframework.jdbc.support.SQLErrorCodeSQLExceptionTranslator.doTranslate(SQLErrorCodeSQLExceptionTranslator.java:237)
+	at org.springframework.jdbc.support.AbstractFallbackSQLExceptionTranslator.translate(AbstractFallbackSQLExceptionTranslator.java:72)
+	at org.mybatis.spring.MyBatisExceptionTranslator.translateExceptionIfPossible(MyBatisExceptionTranslator.java:73)
+	at org.mybatis.spring.SqlSessionUtils$SqlSessionSynchronization.beforeCommit(SqlSessionUtils.java:266)
+	at org.springframework.transaction.support.TransactionSynchronizationUtils.triggerBeforeCommit(TransactionSynchronizationUtils.java:95)
+	at org.springframework.transaction.support.AbstractPlatformTransactionManager.triggerBeforeCommit(AbstractPlatformTransactionManager.java:925)
+	at org.springframework.transaction.support.AbstractPlatformTransactionManager.processCommit(AbstractPlatformTransactionManager.java:738)
+	at org.springframework.transaction.support.AbstractPlatformTransactionManager.commit(AbstractPlatformTransactionManager.java:724)
+	at org.springframework.transaction.interceptor.TransactionAspectSupport.commitTransactionAfterReturning(TransactionAspectSupport.java:475)
+	at org.springframework.transaction.interceptor.TransactionAspectSupport.invokeWithinTransaction(TransactionAspectSupport.java:270)
+	at org.springframework.transaction.interceptor.TransactionInterceptor.invoke(TransactionInterceptor.java:94)
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:172)
+	at org.springframework.aop.interceptor.ExposeInvocationInterceptor.invoke(ExposeInvocationInterceptor.java:91)
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:172)
+	at org.springframework.aop.framework.JdkDynamicAopProxy.invoke(JdkDynamicAopProxy.java:204)
+	at com.sun.proxy.$Proxy34.save(Unknown Source)
+	at com.tengcai.vims.timer.SportteryTimer2.catchOdds(SportteryTimer2.java:277)
+	at sun.reflect.GeneratedMethodAccessor960.invoke(Unknown Source)
+	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.lang.reflect.Method.invoke(Method.java:606)
+	at org.springframework.util.MethodInvoker.invoke(MethodInvoker.java:273)
+	at org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean$MethodInvokingJob.executeInternal(MethodInvokingJobDetailFactoryBean.java:311)
+	... 3 more
+Caused by: java.sql.BatchUpdateException: You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near '' at line 2
+	at com.mysql.jdbc.SQLError.createBatchUpdateException(SQLError.java:1164)
+	at com.mysql.jdbc.PreparedStatement.executeBatchSerially(PreparedStatement.java:1773)
+	at com.mysql.jdbc.PreparedStatement.executeBatchInternal(PreparedStatement.java:1257)
+	at com.mysql.jdbc.StatementImpl.executeBatch(StatementImpl.java:959)
+	at org.apache.commons.dbcp.DelegatingStatement.executeBatch(DelegatingStatement.java:297)
+	at org.apache.commons.dbcp.DelegatingStatement.executeBatch(DelegatingStatement.java:297)
+	at sun.reflect.GeneratedMethodAccessor299.invoke(Unknown Source)
+	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.lang.reflect.Method.invoke(Method.java:606)
+	at org.apache.ibatis.logging.jdbc.PreparedStatementLogger.invoke(PreparedStatementLogger.java:85)
+	at com.sun.proxy.$Proxy47.executeBatch(Unknown Source)
+	at org.apache.ibatis.executor.BatchExecutor.doFlushStatements(BatchExecutor.java:103)
+	at org.apache.ibatis.executor.BaseExecutor.flushStatements(BaseExecutor.java:114)
+	at org.apache.ibatis.executor.BaseExecutor.flushStatements(BaseExecutor.java:109)
+	at org.apache.ibatis.executor.BaseExecutor.commit(BaseExecutor.java:201)
+	at org.apache.ibatis.executor.CachingExecutor.commit(CachingExecutor.java:104)
+	at org.apache.ibatis.session.defaults.DefaultSqlSession.commit(DefaultSqlSession.java:174)
+	at org.apache.ibatis.session.defaults.DefaultSqlSession.commit(DefaultSqlSession.java:169)
+	at org.mybatis.spring.SqlSessionUtils$SqlSessionSynchronization.beforeCommit(SqlSessionUtils.java:263)
+	... 21 more
+Caused by: com.mysql.jdbc.exceptions.jdbc4.MySQLSyntaxErrorException: You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near '' at line 2
+	at sun.reflect.GeneratedConstructorAccessor237.newInstance(Unknown Source)
+	at sun.reflect.DelegatingConstructorAccessorImpl.newInstance(DelegatingConstructorAccessorImpl.java:45)
+	at java.lang.reflect.Constructor.newInstance(Constructor.java:526)
+	at com.mysql.jdbc.Util.handleNewInstance(Util.java:404)
+	at com.mysql.jdbc.Util.getInstance(Util.java:387)
+	at com.mysql.jdbc.SQLError.createSQLException(SQLError.java:941)
+	at com.mysql.jdbc.MysqlIO.checkErrorPacket(MysqlIO.java:3870)
+	at com.mysql.jdbc.MysqlIO.checkErrorPacket(MysqlIO.java:3806)
+	at com.mysql.jdbc.MysqlIO.sendCommand(MysqlIO.java:2470)
+	at com.mysql.jdbc.MysqlIO.sqlQueryDirect(MysqlIO.java:2617)
+	at com.mysql.jdbc.ConnectionImpl.execSQL(ConnectionImpl.java:2550)
+	at com.mysql.jdbc.PreparedStatement.executeInternal(PreparedStatement.java:1861)
+	at com.mysql.jdbc.PreparedStatement.executeUpdateInternal(PreparedStatement.java:2073)
+	at com.mysql.jdbc.PreparedStatement.executeBatchSerially(PreparedStatement.java:1751)
+	... 38 more
+[2017-07-04 13:54:03] [ERROR] - org.quartz.core.ErrorLogger.schedulerError(QuartzScheduler.java:2425) - Job (DEFAULT.oddsTimerFactory threw an exception.
+org.quartz.SchedulerException: Job threw an unhandled exception. [See nested exception: org.springframework.scheduling.quartz.JobMethodInvocationFailedException: Invocation of method 'catchOdds' on target class [class com.tengcai.vims.timer.SportteryTimer2] failed; nested exception is org.springframework.jdbc.BadSqlGrammarException: com.tengcai.vims.sporttery.entity.MATCH_HDC.addList (batch index #1) failed. Cause: java.sql.BatchUpdateException: You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near '' at line 2
+; bad SQL grammar []; nested exception is java.sql.BatchUpdateException: You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near '' at line 2]
+	at org.quartz.core.JobRunShell.run(JobRunShell.java:213)
+	at org.quartz.simpl.SimpleThreadPool$WorkerThread.run(SimpleThreadPool.java:573)
+Caused by: org.springframework.scheduling.quartz.JobMethodInvocationFailedException: Invocation of method 'catchOdds' on target class [class com.tengcai.vims.timer.SportteryTimer2] failed; nested exception is org.springframework.jdbc.BadSqlGrammarException: com.tengcai.vims.sporttery.entity.MATCH_HDC.addList (batch index #1) failed. Cause: java.sql.BatchUpdateException: You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near '' at line 2
+; bad SQL grammar []; nested exception is java.sql.BatchUpdateException: You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near '' at line 2
+	at org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean$MethodInvokingJob.executeInternal(MethodInvokingJobDetailFactoryBean.java:320)
+	at org.springframework.scheduling.quartz.QuartzJobBean.execute(QuartzJobBean.java:113)
+	at org.quartz.core.JobRunShell.run(JobRunShell.java:202)
+	... 1 more
+Caused by: org.springframework.jdbc.BadSqlGrammarException: com.tengcai.vims.sporttery.entity.MATCH_HDC.addList (batch index #1) failed. Cause: java.sql.BatchUpdateException: You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near '' at line 2
+; bad SQL grammar []; nested exception is java.sql.BatchUpdateException: You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near '' at line 2
+	at org.springframework.jdbc.support.SQLErrorCodeSQLExceptionTranslator.doTranslate(SQLErrorCodeSQLExceptionTranslator.java:237)
+	at org.springframework.jdbc.support.AbstractFallbackSQLExceptionTranslator.translate(AbstractFallbackSQLExceptionTranslator.java:72)
+	at org.mybatis.spring.MyBatisExceptionTranslator.translateExceptionIfPossible(MyBatisExceptionTranslator.java:73)
+	at org.mybatis.spring.SqlSessionUtils$SqlSessionSynchronization.beforeCommit(SqlSessionUtils.java:266)
+	at org.springframework.transaction.support.TransactionSynchronizationUtils.triggerBeforeCommit(TransactionSynchronizationUtils.java:95)
+	at org.springframework.transaction.support.AbstractPlatformTransactionManager.triggerBeforeCommit(AbstractPlatformTransactionManager.java:925)
+	at org.springframework.transaction.support.AbstractPlatformTransactionManager.processCommit(AbstractPlatformTransactionManager.java:738)
+	at org.springframework.transaction.support.AbstractPlatformTransactionManager.commit(AbstractPlatformTransactionManager.java:724)
+	at org.springframework.transaction.interceptor.TransactionAspectSupport.commitTransactionAfterReturning(TransactionAspectSupport.java:475)
+	at org.springframework.transaction.interceptor.TransactionAspectSupport.invokeWithinTransaction(TransactionAspectSupport.java:270)
+	at org.springframework.transaction.interceptor.TransactionInterceptor.invoke(TransactionInterceptor.java:94)
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:172)
+	at org.springframework.aop.interceptor.ExposeInvocationInterceptor.invoke(ExposeInvocationInterceptor.java:91)
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:172)
+	at org.springframework.aop.framework.JdkDynamicAopProxy.invoke(JdkDynamicAopProxy.java:204)
+	at com.sun.proxy.$Proxy34.save(Unknown Source)
+	at com.tengcai.vims.timer.SportteryTimer2.catchOdds(SportteryTimer2.java:277)
+	at sun.reflect.GeneratedMethodAccessor960.invoke(Unknown Source)
+	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.lang.reflect.Method.invoke(Method.java:606)
+	at org.springframework.util.MethodInvoker.invoke(MethodInvoker.java:273)
+	at org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean$MethodInvokingJob.executeInternal(MethodInvokingJobDetailFactoryBean.java:311)
+	... 3 more
+Caused by: java.sql.BatchUpdateException: You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near '' at line 2
+	at com.mysql.jdbc.SQLError.createBatchUpdateException(SQLError.java:1164)
+	at com.mysql.jdbc.PreparedStatement.executeBatchSerially(PreparedStatement.java:1773)
+	at com.mysql.jdbc.PreparedStatement.executeBatchInternal(PreparedStatement.java:1257)
+	at com.mysql.jdbc.StatementImpl.executeBatch(StatementImpl.java:959)
+	at org.apache.commons.dbcp.DelegatingStatement.executeBatch(DelegatingStatement.java:297)
+	at org.apache.commons.dbcp.DelegatingStatement.executeBatch(DelegatingStatement.java:297)
+	at sun.reflect.GeneratedMethodAccessor299.invoke(Unknown Source)
+	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.lang.reflect.Method.invoke(Method.java:606)
+	at org.apache.ibatis.logging.jdbc.PreparedStatementLogger.invoke(PreparedStatementLogger.java:85)
+	at com.sun.proxy.$Proxy47.executeBatch(Unknown Source)
+	at org.apache.ibatis.executor.BatchExecutor.doFlushStatements(BatchExecutor.java:103)
+	at org.apache.ibatis.executor.BaseExecutor.flushStatements(BaseExecutor.java:114)
+	at org.apache.ibatis.executor.BaseExecutor.flushStatements(BaseExecutor.java:109)
+	at org.apache.ibatis.executor.BaseExecutor.commit(BaseExecutor.java:201)
+	at org.apache.ibatis.executor.CachingExecutor.commit(CachingExecutor.java:104)
+	at org.apache.ibatis.session.defaults.DefaultSqlSession.commit(DefaultSqlSession.java:174)
+	at org.apache.ibatis.session.defaults.DefaultSqlSession.commit(DefaultSqlSession.java:169)
+	at org.mybatis.spring.SqlSessionUtils$SqlSessionSynchronization.beforeCommit(SqlSessionUtils.java:263)
+	... 21 more
+Caused by: com.mysql.jdbc.exceptions.jdbc4.MySQLSyntaxErrorException: You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near '' at line 2
+	at sun.reflect.GeneratedConstructorAccessor237.newInstance(Unknown Source)
+	at sun.reflect.DelegatingConstructorAccessorImpl.newInstance(DelegatingConstructorAccessorImpl.java:45)
+	at java.lang.reflect.Constructor.newInstance(Constructor.java:526)
+	at com.mysql.jdbc.Util.handleNewInstance(Util.java:404)
+	at com.mysql.jdbc.Util.getInstance(Util.java:387)
+	at com.mysql.jdbc.SQLError.createSQLException(SQLError.java:941)
+	at com.mysql.jdbc.MysqlIO.checkErrorPacket(MysqlIO.java:3870)
+	at com.mysql.jdbc.MysqlIO.checkErrorPacket(MysqlIO.java:3806)
+	at com.mysql.jdbc.MysqlIO.sendCommand(MysqlIO.java:2470)
+	at com.mysql.jdbc.MysqlIO.sqlQueryDirect(MysqlIO.java:2617)
+	at com.mysql.jdbc.ConnectionImpl.execSQL(ConnectionImpl.java:2550)
+	at com.mysql.jdbc.PreparedStatement.executeInternal(PreparedStatement.java:1861)
+	at com.mysql.jdbc.PreparedStatement.executeUpdateInternal(PreparedStatement.java:2073)
+	at com.mysql.jdbc.PreparedStatement.executeBatchSerially(PreparedStatement.java:1751)
+liufeng123
+
+ssh://git@113.4.12.13:20022/JDcaiyucaiqiu.git
+
+
+<Valve className="org.apache.catalina.valves.AccessLogValve" directory="logs"
+               prefix="access_log." suffix=".txt"
+               pattern="Remote User[ %{X-Forwarded-For}i %l %u %t ] Request[ &quot;%r&quot; ] Status Code[ %s ] Bytes[ %b ] Referer[ &quot;%{Referer}i&quot; ] Agent[ &quot;%{User-agent}i&quot; ]" />
+*************************************************************************************************************************
+<Valve className="org.apache.catalina.valves.AccessLogValve" directory="logs"
+               prefix="localhost_access_log." suffix=".txt"
+               pattern="Remote User[ %{X-Forwarded-For}i %l %u %t ] Request[ &quot;%r&quot; ] Status Code[ %s ] Bytes[ %b ]" />
+
+
+tomcat接受nginx传过来的真真实的ip      在server.xml    host  中加入此段
+************************************************************************************************************************************************************************************************
+
+
+
+v1.0.00.201706211648   v1.0.00.201706231319   v1.0.00.201706231340   v1.0.00.201706231538   v1.0.00.201706231556   v1.0.00.201706231600   v1.0.00.201706231623   v1.0.00.201706231630   v1.0.00.201706260813   v1.0.00.201706261405   v1.0.00.201706261445   v1.0.00.201706261552   v1.0.00.201706270952   v1.0.00.201706271145   v1.0.00.201706271638   v1.0.00.201706280824   v1.0.00.201706281116   v1.0.00.201706281126   v1.0.00.201706281430   v1.0.00.201706281721   
+
+v1.0.00.201703241111  v1.0.00.201703241126  v1.0.00.201703241438  v1.0.00.201703241630  v1.0.00.201703270941  v1.0.00.201703271110  v1.0.00.201703271313  v1.0.00.201703271404  v1.0.00.201703271436  v1.0.00.201703271446  v1.0.00.201703271455  v1.0.00.201703271523  v1.0.00.201703271815  v1.0.00.201703290936  v1.0.00.201703300945  v1.0.00.201703301314  v1.0.00.201703301420  v1.0.00.201703301624  v1.0.00.201703311511  v1.0.00.201703311638  v1.0.00.201703311800  v1.0.00.201704011337  v1.0.00.201704011353  v1.0.00.201704011551  v1.0.00.201704011751  v1.0.00.201704051556  v1.0.00.201704061006  v1.0.00.201704070917  v1.0.00.201704071049  v1.0.00.201704071326  v1.0.00.201704071502  v1.0.00.201704071659  v1.0.00.201704071710  v1.0.00.201704071717  v1.0.00.201704101058  v1.0.00.201704101100  v1.0.00.201704110919  v1.0.00.201704111030  v1.0.00.201704111122  v1.0.00.201704111605  v1.0.00.201704111618  v1.0.00.201704111631  v1.0.00.201704111653  v1.0.00.201704111713  v1.0.00.201704111722  v1.0.00.201704111737  v1.0.00.201704121525  v1.0.00.201704121555  v1.0.00.201704121714  v1.0.00.201704121755  v1.0.00.201704131524  v1.0.00.201704131604  
+
+v1.0.00.201705271457  v1.0.00.201705311023  v1.0.00.201705311508  v1.0.00.201705311522  v1.0.00.201705311653  v1.0.00.201706010933  v1.0.00.201706020836  v1.0.00.201706021442  v1.0.00.201706021503  v1.0.00.201706050752  v1.0.00.201706051325  v1.0.00.201706051823  v1.0.00.201706051844  v1.0.00.201706051902  v1.0.00.201706051915  v1.0.00.201706061327  v1.0.00.201706061932    v1.0.00.201706062301  v1.0.00.201706071055  v1.0.00.201706071351  v1.0.00.201706071437  v1.0.00.201706071528  v1.0.00.201706071604  v1.0.00.201706071800  v1.0.00.201706071941  v1.0.00.201706081215  v1.0.00.201706081308  v1.0.00.201706081721  v1.0.00.201706091128  v1.0.00.201706091655  v1.0.00.201706091935  v1.0.00.201706092010  v1.0.00.201706092228  v1.0.00.201706092247  v1.0.00.201706092311  v1.0.00.201706092355  v1.0.00.201706101320  v1.0.00.201706101424  v1.0.00.201706101451  v1.0.00.201706101707  v1.0.00.201706101737  v1.0.00.201706101930  v1.0.00.201706121014  v1.0.00.201706121030  v1.0.00.201706121135  v1.0.00.201706121638  v1.0.00.201706121904  v1.0.00.201706121907  v1.0.00.201706121944  v1.0.00.201706121957  v1.0.00.201706122105    v1.0.00.201706131433  v1.0.00.201706132123  v1.0.00.201706132134  v1.0.00.201706132145  v1.0.00.201706132159  v1.0.00.201706132241  v1.0.00.201706132332  v1.0.00.201706140821  v1.0.00.201706141316  v1.0.00.201706141447  v1.0.00.201706141813  
+
+
+v1.0.00.201703241112  v1.0.00.201703241631  v1.0.00.201703241710  v1.0.00.201703241752  v1.0.00.201703271314  v1.0.00.201703271456  v1.0.00.201703271533  v1.0.00.201703271547  v1.0.00.201703271817  v1.0.00.201703281037  v1.0.00.201703281708  v1.0.00.201703300946  v1.0.00.201703301037  v1.0.00.201703311513  v1.0.00.201703311645  v1.0.00.201703311759  v1.0.00.201704011339  v1.0.00.201704011357  v1.0.00.201704071352  v1.0.00.201704071505  v1.0.00.201704071740  v1.0.00.201704101105  v1.0.00.201704101319  v1.0.00.201704111000  v1.0.00.201704111037  v1.0.00.201704111127  v1.0.00.201704111624  v1.0.00.201704111734  v1.0.00.201704121310  v1.0.00.201704121438  v1.0.00.201704121533  v1.0.00.201704121558  v1.0.00.201704121658  v1.0.00.201704140947  v1.0.00.201704141301  v1.0.00.201704141417  v1.0.00.201704141516  v1.0.00.201704141744  v1.0.00.201704141801  v1.0.00.201704171430  v1.0.00.201704171514  v1.0.00.201704171713  v1.0.00.201704181018  v1.0.00.201704181116  v1.0.00.201704190950  v1.0.00.201704201127  v1.0.00.201704201239  v1.0.00.201704201753  v1.0.00.201704251540  v1.0.00.201704251656  v1.0.00.201704261110  
+
+
+CREATE DATABASE  jdmatchplay
+ DEFAULT CHARACTER SET utf8
+ DEFAULT COLLATE utf8_general_ci ;
+
+GRANT ALL PRIVILEGES ON jdmatchplay.* to 'jdmatch'@'%' IDENTIFIED BY 'mysqladminjdmatch1211';
+
+GRANT ALL PRIVILEGES ON jdmatchplay.* to 'jdmatch'@'localhost' IDENTIFIED BY 'mysqladminjdmatch1211';
+  京东web   http://113.4.12.12:8030/jdcqweb/home-foot.html
+  京东后台  http://113.4.12.12:8029/JDcaiqiuman/admin
+
+运动管家二期开发接口地址  http://113.4.12.12:8032/actmapi  
+
+
+京东项目数据库切换完毕
+京东web   http://113.4.12.12:8030/jdcqweb/
+京东后台  http://113.4.12.12:8029/jdcqman/admin
+
+
+在部署jdcaiqiu的tomcat的 webapps中建立以名为jdfiles 的文件夹，用来存储上传的图片，
+
+#项目图片访问地址
+hostimg.url=http://host:port/jdfiles/
+
+场馆接口地址  http://113.4.12.12:8003/venuesmapi/
+
+
+116.62.35.80   114.55.59.85 118.178.230.68  114.55.29.91  120.27.249.232  118.178.230.181
+
+
+rm   -rf   .git  .settings  .classpath  .gitignore
+
+rm   -rf   .git   .gitignore
+
+
+
+
+543d54f592df4c58913ea182c1cd5dc0
+66d0051347894603999b8dc53efa7baa
+a12e6e3036a64844908144626fb3fb4b
+ccc73732c2494b6ea83df7fca802f8e1
+dd6880e441214decb00accedf4e910c7
+
+cp /home/admin/backup/vconfig/test_config/jdbc.properties.venuesmapi  src/main/java/jdbc.properties
+cp /home/admin/backup/vconfig/test_config/peizhi.properties.venuesmapi  src/main/java/peizhi.properties
+
+TcNexus373
+
+
+wangchunyu123
+***********************
+113.6.252.61  
+admin
+yunshou
+浏览器访问 或vnc访问
+香江技术 2017-05-20 11:38:41
+yunshou
+**********************
+
+
+ip:221.208.170.175  ｜ 数据库名称：yundongguanjia ｜ 用户名：ydgjlt    ｜ 密码：ydgjltmysqladminhljsport
+
+mvn deploy:deploy-file -DgroupId=com.jd.image -DartifactId=image-common -Dversion=1.0.4 -Dpackaging=jar -Dfile=C:\Users\wangchunyu\Desktop\JdCode\image-common-1.0.4-SNAPSHOT.jar -Durl=http://113.4.12.13:8081/nexus/content/repositories/snapshots/ -DrepositoryId=Snapshots
+
+/home/admin/softs
+
+mvn deploy:deploy-file -DgroupId=com.jd.image -DartifactId=image-common -Dversion=1.0.4 -Dpackaging=jar -Dfile=/home/admin/softs/image-common-1.0.4-SNAPSHOT.jar -Durl=http://113.4.12.13:8081/nexus/content/repositories/snapshots/ -DrepositoryId=snapshots
+
+mvn deploy:deploy-file -DgroupId=com.jd.image -DartifactId=image-common -Dversion=1.0.4 -Dpackaging=jar -Dfile=C:\Users\wangchunyu\Desktop\JdCode\image-common-1.0.4-SNAPSHOT.jar -Durl=http://113.4.12.13:8081/nexus/content/repositories/snapshots/ -DrepositoryId=snapshots
+
+
+
+*********************************************************************************************************************************************************************************************************************************************************************************************
+好用
+mvn deploy:deploy-file -DgroupId=com.jd.image -DartifactId=image-common -Dversion=1.0.4-SNAPSHOT -Dpackaging=jar -Dfile=C:/Users/wangchunyu/Desktop/JdCode/image-common-1.0.4-SNAPSHOT.jar -Durl=http://113.4.12.13:8081/nexus/content/repositories/snapshots/ -DrepositoryId=snapshots
+*********************************************************************************************************************************************************************************************************************************************************************************************
+如果启用该选项，传输日志文件将以标准 xferlog 的格式书写，该格式的日志文件默认为 /var/log/xferlog，也可以通过 xferlog_file 选项对其进行设定。默认值为NO。
+dual_log_enable
+如果启用该选项，将生成两个相似的日志文件，默认在 /var/log/xferlog 和 /var/log/vsftpd.log 目录下。前者是 wu-ftpd 类型的传输日志，可以利用标准日志工具对其进行分析；后者是Vsftpd类型的日志。
+syslog_enable
+如果启用该选项，则原本应该输出到/var/log/vsftpd.log中的日志，将输出到系统日志中。
+常见的日志解决方案如下：
+
+xferlog_enable=YES
+xferlog_std_format=YES
+xferlog_file=/var/log/xferlog
+dual_log_enable=YES
+vsftpd_log_file=/var/log/vsftpd.log
+
+该方案将xferlog_enable设置为YES，表明FTP服务器记录上传下载的情况，而将xferlog_std_format也设置为YES，则表明将记录的上传下载情况写在xferlog_file所指定的文件中，即/var/log/xferlog文件。
+同时，该方案启用dual_log_enable，表明启用了双份日志。在用xferlog文件记录服务器上传下载情况的同时，vsftpd_log_file所指定的文件，即/var/log/vsftpd.log，也将用来记录服务器的传输情况。
+下面分别查看xferlog文件和vsftpd.log文件的内容。
+
+
+
+cp /home/admin/backup/vconfig/formal_config/jdbc.properties.actmapi   src/main/resources/jdbc.properties
+cp /home/admin/backup/vconfig/formal_config/user.properties.actmapi   src/main/resources/user.properties
+http://www.hljsporto2o.com
+
+
+elif [ "x${proj}" = "xactmadm" ]
+then
+  cp /home/admin/backup/vconfig/formal_config/jdbc.properties.actmadm   src/main/resources/jdbc.properties
+  cp /home/admin/backup/vconfig/formal_config/sms.properties.actmadm   src/main/resources/sms.properties
+
+
+
+elif [ "x${proj}" = "xvenuesmapi" ]
+then
+  cp /home/admin/backup/vconfig/formal_config/jdbc.properties.actmapi  src/main/java/jdbc.properties
+  cp /home/admin/backup/vconfig/formal_config/peizhi.properties.venuesmapi  src/main/java/peizhi.properties
+
+
+2017年8月1日
+2017年8月2日
+2017年8月3日
+2017年8月4日
+2017年8月7日
+2017年8月8日
+2017年8月9日
+2017年8月10日
+2017年8月11日
+2017年8月14日
+2017年8月15日
+2017年8月16日
+2017年8月17日
+2017年8月18日
+2017年8月21日
+2017年8月22日
+2017年8月23日
+2017年8月24日
+2017年8月25日
+2017年8月28日
+2017年8月29日
+2017年8月30日
+2017年8月31日
+
+scp -P 20022 admin@113.4.12.13:/home/admin/works/venueadmin/target/venueadmin.war .
+
+
+
+
+安卓运动管家二期最新版本测试下载地址：113.6.251.97:8016/sports/ydxgj_v2.0.00.apk
+
+
+参数文件：
+   设定数据库的限制
+   设定用户或者进程的限制
+   设定数据库资源设置限制
+
+show parameter  control
+
+SQL> select  file_name,tablespace_name from   dba_data_files;
+查询表空间，数据文件
+
+
+revoke 收回权限
+
+SQL> grant  all  on emp   to  user1  with  grant  option  ;
+
+
+账户锁定  创建profile  文件
+
+Wcy123456
+  alter   user  tea  account  ulock;
+
+
+  tc999888!@#25197app
+
+  京东后台：http://113.4.12.12:8029/jdcqman
+  京东web：http://113.4.12.12:8030/jdcqweb/
+
+
+git  tag   -a  $Version_Number   -m "$Version_Number "
+git  push  --tags  
+
+git  tag   -a  v1.0.00_201708041830  -m "v1.0.00_201708041830"
+git  push  --tags  
+
+rm  -rf  .git  .gitignore
+
+tar   -zcvf  jdfbdata_v1.0.00_201708041830.tar.gz   jdfbdata
+
+tar   -zcvf  jcgamelogic_v1.0.00_201708041830.tar.gz  jcgamelogic
+
+tar  -zcvf   jdcaiqiu_v1.0.00_201708041830.tar.gz  jdcaiqiu
+
+tar   -zcvf   jdcqweb_v1.0.00_201708041830.tar.gz  jdcqweb
+
+tc999888!@#11975app
+
+
+#!/bin/bash
+#mysql backup
+DBNAME="yundongguanjia"
+BACKPATH="/home/app/backup"
+USER=ydgjlt
+PASSWORD=ydgjltmysqladminhljsport
+if [ ! -d $BACKPATH ];then
+  mkdir -p $BACKPATH
+fi
+/home/apps/mysql/bin/mysqldump -h 127.0.0.1  -u$USER  -p$PASSWORD -B     yundongguanjia    >$BACKPATH/$DBNAME-$(date +%Y%m%d).sql
+cd $BACKPATH
+tar zPcf $DBNAME-$(date +%Y%m%d).sql.tar.gz $DBNAME-$(date +%Y%m%d).sql
+find $BACKPATH -mtime +5 -name "*.sql.tar.gz" |xargs rm -rf {} 
+rm -rf $BACKPATH/*.sql
+find $BACKPATH -mtime +2 -name "*.sql.tar.gz" |xargs rm -rf {}
+#scp -p 20022  $BACKPATH/$DBNAME-$(date +%Y%m%d).sql.tar.gz root@221.208.171.174:/backup
+
+extmailmysqladmin
+mysql
+
+update MySQL.user set password=PASSWORD('mysqladmin170176root') where User='root';
+
+mysqladmin170176root
+
+
+
+
+一、更改my.cnf配置文件
+
+1.用命令编辑/etc/my.cnf配置文件，即：vim /etc/my.cnf 或者 vi /etc/my.cnf
+
+2.在[mysqld]下添加skip-grant-tables，然后保存并退出
+
+3.重启mysql服务：service mysqld restart
+
+二、更改root用户名
+
+1.重启以后，执行mysql命令进入mysql命令行
+2.修改root用户密码	
+MySQL> UPDATE mysql.user SET Password=PASSWORD('新密码') where USER='root';
+MySQL> flush privileges; 
+MySQL> exit
+3.把/etc/my.cnf中的skip-grant-tables注释掉，然后重启mysql，即：service mysqld restart
+
+导出库
+   mysqldump -uroot -proot --databases db1 db2 >/tmp/user.sql
+导出數據库為dbname某张表(test)结构及表數據（不加-d）
+   mysqldump -uroot -pdbpasswd dbname test>db.sql;
