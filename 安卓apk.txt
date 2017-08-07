@@ -1,0 +1,125 @@
+1.上传android-sdk_r24.4.1-linux.tgz 到/mnt
+# tar xf android-sdk_r24.4.1-linux.tgz
+# cd android-sdk-linux/
+# vim /etc/profile.d/android.sh
+#!/bin/bash
+export ANDROID_HOME='/mnt/android-sdk-linux'  
+export PATH=$ANDROID_HOME/tools:$PATH 
+# chmod +x /etc/profile.d/android.sh
+# /etc/profile.d/android.sh 
+重开终端：
+# android
+# android list sdk --all
+# android update sdk -u
+------------------------安卓JDK完成---------------------------------------------------
+# cd /mnt
+# rz -be jdk-8u101-linux-x64.tar.gz
+# tar xf jdk-8u101-linux-x64.tar.gz
+# cd /etc/profile.d/jdk.sh
+JAVA_HOME=/mnt/jdk1.8.0_101
+JRE_HOME=$JAVA_HOME/jre
+PATH=$PATH:$JAVA_HOME/bin:$JRE_HOME/bin
+CLASSPATH=:$JAVA_HOME/lib/dt.jar:$JAVA_HOME/lib/tools.jar:$JRE_HOME/lib
+export JAVA_HOME JRE_HOME PATH CLASSPATH
+# chmod +x jdk.sh
+# ./jdk.sh
+[root@lamp ~]# rpm -qa | grep java 
+python-javapackages-3.4.1-6.el7_0.noarch
+java-1.7.0-openjdk-1.7.0.75-2.5.4.2.el7_0.x86_64
+tzdata-java-2015a-1.el7.noarch
+javapackages-tools-3.4.1-6.el7_0.noarch
+java-1.7.0-openjdk-headless-1.7.0.75-2.5.4.2.el7_0.x86_64
+[root@lamp ~]# rpm -e --nodeps python-javapackages-3.4.1-6.el7_0.noarch
+[root@lamp ~]# rpm -e --nodeps java-1.7.0-openjdk-1.7.0.75-2.5.4.2.el7_0.x86_64
+[root@lamp ~]# rpm -e --nodeps tzdata-java-2015a-1.el7.noarch
+[root@lamp ~]# rpm -e --nodeps javapackages-tools-3.4.1-6.el7_0.noarch
+[root@lamp ~]# rpm -e --nodeps java-1.7.0-openjdk-headless-1.7.0.75-2.5.4.2.el7_0.x86_64
+# java -version 能看到JDK环境变量配置成功1.8
+--------------------------JAVA JKD配置完成-----------------------------------------------
+# cd /mnt
+# rz -be gradle-2.10-bin.zip
+# unzip gradle-2.10-bin.zip
+# vim /etc/profile.d/gradle.sh
+#!/bin/bash
+export GRADLE_HOME=/mnt/gradle-2.10
+export PATH=$GRADLE_HOME/bin:$PATH
+# chmod +x gradle.sh
+# ./gradle.sh
+# gradle -v 能查看到相关版本信息
+---------------------------gradle环境安装完成---------------------------------------------
+# ssh-keygen （将生成的公钥上传到网页端git ssh keys）
+# yum install git
+#  mkdir /project
+# git clone ssh://git@222.171.119.77:20022/hljtcp/hljtcpandroid.git
+# cd /project/hljtcpandroid
+# gradle task 会有报错
+# cd /project/hljtcpandroid/app
+# vim build.gradle
+把这行：
+buildToolsVersion "24.0.0"
+修改成：
+buildToolsVersion "26 rc1"
+# cd /project/hljtcpandroid/springview
+# vim build.gradle 
+把这行： 
+buildToolsVersion "23.0.2"
+compileSdkVersion 23
+修改成：
+compileSdkVersion 24
+buildToolsVersion "26 rc1"
+# grandle task
+# touch /project/hljtcpandroid/local.properties
+# grandle task
+# cd /project/hljtcpandroid/swipemenulib
+# vim build.gradle 
+把这行：
+    compileSdkVersion 23
+    buildToolsVersion "23.0.3"
+修改成：
+ compileSdkVersion 24
+    buildToolsVersion "26 rc1"
+# gradle task 没有报错了，成功了
+# vim /project/hljtcpandroid/app/build.gradle 注释其它平台的包
+     yingyongbao {}
+      //  huawei {}
+      //  anzhi {}
+      //  lianxiangleshangdian {}
+     //   qh360 {}
+     //   baidu {}
+     //   wandoujia {}
+
+# cd /project/hljtcpandroid
+# gradle build
+# vim /project/hljtcpandroid/app/build.gradle
+最下面加入：
+android {
+      lintOptions {
+          abortOnError false
+      }
+  }
+
+# gradle build 还有报错
+# vim /project/hljtcpandroid/springview/build.gradle 
+tasks.withType(Javadoc) {
+    options.addStringOption('Xdoclint:none', '-quiet')
+    options.addStringOption('encoding', 'UTF-8')
+    options.addStringOption('charSet', 'UTF-8')
+  }
+
+# gradle build
+# vim /project/hljtcpandroid/springview/build.gradle 
+android {
+      lintOptions {
+          abortOnError false
+      }
+  }
+# # gradle build 成功了
+签名：
+# vim /project/hljtcpandroid/app/build.gradle
+android {
+      lintOptions {
+          abortOnError false
+      }
+  }
+# # gradle clean
+# gradle build
