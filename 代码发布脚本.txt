@@ -1,0 +1,197 @@
+#!/bin/bash
+#Deployment Test Environment
+#v1.0.01  增加指定版本号，发布某版本功能
+if [ $# -ne 3 -a  $# -ne 2 ]
+then
+echo "Usage: `basename $0` [projs:jdfbcpapi|jdcqweb|jcgamelogic|jdcaiqiu|venuesmapi|jdfbdata|acmtadm|actmapi|hljsigweb|barcelonaentry|teenagers|spltdata|sportsdt|sportsmwap|hljtcpadm|hljtcpapi|venstocks|fbcpdata|cpstoreapi|userwebservice|tcjfweb|tcjfadmin|venueappapi|venueadmin|venuemanage|vinfoservice|orderservice|longtiweb|sportsmapi] [Version-Number]"
+exit 1
+fi
+proj="$1"
+Number="$2"
+Version="$3"
+Time=$(date +%Y%m%d%H%M)
+Version_Number=$Number.$Time
+password=tc999888!@#app
+if [     "x${proj}" != "xjdfbcpapi" -a  "x${proj}" != "xjdcqweb" -a   "x${proj}" != "xjcgamelogic" -a  "x${proj}" != "xjdcaiqiu" -a  "x${proj}" != "xvenuesmapi" -a   "x${proj}" != "xjdfbdata" -a   "x${proj}" != "xactmadm" -a   "x${proj}" != "xhljsigweb" -a  "x${proj}" != "xactmapi" -a  "x${proj}" != "xbarcelonaentry"  -a  "x${proj}" != "xteenagers"  -a  "x${proj}" != "xspltdata"  -a  "x${proj}" != "xsportsdt"  -a    "x${proj}" != "xsportsmwap"  -a   "x${proj}" != "xhljtcpadm" -a  "x${proj}" != "xhljtcpapi" -a  "x${proj}" != "xfbcpdata" -a    "x${proj}" != "xcpstoreapi" -a    "x${proj}" != "xuserwebservice" -a  "x${proj}" != "xtcjfweb" -a "x${proj}" != "xtcjfadmin" -a  "x${proj}" != "xsportsmapi" -a "x${proj}" != "xjdorder" -a "x${proj}" != "xvenueadmin" -a "x${proj}" != "xvenuemanage" -a  "x${proj}" != "xvinfoservice" -a "x${proj}" != "xorderservice" -a "x${proj}" != "xventimer" -a "x${proj}" != "xvenstocks" -a "x${proj}" != "xlongtiweb" -a "x${proj}" != "xvenueappapi" ]
+then
+  echo "The project name input error!"
+  exit 1 
+fi
+
+workdir="$HOME/works"
+cd $workdir/$proj
+[ $? -ne 0 ] && exit 1
+
+#git checkout v1.0.0_mysql
+#git checkout master
+
+
+if  [ x$Version == "x" ];then
+   if  [  "x${proj}" == "xtcjfweb"  ];then
+         git  checkout  hljtcpweb
+         [  $? -ne 0 ] && exit 1
+   else
+         git checkout  master
+   fi
+   git pull
+   [ $? -ne 0 ] && exit 1
+   echo "Git Pull Success"
+else
+   git  checkout  $Version
+   [  $? -ne 0 ] && exit 1
+fi
+
+
+mvn clean
+echo "Mvn Clean Success"
+if [ "x${proj}" = "xvenueadmin"  ]
+then
+  cp /home/admin/backup/vconfig/test_config/jdbc.properties.venueadmin  src/main/resources/jdbc.properties
+  cp  /home/admin/backup/vconfig/test_config/sms.properties.venueadmin  src/main/resources/sms.properties
+elif [ "x${proj}" = "xvenuemanage" ]
+then
+  cp /home/admin/backup/vconfig/test_config/jdbc.properties.actmadm  src/main/resources/jdbc.properties
+  cp /home/admin/backup/vconfig/test_config/leshi.properties.venuemanage    src/main/resources/leshi.properties
+elif [ "x${proj}" = "xvenueappapi" ]
+then
+  cp /home/admin/backup/vconfig/test_config/jdbc.properties.venueadmin   src/main/java/jdbc.properties
+  cp /home/admin/backup/vconfig/test_config/peizhi.properties.venueappapi  src/main/java/peizhi.properties
+elif [ "x${proj}" = "xvenuesmapi" ]
+then
+  cp /home/admin/backup/vconfig/test_config/jdbc.properties.actmapi  src/main/java/jdbc.properties
+  cp /home/admin/backup/vconfig/test_config/peizhi.properties.venuesmapi  src/main/java/peizhi.properties
+elif [ "x${proj}" = "xvenstocks" ]
+then
+  cp /home/admin/backup/vconfig/test_config/jdbc.properties.actmadm  src/main/resources/jdbc.properties
+  cp /home/admin/backup/vconfig/test_config/send.properties.venstocks   src/main/resources/send.properties
+elif [ "x${proj}" = "xvinfoservice" ] 
+then
+  cp /home/admin/backup/vconfig/test_config/jdbc.properties.info_mysql_pro src/main/java/jdbc.properties
+elif [ "x${proj}" = "xorderservice" ]
+then
+  cp /home/admin/backup/vconfig/test_config/jdbc.properties.order_mysql_pro src/main/java/jdbc.properties
+elif [ "x${proj}" = "xventimer"  ]
+then
+  cp /home/admin/backup/vconfig/test_config/jdbc.properties.actmadm   src/main/resources/jdbc.properties
+  cp /home/admin/backup/vconfig/test_config/leshi.properties.ventimer   src/main/resources/leshi.properties
+elif [ "x${proj}" = "xlongtiweb" ]
+then
+  cp /home/admin/backup/vconfig/test_config/jdbc.properties.longtiweb src/main/resources/jdbc.properties
+elif [ "x${proj}" = "xtcjfadmin" ]
+then
+  cp /home/admin/backup/vconfig/test_config/jdbc.properties.tcjfadmin  src/main/resources/jdbc.properties
+  cp /home/admin/backup/vconfig/test_config/sms.properties.tcjfadmin   src/main/resources/sms.properties
+elif [ "x${proj}" = "xtcjfweb" ]
+then
+  cp /home/admin/backup/vconfig/test_config/jdbc.properties.tcjfweb  src/main/resources/jdbc.properties
+  cp /home/admin/backup/vconfig/test_config/user.properties.tcjfweb    src/main/resources/user.properties
+  cp /home/admin/backup/vconfig/test_config/sms.properties.tcjfweb     src/main/resources/sms.properties
+  cp /home/admin/backup/vconfig/test_config/img.properties_hljtcpadm   src/main/resources/img.properties
+elif [ "x${proj}" = "xsportsmapi" ]
+then
+  cp /home/admin/backup/vconfig/test_config/jdbc.properties.venueadmin  src/main/resources/jdbc.properties
+  cp /home/admin/backup/vconfig/test_config/user.properties.sportsmapi  src/main/resources/user.properties
+elif [ "x${proj}" = "xuserwebservice" ]
+then
+  cp /home/admin/backup/vconfig/test_config/jdbc.properties.userwebservice  src/main/resources/jdbc.properties
+  cp /home/admin/backup/vconfig/test_config/user.properties.userwebservice  src/main/resources/user.properties
+elif [ "x${proj}" = "xfbcpdata" ]
+then
+  cp /home/admin/backup/vconfig/test_config/jdbc.properties.fbcpdata  src/main/resources/jdbc.properties
+
+elif [ "x${proj}" = "xcpstoreapi" ]
+then
+  cp /home/admin/backup/vconfig/test_config/jdbc.properties.tcjfadmin   src/main/java/jdbc.properties
+elif [ "x${proj}" = "xhljtcpapi" ]
+then
+  cp /home/admin/backup/vconfig/test_config/jdbc.properties.hljtcpapi   src/main/resources/jdbc.properties
+  cp /home/admin/backup/vconfig/test_config/user.properties.hljtcpapi   src/main/resources/user.properties
+  cp /home/admin/backup/vconfig/test_config/img.properties_hljtcpadm   src/main/resources/img.properties
+
+elif [ "x${proj}" = "xhljtcpadm" ]
+then
+  cp /home/admin/backup/vconfig/test_config/jdbc.properties.hljtcpadm   src/main/resources/jdbc.properties
+  cp /home/admin/backup/vconfig/test_config/sms.properties.hljtcpadm   src/main/resources/sms.properties
+  cp /home/admin/backup/vconfig/test_config/img.properties_hljtcpadm   src/main/resources/img.properties
+
+elif [ "x${proj}" = "xsportsmwap" ]
+then
+  cp /home/admin/backup/vconfig/test_config/jdbc.properties.sportsmwap   src/main/resources/jdbc.properties
+  cp /home/admin/backup/vconfig/test_config/user.properties.sportsmwap  src/main/resources/user.properties
+
+elif [ "x${proj}" = "xsportsdt" ]
+then
+  cp /home/admin/backup/vconfig/test_config/jdbc.properties.sportsdt   src/main/resources/jdbc.properties
+elif [ "x${proj}" = "xspltdata" ]
+then
+  cp /home/admin/backup/vconfig/test_config/jdbc.properties.spltdata  src/main/resources/jdbc.properties
+
+elif [ "x${proj}" = "xteenagers" ]
+then
+  cp /home/admin/backup/vconfig/test_config/jdbc.properties.hljmatch   src/main/resources/jdbc.properties
+  cp /home/admin/backup/vconfig/test_config/user.properties.hljmatch  src/main/resources/user.properties
+  cp /home/admin/backup/vconfig/test_config/sms.properties.hljmatch   src/main/resources/sms.properties
+elif [ "x${proj}" = "xbarcelonaentry" ]
+then
+  cp /home/admin/backup/vconfig/test_config/jdbc.properties.hljbcn   src/main/resources/jdbc.properties
+  cp /home/admin/backup/vconfig/test_config/user.properties.hljbcn  src/main/resources/user.properties
+elif [ "x${proj}" = "xactmapi" ]
+then
+  cp /home/admin/backup/vconfig/test_config/jdbc.properties.actmapi   src/main/resources/jdbc.properties
+  cp /home/admin/backup/vconfig/test_config/user.properties.actmapi   src/main/resources/user.properties
+elif [ "x${proj}" = "xhljsigweb" ]
+then
+  cp /home/admin/backup/vconfig/test_config/jdbc.properties.hljsig   src/main/resources/jdbc.properties
+elif [ "x${proj}" = "xactmadm" ]
+then
+  cp /home/admin/backup/vconfig/test_config/jdbc.properties.actmadm   src/main/resources/jdbc.properties
+  cp /home/admin/backup/vconfig/test_config/sms.properties.actmadm   src/main/resources/sms.properties
+
+elif [ "x${proj}" = "xjdfbcpapi" ]
+then
+  cp /home/admin/backup/vconfig/test_config/jdbc.properties.jdfbcpapi   src/main/resources/jdbc.properties
+
+else
+  echo "The Code Project Name Is Error!"
+  exit 1
+fi
+
+mvn package
+
+#[ $? -ne 0 ] && exit 1
+if [ $? -ne 0 ];then
+
+  echo  "${proj} Compile Faild"
+  exit 1
+else
+  echo  "${proj} Compile Successful"
+fi
+
+git log |head -40
+git  tag   -a  $Version_Number   -m "$Version_Number "
+git  push  --tags  
+ 
+[  "x${proj}" = "xventimer" -o  "x${proj}" = "xjdfbcpapi" -o  "x${proj}" = "xactmadm" -o  "x${proj}" = "xhljsigweb" -o  "x${proj}" = "xuserwebservice" -o  "x${proj}" = "xactmapi" -o  "x${proj}" = "xbarcelonaentry" -o   "x${proj}" = "xteenagers" -o  "x${proj}" = "xspltdata" -o    "x${proj}" = "xsportsdt" -o   "x${proj}" = "xsportsmwap" -o   "x${proj}" = "xhljtcpadm" -o  "x${proj}" = "xhljtcpapi" -o    "x${proj}" = "xfbcpdata" -o  "x${proj}" = "xtcjfweb" -o "x${proj}" = "xtcjfadmin" -o  "x${proj}" = "xlongtiweb" -o  "x${proj}" = "xsportsmapi" -o "x${proj}" = "xvenueadmin" -o "x${proj}" = "xvenuemanage" -o "x${proj}" = "xvenstocks" ] && git checkout -- src/main/resources/jdbc.properties
+[    "x${proj}" = "xvenuesmapi" -o  "x${proj}" = "xcpstoreapi" -o   "x${proj}" = "xvenueappapi" -o "x${proj}" = "xvinfoservice" -o "x${proj}" = "xorderservice" -o  "x${proj}" = "xjdorder" ] && git checkout -- src/main/java/jdbc.properties
+[  "x${proj}" = "xactmapi" -o "x${proj}" = "xuserwebservice" -o  "x${proj}" = "xbarcelonaentry" -o  "x${proj}" = "xteenagers" -o  "x${proj}" = "xsportsmwap" -o     "x${proj}" = "xtcjfweb" -o "x${proj}" = "xsportsmapi" -o "x${proj}" = "xhljtcpapi"   ] && git checkout -- src/main/resources/user.properties
+[  "x${proj}" = "xactmadm"  -o  "x${proj}" = "xteenagers"  -o   "x${proj}" = "xhljtcpadm"  -o  "x${proj}" = "xtcjfweb"  -o  "x${proj}" = "xtcjfadmin" -o "x${proj}" = "xvenueadmin"    ] && git checkout -- src/main/resources/sms.properties
+[  "x${proj}" = "xventimer" -o  "x${proj}" = "xactmapi" -o   "x${proj}" = "xvenuemanage"  ]   && git checkout -- src/main/resources/leshi.properties
+
+[   "x${proj}" = "xvenueappapi" -o   "x${proj}" = "xvenuesmapi"  ]  && git checkout -- src/main/java/peizhi.properties
+[   "x${proj}" = "xvenstocks" ]  && git checkout -- src/main/resources/send.properties
+#[    "x${proj}" = "xventimer"  ]   && git checkout -- src/main/java/leshi.properties
+#[  "x${proj}" = "xuserwebservice"  ]   && git checkout -- src/main/java/user.properties
+
+
+#version
+echo   $proj/$Version_Number  >/home/admin/bin/temp/test.log
+echo  "Wait for a While......"
+/usr/bin/sshpass  -p $password  scp  -P  20022  /home/admin/bin/temp/test.log    app@113.6.251.97:/home/app/temp  &>/dev/null 
+/usr/bin/sshpass  -p $password  ssh  -p  20022  app@113.6.251.97 '/home/app/temp/dir_mk.sh'
+#ssh war
+/usr/bin/sshpass  -p $password  scp  -P   20022  target/*.war   app@113.6.251.97:/home/app/project_bak/beta/$proj/$Version_Number 
+if [ $? ==  0 ];then
+   echo  "Complete!!"
+else
+   echo "Ssh  Transmission Failed"
+fi
