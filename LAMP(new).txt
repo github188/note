@@ -579,3 +579,6 @@ ProxyPassMatch：把以.php结尾的文件请求发送到php-fpm进程，php-fpm
     DirectoryIndex  index.php  index.html
 
 补充：Apache httpd 2.4以前的版本中，要么把PHP作为Apache的模块运行，要么添加一个第三方模块支持PHP-FPM实现。
+
+113.4.12.13  admin  hycadmin333     20022
+113.4.12.12  actmapi  tc999888!@#    20022
