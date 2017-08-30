@@ -1,0 +1,814 @@
+FastDFS介绍
+FastDFS 服务有三个角色：跟踪服务器（tracker server）、存储服务器（storage server）和客户端（client）
+tracker server：跟踪服务器，主要做调度工作，起到均衡的作用；负责管理所有的 storage server和group，每个 storage 在启动后会连接 Tracker，告知自己所属 group 等信息，并保持周期性心跳，Tracker根据 storage 心跳信息，建立 group--->[storage server list]的映射表；tracker 管理的元数据很少，会直接存放在内存；tracker 上的元信息都是由 storage 汇报的信息生成的，本身不需要持久化任何数据，tracker 之间是对等关系，因此扩展 tracker 服务非常容易，直接增加tracker 服务器即可，所有 tracker 都接受 stroage 心跳信息，生成元数据信息来提供读写服务（与其他 Master-Slave 架构的优势是没有单点，tracker 也不会成为瓶颈，最终数据是和一个可用的Storage Server 进行传输的）
+
+storage server：存储服务器，主要提供容量和备份服务；以 group 为单位，每个 group 内可以包含多台 storage server，数据互为备份，存储容量空间以 group 内容量最小的 storage 为准；建议 group 内的 storage server 配置相同；以 group 为单位组织存储能够方便的进行应用隔离、负载均衡和副本数定制；缺点是 group 的容量受单机存储容量的限制， 同时 group 内机器坏掉，数据恢复只能依赖 group 内其他机器重新同步（坏盘替换，重新挂载重启 fdfs_storaged 即可）
+
+多个 group 之间的存储方式有 3 种策略：round robin（轮询）、load  balance（选择最大剩余空间的组上传文件）、specify group（指定 group 上传）
+
+
+group 中 storage 存储依赖本地文件系统，storage 可配置多个数据存储目录， 磁盘不做 raid，直接分别挂载到多个目录，将这些目录配置为 storage 的数据目录即可
+
+storage 接受写请求时，会根据配置好的规则，选择其中一个存储目录来存储文件；为避免单个目录下的文件过多，storage 第一次启动时，会在每个数据存储目录里创建 2 级子目录，每级 256个，总共 65536 个，新写的文件会以 hash 的方式被路由到其中某个子目录下，然后将文件数据直接作为一个本地文件存储到该目录中
+
+
+
+
+FastDFS基础服务安装
+# cd /usr/local/src
+# wget https://codeload.github.com/happyfish100/libfastcommon/tar.gz/V1.0.7 -O libfastcommon-1.0.7.tar.gz
+# tar xvzf libfastcommon-1.0.7.tar.gz
+# cd libfastcommon-1.0.7
+# ./make.sh
+# ./make.sh install
+**************************************
+cd /usr/local/src
+#wget https://github.com/happyfish100/fastdfs/archive/V5.05.tar.gz
+# tar xvzf FastDFS_v5.05.tar.gz
+# cd FastDFS
+# ./make.sh
+# ./make.sh install
+
+*************************************************
+创建数据目录
+# mkdir -p /data/fastdfs
+
+***************************************************************************************************
+一、tracker配置(tracker节点)
+vim /etc/fdfs/tracker.conf
+****************************
+disabled=false
+bind_addr=
+port=22122
+connect_timeout=30
+network_timeout=60
+base_path=/data/fastdfs
+max_connections=1024
+accept_threads=6
+work_threads=24
+store_lookup=2
+store_group=group2
+store_server=0
+store_path=0
+download_server=0
+reserved_storage_space = 10%
+log_level=info
+run_by_group=
+run_by_user=
+allow_hosts=*
+sync_log_buff_interval = 10
+check_active_interval = 120
+thread_stack_size = 64KB
+storage_ip_changed_auto_adjust = true
+storage_sync_file_max_delay = 86400
+storage_sync_file_max_time = 300
+use_trunk_file = false 
+slot_min_size = 256
+slot_max_size = 16MB
+trunk_file_size = 64MB
+trunk_create_file_advance = false
+trunk_create_file_time_base = 02:00
+trunk_create_file_interval = 86400
+trunk_create_file_space_threshold = 20G
+trunk_init_check_occupying = false
+trunk_init_reload_from_binlog = false
+trunk_compress_binlog_min_interval = 0
+use_storage_id = false
+storage_ids_filename = storage_ids.conf
+id_type_in_filename = ip
+store_slave_file_use_link = false
+rotate_error_log = true
+error_log_rotate_time=00:00
+rotate_error_log_size = 0
+log_file_keep_days = 7
+use_connection_pool = false
+connection_pool_max_idle_time = 3600
+http.server_port=8080
+http.check_alive_interval=30
+http.check_alive_type=tcp
+http.check_alive_uri=/status.html
+*********************************
+# ln -s /usr/bin/fdfs_trackerd /usr/local/bin
+# ln -s /usr/bin/stop.sh /usr/local/bin
+# ln -s /usr/bin/restart.sh /usr/local/bin
+起动trackerd程序
+# service fdfs_trackerd start
+
+
+nginx部署（tracker节点）
+在tracker上安装nginx主要是为了提供http访问的反向代理、负载均衡以及缓存服务。
+需要安装的软件包：zlib、pcre、openssl、luajit、geoip、tengine、ngx_cache_purge
+
+# echo "/usr/local/lib" >> /etc/ld.so.conf
+# echo "/usr/local/lib64" >> /etc/ld.so.conf
+# /sbin/ldconfig
+******************************************************
+# mkdir -p /var/log/nginx
+# mkdir -p /var/nginx_temp/{nginx_client,nginx_proxy,nginx_fastcgi,nginx_temp,nginx_cache}
+
+# yum -y install libxml2 libxml2-devel libxslt libxslt-devel gd gd-devel
+# cd /usr/local/src
+# wget http://sourceforge.net/projects/libpng/files/zlib/1.2.8/zlib-1.2.8.tar.gz
+# tar xvzf zlib-1.2.8.tar.gz
+# cd zlib-1.2.8
+# ./configure --prefix=/usr/local
+# make && make install
+******************************************************
+
+https://ftp.pcre.org/pub/pcre/pcre-8.36.tar.gz
+# cd /usr/local/src
+# wget https://ftp.pcre.org/pub/pcre/pcre-8.36.tar.gz
+# tar xvzf pcre-8.36.tar.gz
+# cd pcre-8.36
+# ./configure --prefix=/usr/local
+# make && make install
+
+****************************************************
+# cd /usr/local/src
+# wget http://www.openssl.org/source/openssl-1.0.1m.tar.gz
+# tar xvzf openssl-1.0.1m.tar.gz
+# cd openssl-1.0.1m
+# ./config shared --prefix=/usr/local
+# make && make install
+****************************************************
+
+# cd /usr/local/src
+# wget http://pkgs.fedoraproject.org/repo/pkgs/GeoIP/GeoIP-1.6.5.tar.gz/be57b27082d81543611fcfab2f7d9c7a/GeoIP-1.6.5.tar.gz
+# tar xvzf GeoIP-1.6.5.tar.gz 
+# cd GeoIP-1.6.5
+# ./configure --prefix=/usr/local
+# make && make install
+****************************************************
+# cd /usr/local/src
+# wget http://luajit.org/download/LuaJIT-2.0.4.tar.gz
+# tar xvzf LuaJIT-2.0.4.tar.gz
+# cd LuaJIT-2.0.4
+# make PREFIX=/usr/local
+# make install
+************************************************
+
+# cd /usr/local/src
+# wget http://labs.frickle.com/files/ngx_cache_purge-2.3.tar.gz
+# tar xvzf ngx_cache_purge-2.3.tar.gz
+****************************************************
+# cd /usr/local/src
+# wget http://tengine.taobao.org/download/tengine-1.5.2.tar.gz
+# tar xvzf tengine-1.5.2.tar.gz
+# cd tengine-1.5.2
+********************************
+# ./configure --prefix=/usr/local/nginx \
+--lock-path=/var/lock/nginx.lock \
+--pid-path=/var/run/nginx.pid \
+--error-log-path=/var/log/nginx/error.log \
+--http-log-path=/var/log/nginx/access.log \
+--user=nobody \
+--group=nobody \
+--with-pcre=../pcre-8.36 \
+--with-pcre-opt=-fPIC \
+--with-openssl=../openssl-1.0.1m \
+--with-openssl-opt=-fPIC \
+--with-zlib=../zlib-1.2.8 \
+--with-zlib-opt=-fPIC \
+--with-backtrace_module \
+--with-http_stub_status_module \
+--with-http_gzip_static_module \
+--with-http_realip_module \
+--with-http_concat_module=shared \
+--with-http_sysguard_module=shared \
+--with-http_limit_conn_module=shared \
+--with-http_limit_req_module=shared \
+--with-http_split_clients_module=shared \
+--with-http_footer_filter_module=shared \
+--with-http_geoip_module=shared \
+--with-http_sub_module=shared \
+--with-http_access_module=shared \
+--with-http_upstream_ip_hash_module=shared \
+--with-http_upstream_least_conn_module=shared \
+--with-http_referer_module=shared \
+--with-http_rewrite_module=shared \
+--with-http_memcached_module=shared \
+--with-http_upstream_session_sticky_module=shared \
+--with-http_addition_module=shared \
+--with-http_xslt_module=shared \
+--with-http_image_filter_module=shared \
+--with-http_user_agent_module=shared \
+--with-http_empty_gif_module=shared \
+--with-http_browser_module=shared \
+--with-http_map_module=shared \
+--with-http_userid_filter_module=shared \
+--with-http_charset_filter_module=shared \
+--with-http_trim_filter_module=shared \
+--with-http_lua_module=shared \
+--without-http_fastcgi_module \
+--without-http_uwsgi_module \
+--without-http_scgi_module \
+--without-select_module \
+--without-poll_module \
+--add-module=../ngx_cache_purge-2.3 \
+--http-client-body-temp-path=/var/nginx_temp/nginx_client \
+--http-proxy-temp-path=/var/nginx_temp/nginx_proxy \
+--http-fastcgi-temp-path=/var/nginx_temp/nginx_fastcgi
+
+# make && make install
+# mkdir -p /usr/local/nginx/conf/{conf.d,vhost.d}
+********************************************************
+user nobody nobody;
+ 
+worker_processes auto;
+worker_cpu_affinity auto;
+ 
+error_log /var/log/nginx/error.log crit;
+pid /var/run/nginx.pid;
+ 
+worker_rlimit_nofile 65535;
+ 
+dso { 
+    load ngx_http_rewrite_module.so; 
+    load ngx_http_access_module.so; 
+    load ngx_http_concat_module.so; 
+    load ngx_http_limit_conn_module.so; 
+    load ngx_http_limit_req_module.so; 
+    load ngx_http_sysguard_module.so; 
+    load ngx_http_upstream_session_sticky_module.so; 
+    load ngx_http_footer_filter_module.so; 
+    load ngx_http_trim_filter_module.so; 
+    load ngx_http_lua_module.so;
+}
+ 
+events { 
+    use epoll; 
+    worker_connections 10240;
+}
+ 
+http { 
+    server_tokens off; 
+    server_tag off; 
+    autoindex off; 
+    access_log off; 
+    include mime.types; 
+    default_type application/octet-stream;  
+     
+    server_names_hash_bucket_size 128; 
+    client_header_buffer_size 32k; 
+    large_client_header_buffers 4 32k; 
+    client_max_body_size 30m; 
+    client_body_buffer_size 256k;  
+     
+    sendfile on; 
+    tcp_nopush on; 
+    keepalive_timeout 60; 
+    tcp_nodelay on;  
+     
+    gzip on; 
+    gzip_min_length 1k; 
+    gzip_buffers 4 16k; 
+    gzip_http_version 1.1; 
+    gzip_comp_level 6; 
+    gzip_types text/plain application/x-javascript text/css application/xml application/javascript text/javascript image/jpeg image/gif image/png; 
+    gzip_vary on;  
+     
+    proxy_connect_timeout 120; 
+    proxy_read_timeout 120; 
+    proxy_send_timeout 120; 
+    proxy_buffer_size 128k; 
+    proxy_buffers 4 128k; 
+    proxy_busy_buffers_size 256k; 
+    proxy_temp_file_write_size 256k; 
+    proxy_headers_hash_max_size 1024; 
+    proxy_headers_hash_bucket_size 128;  
+     
+    proxy_redirect off; 
+    proxy_set_header Host $host; 
+    proxy_set_header X-Real-IP $remote_addr; 
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;  
+     
+    proxy_temp_path /var/nginx_temp/nginx_temp; 
+    proxy_cache_path /var/nginx_temp/nginx_cache levels=1:2 keys_zone=cache_one:2048m inactive=30m max_size=60g;  
+     
+    log_format access '$remote_addr - $remote_user [$time_local] "$request"'  
+                      '$status $body_bytes_sent "$http_referer"'  
+                      '"$http_user_agent" $http_x_forwarded_for';  
+     
+    server {  
+        sysguard on;
+           
+        sysguard_load load=24 action=/loadlimit;  
+        sysguard_mem swapratio=24% action=/swaplimit;  
+        sysguard_mem free=100M action=/freelimit;    
+         
+        location /loadlimit {   
+            return 503;  
+        }
+             
+        location /swaplimit {   
+            return 503;  
+        } 
+            
+        location /freelimit {   
+            return 503;  
+        } 
+    }
+     
+    include conf.d/*.conf; 
+    include vhost.d/*.conf;
+}
+
+
+****************************************************
+# vim /usr/local/nginx/conf/conf.d/fdfs_group1.conf
+
+
+upstream fdfs_group1 { 
+    consistent_hash $request_uri; 
+    server 10.0.12.142:8080 id=100 weight=10;  #存储节点
+    server 10.0.12.143:8080 id=101 weight=10; 
+    session_sticky;
+ 
+    check interval=3000 rise=2 fall=5 timeout=1000 type=tcp;
+}
+****************************************************
+# vim /usr/local/nginx/conf/vhost.d/fdfs_group1_vh.conf
+
+
+server { 
+    listen 8080; 
+    server_name 10.0.20.51;
+     
+    location /group1/M00 {  
+        proxy_next_upstream http_502 http_504 error timeout invalid_header;  
+        proxy_cache cache_one;  
+        proxy_cache_valid 200 304 1h;  
+        proxy_cache_valid 301 302 30m;  
+        proxy_cache_valid any 1m;  
+        proxy_cache_key $host$uri$is_args$args;  
+        add_header eleme '$upstream_cache_status from $host';  
+        proxy_pass http://fdfs_group1;  
+        expires 1d; 
+    }
+     
+    location ~ /purge(/.*) {  
+        allow 127.0.0.1;  
+        allow 10.0.0.0/8;  
+        allow 172.0.0.0/8;  
+        deny all;  
+        proxy_cache_purge cache_one $host$1$is_args$args; 
+    }
+     
+    location ~ health_status {  
+        check_status;  
+        allow 127.0.0.1;  
+        allow 10.0.0.0/8;  
+        allow 172.0.0.0/8;  
+        deny all; 
+    }
+}
+
+
+# service nginx start
+注：nginx启动脚本见本文附录
+***************************************************************************************
+二、storeage 节点storage配置（storage节点）
+
+vim /etc/fdfs/storage.conf
+
+
+disabled=false
+group_name=group1
+bind_addr=
+client_bind=true
+port=23000
+connect_timeout=30
+network_timeout=60
+heart_beat_interval=30
+stat_report_interval=60
+base_path=/data/fastdfs
+max_connections=1024
+buff_size = 256KB
+accept_threads=6
+work_threads=24
+disk_rw_separated = true
+disk_reader_threads = 1
+disk_writer_threads = 1
+sync_wait_msec=50
+sync_interval=0
+sync_start_time=00:00
+sync_end_time=23:59
+write_mark_file_freq=500
+store_path_count=1
+store_path0=/data/fastdfs
+subdir_count_per_path=256
+tracker_server=10.0.20.51:22122
+log_level=info
+run_by_group=
+run_by_user=
+allow_hosts=*
+file_distribute_path_mode=0
+file_distribute_rotate_count=100
+fsync_after_written_bytes=0
+sync_log_buff_interval=10
+sync_binlog_buff_interval=10
+sync_stat_file_interval=300
+thread_stack_size=512KB
+upload_priority=10
+if_alias_prefix=
+check_file_duplicate=0
+file_signature_method=hash
+key_namespace=FastDFS
+keep_alive=0
+use_access_log = false
+rotate_access_log = false
+access_log_rotate_time=00:00
+rotate_error_log = false
+error_log_rotate_time=00:00
+rotate_access_log_size = 0
+rotate_error_log_size = 0
+log_file_keep_days = 7
+file_sync_skip_invalid_record=false
+use_connection_pool = false
+connection_pool_max_idle_time = 3600
+http.domain_name=
+http.server_port=8080
+*************************************************************
+# ln -s /usr/bin/fdfs_storaged /usr/local/bin
+# ln -s /usr/bin/stop.sh /usr/local/bin
+# ln -s /usr/bin/restart.sh /usr/local/bin
+
+# service fdfs_storaged start
+************************************************************
+nginx部署（storage节点）
+
+在storage上安装nginx主要是为了提供http访问服务，同时解决group中store服务器的同步延迟问题。
+需要安装的软件包：zlib、pcre、openssl、tengine、fastdfs-nginx-module
+************************************************************
+# echo "/usr/local/lib" >>  /etc/ld.so.conf
+# echo "/usr/local/lib64" >>  /etc/ld.so.conf
+# /sbin/ldconfig
+
+# mkdir -p /var/log/nginx
+# mkdir -p /var/nginx_temp/{nginx_client,nginx_proxy,nginx_fastcgi}
+
+# ln -s /usr/include/fastdfs/*.h /usr/include
+# ln -s /usr/include/fastcommon/*.h /usr/include
+***********************************************************
+# cd /usr/local/src
+# wget http://sourceforge.net/projects/libpng/files/zlib/1.2.8/zlib-1.2.8.tar.gz
+# tar xvzf zlib-1.2.8.tar.gz
+# cd zlib-1.2.8
+# ./configure --prefix=/usr/local
+# make && make install
+
+************************************************************
+# cd /usr/local/src
+# wget https://ftp.pcre.org/pub/pcre/pcre-8.36.tar.gz
+# tar xvzf pcre-8.36.tar.gz
+# cd pcre-8.36
+# ./configure --prefix=/usr/local
+# make && make install
+*************************************************************
+
+# cd /usr/local/src
+# wget http://www.openssl.org/source/openssl-1.0.1m.tar.gz
+# tar xvzf openssl-1.0.1m.tar.gz
+# cd openssl-1.0.1m
+# ./config shared --prefix=/usr/local
+# make && make install
+**************************************************************
+# cd /usr/local/src
+# wget  http://jaist.dl.sourceforge.NET/project/fastdfs/FastDFS%20Nginx%20Module%20Source%20Code/fastdfs-nginx-module_v1.16.tar.gz
+# tar xvzf fastdfs-nginx-module_v1.16.tar.gz
+# cp fastdfs-nginx-module/src/mod_fastdfs.conf /etc/fdfs
+**************************************************************
+
+# cd /usr/local/src
+# wget http://tengine.taobao.org/download/tengine-1.5.2.tar.gz
+# tar xvzf tengine-1.5.2.tar.gz
+# cd tengine-1.5.2
+
+# ./configure --prefix=/usr/local/nginx \
+--lock-path=/var/lock/nginx.lock \
+--pid-path=/var/run/nginx.pid \
+--error-log-path=/var/log/nginx/error.log \
+--http-log-path=/var/log/nginx/access.log \
+--user=nobody \
+--group=nobody \
+--with-pcre=../pcre-8.36 \
+--with-pcre-opt=-fPIC \
+--with-openssl=../openssl-1.0.1m \
+--with-openssl-opt=-fPIC \
+--with-zlib=../zlib-1.2.8 \
+--with-zlib-opt=-fPIC \
+--with-backtrace_module \
+--with-http_stub_status_module \
+--with-http_gzip_static_module \
+--with-http_realip_module \
+--without-select_module \
+--without-poll_module \
+--with-http_concat_module=shared \
+--with-http_sysguard_module=shared \
+--with-http_limit_conn_module=shared \
+--with-http_limit_req_module=shared \
+--with-http_split_clients_module=shared \
+--with-http_footer_filter_module=shared \
+--with-http_sub_module=shared \
+--with-http_access_module=shared \
+--with-http_addition_module=shared \
+--with-http_referer_module=shared \
+--with-http_rewrite_module=shared \
+--with-http_memcached_module=shared \
+--without-http_upstream_check_module \
+--without-http_upstream_least_conn_module \
+--without-http_upstream_keepalive_module \
+--without-http_upstream_ip_hash_module \
+--without-http_geo_module \
+--http-client-body-temp-path=/var/nginx_temp/nginx_client \
+--http-proxy-temp-path=/var/nginx_temp/nginx_proxy \
+--http-fastcgi-temp-path=/var/nginx_temp/nginx_fastcgi \
+--add-module=../fastdfs-nginx-module/src
+
+# make && make install
+
+************************************************************
+# vim /usr/local/nginx/conf/nginx.conf
+
+user nobody nobody;
+ 
+worker_processes auto;
+worker_cpu_affinity auto;
+ 
+error_log /var/log/nginx/error.log crit;
+pid /var/run/nginx.pid;
+worker_rlimit_nofile 65535;
+ 
+dso { 
+    load ngx_http_rewrite_module.so; 
+    load ngx_http_access_module.so; 
+    load ngx_http_concat_module.so; 
+    load ngx_http_limit_conn_module.so; 
+    load ngx_http_limit_req_module.so; 
+    load ngx_http_sysguard_module.so;
+}
+ 
+events { 
+    use epoll; 
+    worker_connections 10240;
+}
+ 
+http { 
+    server_tokens off; 
+    server_tag off; 
+    autoindex off; 
+    access_log off; 
+    include mime.types; 
+    default_type application/octet-stream;
+     
+    server_names_hash_bucket_size 128; 
+    client_header_buffer_size 32k; 
+    large_client_header_buffers 4 32k; 
+    client_max_body_size 30m; 
+    client_body_buffer_size 256k;
+      
+    sendfile on; 
+    tcp_nopush on; 
+    keepalive_timeout 60; 
+    tcp_nodelay on;
+ 
+    gzip on; 
+    gzip_min_length 1k; 
+    gzip_buffers 4 16k; 
+    gzip_http_version 1.1; 
+    gzip_comp_level 6; 
+    gzip_types text/plain application/x-javascript text/css application/xml application/javascript text/javascript image/jpeg image/gif image/png; 
+    gzip_vary on;
+     
+    fastcgi_connect_timeout 120; 
+    fastcgi_read_timeout 120; 
+    fastcgi_send_timeout 120; 
+    fastcgi_buffer_size 1024k; 
+    fastcgi_buffers 32 1024k; 
+    fastcgi_busy_buffers_size 2048k; 
+    fastcgi_temp_file_write_size 2048k;
+     
+    fastcgi_temp_path /var/nginx_temp/nginx_temp;
+     
+    log_format access '$remote_addr - $remote_user [$time_local] "$request"'  
+                    '$status $body_bytes_sent "$http_referer"'  
+                    '"$http_user_agent" $http_x_forwarded_for';
+     
+    server {  
+        sysguard on;    
+         
+        sysguard_load load=24 action=/loadlimit;  
+        sysguard_mem swapratio=24% action=/swaplimit;  
+        sysguard_mem free=100M action=/freelimit;    
+         
+        location /loadlimit {   
+            return 503;  
+        }    
+         
+        location /swaplimit {   
+            return 503;  
+        }    
+         
+        location /freelimit {   
+            return 503;  
+        } 
+    }
+     
+    server {         
+        listen 8080;         
+        server_name 10.0.12.143;
+         
+        location / {   
+            root html;   
+            index index.html index.htm;  
+        }
+         
+        location ~/group[1-3]/M00 {
+            root /data/fastdfs/data;
+            ngx_fastdfs_module;
+        }
+    }
+}
+
+******************************************************
+vim /etc/fdfs/mod_fastdfs.conf
+
+connect_timeout=2
+network_timeout=30
+base_path=/data/fastdfs
+load_fdfs_parameters_from_tracker=true
+storage_sync_file_max_delay = 86400
+use_storage_id = false
+storage_ids_filename = 
+storage_ids.conf
+tracker_server=10.0.20.51:22122
+storage_server_port=23000
+group_name=group1
+url_have_group_name = true
+store_path_count=1
+store_path0=/data/fastdfs
+log_level=info
+log_filename=/var/log/fastdfs/mod_fastdfs.log
+response_mode=proxy
+if_alias_prefix=
+flv_support = true
+flv_extension = flv
+include http.conf
+http.need_find_content_type=truegroup_count = 3
+ 
+[group1]
+group_name=group1
+storage_server_port=23000
+store_path_count=1
+store_path0=/data/fastdfs
+ 
+[group2]
+group_name=group2
+storage_server_port=23000
+store_path_count=1
+store_path0=/data/fastdfs
+ 
+[group3]
+group_name=group3
+storage_server_port=23000
+store_path_count=1
+store_path0=/data/fastdfs
+
+
+****************************************************
+注：本次测试只用到了group1
+
+# ln -s /data/fastdfs/data /data/fastdfs/data/M00
+#cp /usr/local/src/fastdfs-5.05/conf/mime.types /etc/fdfs
+# cp /usr/local/src/fastdfs-5.05/conf/http.conf /etc/fdfs
+# cp //usr/local/src/fastdfs-5.05/conf/anti-steal.jpg /etc/fdfs
+
+# mkdir -p /var/log/fastdfs
+# chown -R nobody:nobody /var/log/fastdfs
+
+# service nginx start
+注：nginx启动脚本见本文附录
+
+
+************************************************************
+基础测试（tracker节点）
+# vim /etc/fdfs/client.conf
+
+connect_timeout=30
+network_timeout=60
+base_path=/data/fastdfs
+tracker_server=10.0.20.51:22122
+log_level=info
+use_connection_pool = false
+connection_pool_max_idle_time = 3600
+load_fdfs_parameters_from_tracker=false
+use_storage_id = false
+storage_ids_filename = storage_ids.conf
+http.tracker_server_port=8080
+
+
+**************************************************************
+文件上传
+# fdfs_upload_file /etc/fdfs/client.conf /usr/local/nginx/conf/nginx.conf
+通过浏览器访问，比如：
+http://10.0.20.51:8080/group1/M00/00/00/CgAMj1VmJoCAJQ64AAAH548RQaY07.conf
+文件缓存清除，比如：
+http://10.0.20.51:8080/purge/group1/M00/00/00/CgAMj1VmJoCAJQ64AAAH548RQaY07.conf
+文件下载
+# fdfs_download_file /etc/fdfs/client.conf group1/M00/00/00/CgAMj1VmJoCAJQ64AAAH548RQaY07.conf
+文件属性信息查看
+# fdfs_file_info /etc/fdfs/client.conf group1/M00/00/00/CgAMj1VmJoCAJQ64AAAH548RQaY07.conf
+文件删除
+# fdfs_delete_file /etc/fdfs/client.conf group1/M00/00/00/CgAMj1VmJoCAJQ64AAAH548RQaY07.conf
+查看系统状态
+# fdfs_monitor /etc/fdfs/client.conf | grep ACTIVE
+查看存储节点信息（storage）
+# fdfs_monitor /etc/fdfs/storage.conf
+
+
+
+**************************************************************************
+
+nginx  脚本
+#!/bin/sh
+#
+# nginx - this script start and stop the nginx daemon
+#
+# chkconfig: 2345
+# description: Startup script for nginx
+# processname: nginx
+# config: /usr/local/nginx/conf/nginx.conf
+# pidfile: /var/run/nginx.pid
+#
+# code by rocketzhang
+#
+PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
+ 
+DAEMON="/usr/local/nginx/sbin/nginx"
+CNFFILE="/usr/local/nginx/conf/nginx.conf"
+PIDFILE="/var/run/nginx.pid"
+LOCKFILE="/var/lock/nginx.lock"
+ 
+RETVAL=0
+ 
+set -e
+[[ -x "$DAEMON" ]] || exit 0
+ 
+start() { 
+    [[ -x $DAEMON ]] || exit 5 
+    [[ -f $CNFFILE ]] || exit 6  
+     
+    echo -n "Startting Nginx......" 
+    $DAEMON -c $CNFFILE || echo -n "Nginx already running!" 
+    RETVAL=$? 
+    echo 
+    [[ $RETVAL -eq 0 ]] && touch $LOCKFILE
+}
+ 
+stop() { 
+    echo -n "Stopping Nginx......"
+     
+    if [[ -n `ps aux | grep nginx | awk '/master/{print $2}'` ]]; then  
+        kill -QUIT `ps aux | grep nginx | awk '/master/{print $2}'`  
+        RETVAL=$?  
+        echo  
+        [[ $RETVAL -eq 0 ]] && rm -f $LOCKFILE $PIDFILE 
+    fi
+}
+ 
+reload() {  
+    echo -n "Reloading Nginx......"
+ 
+    if [[ -n `ps aux | grep nginx | awk '/master/{print $2}'` ]]; then  
+        kill -HUP `ps aux | grep nginx | awk '/master/{print $2}'`  
+        RETVAL=$?  
+        echo 
+    fi
+} 
+ 
+case "$1" in
+start) 
+    start 
+    ;;
+ 
+stop) 
+    stop 
+    ;;
+ 
+reload) 
+    reload 
+    ;;
+ 
+restart) 
+    stop 
+    sleep 1 
+    start 
+    ;;
+ 
+*) 
+    echo "Usage: service nginx {start|stop|reload|restart}" 
+    RETVAL=1 
+    ;;
+esac
+ 
+exit $RETVAL
