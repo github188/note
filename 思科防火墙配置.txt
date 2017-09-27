@@ -1,0 +1,435 @@
+思科防火墙配置
+
+忘记防火墙密码
+
+
+1.需要 网孔转串口线  和 串口与转use线，然后和pc连接，pc机需要安装 串口与转use驱动程序
+
+2.打开crt  建立连接 serial协议 ，即可连接防火墙
+3.密码恢复程序
+
+首先，我们打开PC机的超级终端，然后启动ASA后迅速按ESC或CTRL+BREAK 键进入Rommon状态。
+
+rommon #0>
+
+然后我们打入命令confreg 0x41，进行配置寄存器值的修改.如下
+
+rommon #1> confreg 0x41
+
+Update Config Register (0x41) in NVRAM...
+
+修改后，就可以重启，输入 " boot " 如下。
+
+rommon #2> reset
+
+启动成功进入ASA以后,enable密码为空.
+
+输入 enable 如下。
+
+ciscoasa> enable
+
+password这步直接敲回车。现在ASA 密码为空。如下
+
+Password: 密码为空，直接敲回车。
+
+然后输入如下命令。。
+
+ciscoasa# copy startup-config running-config
+
+ciscoasa# configure terminal
+
+然后设置新的密码：如下三条命令： 注：密码和用户名全为cisco1234
+
+ciscoasa(config)# password cisco1234
+
+ciscoasa(config)# enable password cisco1234
+
+ciscoasa(config)# username cisco1234 password cisco1234
+
+然后必须修改回原来的配置寄存器的值，命令如下。
+
+ciscoasa(config)# config-register 0x11
+
+最后必须保存配置文件，切记，否则新密码无效，命令如下。
+
+ciscoasa(config)# copy running-config startup-config 
+
+
+一、 基础配置
+1.1 密码配置 ciscoasa(config)#passwd password 一般用于telnet登陆ASA的登录密码
+1.2 Enable密码配置 ciscoasa(config)#enable password password 用于进入enable特权模式的密码
+1.3 设备命名 ciscoasa(config)#hostname hostname 用于设备命名管理
+二、 接口配置
+2.1 接口命名 ciscoasa(config)#interface interface_id 进入接口配置模式
+ciscoasa(config-if)#nameif interface_name 配置接口名称
+2.2 配置接口安全级别
+ciscoasa(config-if)#security-level security_level 安全级别为0-100，0为最低
+2.3 配置IP地址
+ciscoasa(config-if)#ip address ip_address netmask 配置接口IP地址与掩码
+2.4 关闭/激活接口
+ciscoasa(config-if)#shutdown
+//关闭接口
+ciscoasa(config-if)#no shutdown
+//激活接口
+2.5 范例
+ciscoasa(config)#interface g0/0
+//进入g0/0接口
+ciscoasa(config-if)#nameif outside
+//配置g0/0接口名称为outside
+ciscoasa(config-if)#security-level 0
+//配置outside接口安全级别为0（outside接口默认安全级别为0）
+ciscoasa(config-if)#ip address 218.21.217.161 255.255.255.252
+//配置outside接口IP地址为218.21.217.162，掩码为255.255.255.252
+ciscoasa(config-if)#no shutdown
+//激活该接口
+三、 路由配置
+3.1 静态路由配置
+ciscoasa(config)#route interface_name destination_network netmask gateway_address
+interface_name：路由方向的接口名称
+destination_network：目的网络地址
+netmask：目的网络掩码
+gateway_address：下一跳网关地址
+3.2 外口默认路由配置
+ciscoasa(config)#route outside 0 0 gateway_address
+3.3 范例
+ciscoasa(config)#route inside 172.16.0.0 255.255.0.0 192.168.100.1
+//在inside接口上创建一条到172.16.0.0/16网络走192.168.100.1的路由，ASA会将到172.16.0.0/16网络的所有数据包转发给下一跳网关192.168.100.1
+ciscoasa(config)#route outside 0 0 218.21.217.161
+//创建一条外网的默认路由，ASA将所有的互联网流量发给internet网关218.21.217.161
+四、 网络地址转换（NAT）配置
+4.1 关于NAT
+随着接入Internet的计算机数量的不断猛增，IP地址资源也就愈加显得捉襟见肘，即使是拥有几百台计算机的大型局域网用户，当他们申请IP地址时，所分配的地址也不过只有一个或几个IP地址，显然，这样少的IP地址根本无法满足网络用户的需求，于是也就产生了NAT技术。
+借助于NAT，私有(保留)地址的"内部"网络通过路由器发送数据包时，私有地址被转换成合法的IP地址，一个局域网只需使用少量IP地址(甚至是1个)即可实现私有地址网络内所有计算机与Internet的通信需求。
+NAT的实现方式有三种：动态NAT、静态NAT、PAT
+动态NAT：指将内部网络的私有IP地址转换为公用IP地址时，IP地址对是不确定的，而是随机的，所有被授权访问上Internet的私有IP地址可随机转换为任何指定的合法IP地址。
+静态NAT：指将内部网络的私有IP地址转换为公有IP地址，IP地址对是一对一的，是一成不变的，某个私有IP地址只转换为某个公有IP地址。
+PAT： 指改变外出数据包的源端口并进行端口转换，即端口地址转换(PAT，Port Address Translation).采用端口多路复用方式。内部网络的所有主机均可共享一个合法外部IP地址实现对Internet的访问，从而可以最大限度地节约IP地址资源。同时，又可隐藏网络内部的所有主机，有效避免来自internet的攻击。因此，目前网络中应用最多的就是端口多路复用方式。
+4.2 动态NAT的配置
+ciscoasa(config)#nat (if_name) nat_id network netmask
+if_name：激活NAT的接口，一般是inside
+nat_id：NAT转换的序号，对应global序号
+network：需要做NAT转换的网络
+netmask：需要转换网络的掩码
+ciscoasa(config)#global (if_name) nat_id address_range netmask netmask
+if_name：NAT转换后的出接口名，一般是outside
+nat_id：对应NAT转换的序号
+address_range：用作NAT的地址池
+netmask：地址池的掩码
+范例：
+ciscoasa(config)#nat (inside) 1 network 172.16.0.0 255.255.0.0
+//在inside接口为172.16.0.0/16网络激活NAT
+ciscoasa(config)#global (outside) 1 10.78.139.129-10.78.139.254 netmask 255.255.255.0
+//把来自inside接口172.16.0.0/16网络的地址动态转换为10.78.139.129-254/24中的地址
+4.3 静态NAT的配置
+ciscoasa(config)#nat (if_name) nat_id host 255.255.255.255
+if_name：激活NAT的接口，一般是inside
+nat_id：NAT转换的序号，对应global序号
+host：被转换的主机IP地址
+ciscoasa(config)#global (if_name) nat_id address netmask
+if_name：NAT转换后的出接口名，一般是outside
+nat_id：对应NAT转换的序号
+address：转换后的IP地址
+netmask：转换后地址的掩码
+范例：
+ciscoasa(config)#nat (inside) 2 10.78.224.9 255.255.255.255
+//为来自inside接口的10.78.224.9这个地址激活NAT
+ciscoasa(config)#global (outside) 2 218.21.217.162 255.255.255.252
+//将10.78.224.9这个地址转换为218.21.217.162
+4.4 PAT的配置
+ciscoasa(config)#nat (if_name) nat_id network netmask
+if_name：激活NAT的接口，一般是inside
+nat_id：NAT转换的序号，对应global序号
+network：需要做NAT转换的网络
+netmask：需要转换网络的掩码
+ciscoasa(config)#global (if_name) nat_id interface
+if_name：NAT转换后的出接口名，一般是outside
+nat_id：对应NAT转换的序号
+范例：
+ciscoasa(config)#nat (inside) 3 172.16.0.0 255.255.0.0
+//为来自inside接口的172.16.0.0/16网络激活NAT
+ciscoasa(config)#global (outside) 3 interface
+//把来自inside接口172.16.0.0/16网络的地址做PAT转换为outside接口的地址
+4.5 端口映射的配置
+4.5.1. 什么时候需要做端口映射
+当外网需要访问内网中的一台服务器时，ASA并不知道访问的是哪一台内网中的机器，这时就需要做静态的端口映射。
+4.5.2. 端口映射的配置 ciscoasa(config)#access-list list_name extended permit tcp/udp any host outside_address eq port_num（具体内容详见访问控制配置）
+list_name：访问控制列表名称
+tcp/udp：需要映射的协议类型
+outside_address：outside接口IP地址
+port_num：需要映射的端口号
+ciscoasa(config)#static (inside,outside) tcp/udp interface port_num local_address port_num netmask 255.255.255.255
+tcp/udp：需要映射的协议类型
+port_num：映射前的端口号
+local_address：映射后的内网主机IP地址
+Port_num：映射后的端口号
+ciscoasa(config)#access-group 100 in interface outside
+//在outside接口in方向调用名称为100的访问控制列表
+4.5.3. 范例：
+ciscoasa(config)#access-list 100 extended permit tcp any host 218.21.217.162 eq 80
+//允许外网访问218.21.217.162的tcp 80端口
+ciscoasa(config)#static (inside,outside) tcp interface 80 10.78.224.10 80 netmask 255.255.255.255
+//外网访问218.21.217.162的tcp 80端口时启用静态PAT映射至内网10.78.224.10的TCP 80端口
+ciscoasa(config)#access-group 100 in interface outside inbound
+//访问必须调用ACL
+五、 访问控制（ACL）配置
+5.1. 配置访问控制列表的一般步骤
+配置访问控制列表
+接口方向的调用
+5.2. 标准访问控制列表
+ciscoasa(config)#access-list list_name standard deny/permit des_address netmask
+list_name：标准访问控制列表的名称
+deny/permit：阻止/允许符合此条规则的流量
+des_address：需要做控制的目的地址
+netmask：需要做控制的目的地址的掩码
+ciscoasa(config)#access-group list_name in/out interface interface_name
+in/out：调用接口的入/出方向
+interface_name：调用控制列表的接口名
+5.3. 扩展访问控制列表
+ciscoasa(config)#access-list list_name extended deny/permit tcp/udp sour_address sour_netmask des_address des_netmask eq port_num
+list_name：扩展访问控制列表名称
+deny/permit：阻止/允许符合此条规则的流量
+tcp/udp：此条规则匹配的协议
+sour_address：此条规则匹配的源地址
+sour_netmask：此条规则匹配的源地址掩码
+des_address：此条规则匹配的目的地址
+des_netmask：此条规则匹配的目的地址掩码
+port_num：此条规则所匹配的端口号
+ciscoasa(config)#access-group list_name in/out interface interface_name
+in/out：调用接口的入/出方向
+interface_name：调用控制列表的接口名
+5.4. 范例
+ciscoasa(config)#access-list 400 extended deny udp 10.78.224.0 255.255.255.0 61.134.1.4 255.255.255.255 eq 53
+//阻止源地址10.78.224.0/24网段对目的地址61.134.1.4主机UDP 53端口
+ciscoasa(config)#access-group 400 in interface inside
+//在inside接口的入方向调用
+六、 ASA防火墙工作状态调试
+6.1. 防火墙健康检查
+查看当前ASA配置
+ciscoasa#show run
+查看CPU利用率
+ciscoasa#show cpu usage (show cpu usage context all 正常应该在80%以下)
+内存利用：
+ciscoasa#show memory
+Xlate 表大小：
+ciscoasa#show xlate count
+Conn 表大小：
+ciscoasa#show conn count
+端口状态：
+ciscoasa#show interface interface_name
+6.2. 验证防火墙的连接性
+ping测试：
+ciscoasa#ping ip_address
+traceroute测试：
+ciscoasa#traceroute ip_address
+查看路由表：
+ciscoasa#show route
+ASA防火墙ACL检查：
+ciscoasa#show access-list
+
+
+
+
+
+
+要想配置思科的防火墙得先了解这些命令：
+　　常用命令有：nameif、interface、ip address、nat、global、route、static等。
+　　global
+　　指定公网地址范围：定义地址池。
+　　Global命令的配置语法：
+　　global (if_name) nat_id ip_address-ip_address [netmark global_mask]
+　　其中：
+　　(if_name)：表示外网接口名称，一般为outside。
+　　nat_id：建立的地址池标识(nat要引用)。
+　　ip_address-ip_address：表示一段ip地址范围。
+　　[netmark global_mask]：表示全局ip地址的网络掩码。
+　　nat
+　　地址转换命令，将内网的私有ip转换为外网公网ip。
+　　nat命令配置语法：nat (if_name) nat_id local_ip [netmark]
+　　其中：
+　　(if_name)：表示接口名称，一般为inside.
+　　nat_id： 表示地址池，由global命令定义。
+　　local_ip： 表示内网的ip地址。对于0.0.0.0表示内网所有主机。
+　　[netmark]：表示内网ip地址的子网掩码。
+　　route
+　　route命令定义静态路由。
+　　语法：
+　　route (if_name) 0 0 gateway_ip [metric]
+　　其中：
+　　(if_name)：表示接口名称。
+　　0 0 ：表示所有主机
+　　Gateway_ip：表示网关路由器的ip地址或下一跳。
+　　[metric]：路由花费。缺省值是1。
+　　static
+　　配置静态IP地址翻译，使内部地址与外部地址一一对应。
+　　语法：
+　　static(internal_if_name,external_if_name) outside_ip_addr inside_ ip_address
+　　其中：
+　　internal_if_name表示内部网络接口，安全级别较高，如inside。
+　　external_if_name表示外部网络接口，安全级别较低，如outside。
+　　outside_ip_address表示外部网络的公有ip地址。
+　　inside_ ip_address表示内部网络的本地ip地址。
+　　(括号内序顺是先内后外，外边的顺序是先外后内)
+　　例如：
+　　asa(config)#static (inside，outside) 133.0.0.1 192.168.0.8
+　　表示内部ip地址192.168.0.8，访问外部时被翻译成133.0.0.1全局地址
+　　**************************************************************************
+　　asa#conf t
+　　asa(config)# hostname asa //设置主机名
+　　asa(config)#enable password cisco //设置密码
+　　配置外网的接口，名字是outside，安全级别0，输入ISP给您提供的地址就行了。
+　　asa(config)#interface GigabitEthernet0/0
+　　asa(config)#nameif outside //名字是outside
+　　asa(config)#securit-level 0 //安全级别0
+　　asa(config)#ip address *.*.*.* 255.255.255.0 //配置公网IP地址
+　　asa(config)#duplex full
+　　asa(config)#
+　　asa(config)#no shutdown
+　　配置内网的接口，名字是inside，安全级别100
+　　asa(config)#interface GigabitEthernet0/1
+　　asa(config)#nameif inside
+　　asa(config)#securit-level 100
+　　asa(config)#duplex full
+　　asa(config)#speed 100
+　　asa(config)#no shutdown
+　　配置DMZ的接口,名字是dmz，安全级别50
+　　asa(config)#interface GigabitEthernet0/2
+　　asa(config)#nameif dmz
+　　asa(config)#securit-level 50
+　　asa(config)#duplex full
+　　asa(config)#
+　　asa(config)#no shutdown
+　　网络部分设置
+　　asa(config)#nat(inside) 1 192.168.1.1 255.255.255.0
+　　asa(config)#global(outside) 1 222.240.254.193 255.255.255.248
+　　asa(config)#nat (inside) 0 192.168.1.1 255.255.255.255 //表示192.168.1.1这个地址不需要转换。直接转发出去。
+　　asa(config)#global (outside) 1 133.1.0.1-133.1.0.14 //定义的地址池
+　　asa(config)#nat (inside) 1 0 0 //0 0表示转换网段中的所有地址。定义内部网络地址将要翻译成的全局地址或地址范围
+　　配置静态路由
+　　asa(config)#route outside 0 0 133.0.0.2 //设置默认路由 133.0.0.2为下一跳
+　　如果内部网段不是直接接在防火墙内口，则需要配置到内部的路由。
+　　asa(config)#Route inside 192.168.10.0 255.255.255.0 192.168.1.1 1
+　　地址转换
+　　asa(config)#static (dmz，outside) 133.1.0.1 10.65.1.101 ;静态NAT
+　　asa(config)#static (dmz，outside) 133.1.0.2 10.65.1.102 ;静态NAT
+　　asa(config)#static (inside，dmz) 10.66.1.200 10.66.1.200 ;静态NAT
+　　如果内部有服务器需要映射到公网地址(外网访问内网)则需要static
+　　asa(config)#static (inside, outside) 222.240.254.194 192.168.1.240
+　　asa(config)#static (inside, outside) 222.240.254.194 192.168.1.240 10000 10 //后面的10000为限制连接数，10为限制的半开连接数
+　　ACL实现策略访问
+　　asa(config)#access-list 101 permit ip any host 133.1.0.1 eq www;设置ACL
+　　asa(config)#access-list 101 permit ip any host 133.1.0.2 eq ftp;设置ACL
+　　asa(config)#access-list 101 deny ip any any ;设置ACL
+　　asa(config)#access-group 101 in interface outside ;将ACL应用在outside端口
+　　当内部主机访问外部主机时，通过nat转换成公网IP，访问internet。
+　　当内部主机访问中间区域dmz时，将自己映射成自己访问服务器，否则内部主机将会映射成地址池的IP，到外部去找。
+　　当外部主机访问中间区域dmz时，对133.0.0.1映射成10.65.1.101，static是双向的。
+　　PIX的所有端口默认是关闭的，进入PIX要经过acl入口过滤。
+　　静态路由指示内部的主机和dmz的数据包从outside口出去。
+
+
+思科ASA和PIX防火墙配置手册
+
+
+一、 配置基础
+1.1用户接口
+思科防火墙支持下列用户配置方式：
+Console，Telnet，SSH（1.x或者2.0，2.0为7.x新特性，PDM的http方式（7.x以后称为ASDM）和VMS的Firewall Management Center。
+支持进入Rom Monitor模式，权限分为用户模式和特权模式，支持Help，History和命令输出的搜索和过滤。
+注：Catalyst6500的FWSM没有物理接口接入，通过下面CLI命令进入：
+Switch# session slot slot processor 1 （FWSM所在slot号）
+用户模式：
+Firewall> 为用户模式，输入enable进入特权模式Firewall#。特权模式下可以进入配置模式，在6.x所有的配置都在一个全局模式下进行，7.x以后改成和IOS类似的全局配置模式和相应的子模式。通过exit，ctrl-z退回上级模式。
+配置特性：
+在原有命令前加no可以取消该命令。Show running-config 或者 write terminal显示当前配置，7.x后可以对show run 的命令输出进行搜索和过滤。Show running-config all显示所有配置，包含缺省配置。Tab可以用于命令补全，ctrl-l可以用于重新显示输入的命令（适用于还没有输入完命令被系统输出打乱的情况），help和history相同于IOS命令集。
+Show命令支持 begin，include，exclude，grep 加正则表达式的方式对输出进行过滤和搜索。
+Terminal width 命令用于修改终端屏幕显示宽度，缺省为80个字符，pager命令用于修改终端显示屏幕显示行数，缺省为24行，pager lines 0命令什么效果可以自己试试。
+1.2防火墙许可介绍
+防火墙具有下列几种许可形式，通过使用show version命令可以看设备所支持的特性：
+Unrestricted (UR) 所有的限制仅限于设备自身的性能，也支持Failover
+Restricted (R) 防火墙的内存和允许使用的最多端口数有限制，不支持Failover
+Failover (FO) 不能单独使用的防火墙，只能用于Failover
+Failover-Active/Active (FO-AA) 只能和UR类型的防火墙一起使用，支持active/active failover
+注：FWSM内置UR许可。
+activation-key 命令用于升级设备的许可，该许可和设备的serial number有关（show version输出可以看到），6.x为16字节，7.x为20字节。
+1.3初始配置
+跟路由器一样可以使用setup进行对话式的基本配置。
+
+
+二、 配置连接性
+2.1配置接口
+接口基础：
+防火墙的接口都必须配置接口名称，接口IP地址和掩码（7.x开始支持IPv6）和安全等级。接口可以是物理接口也可以是逻辑接口（vlan），从6.3贾С?lt;/SPAN>trunk，但只支持802.1Q封装，不支持DTP协商。
+接口基本配置：
+注：对于FWSM所有的接口都为逻辑接口，名字也是vlan后面加上vlanid。例如FWSM位于6500的第三槽，配置三个接口，分别属于vlan 100,200,300.
+Switch(config)# firewall vlan-group 1 100,200,300
+Switch(config)# firewall module 3 vlan-group 1
+Switch(config)# exit
+Switch# session slot 3 processor 1
+经过此配置后形成三个端口vlan100.vlan200,vlan300
+PIX 6.x
+Firewall(config)# interface hardware-id [hardware-speed] [shutdown] （Hardware-id可以用show version命令看到）
+PIX 7.x
+Firewall(config)# interface hardware-id
+Firewall(config-if)# speed {auto | 10 | 100 | nonegotiate}
+Firewall(config-if)# duplex {auto | full | half}
+Firewall(config-if)# [no] shutdown
+命名接口
+FWSM 2.x
+Firewall(config)# nameif vlan-id if_name securitylevel
+PIX 6.x
+Firewall(config)# nameif {hardware-id | vlan-id} if_name securitylevel
+PIX 7.x
+Firewall(config)# interface hardware_id[.subinterface]
+Firewall(config-if)# nameif if_name
+Firewall(config-if)# security-level level
+注：Pix 7.x和FWSM 2.x开始支持不同接口有相同的security level，前提是全局配置模式下使用same-security-traffic permit inter-interface命令。
+配置IP地址
+静态地址：Firewall(config)# ip address if_name ip_address [netmask]
+动态地址：Firewall(config)# ip address outside dhcp [setroute] [retry retry_cnt]
+注：setroute参数可以同时获得来自DHCP服务器的缺省路由，再次输入此命令可以renew地址。
+PPPOE：Firewall(config)# vpdn username JohnDoe password JDsecret
+Firewall(config)# vpdn group ISP1 localname JohnDoe
+Firewall(config)# vpdn group ISP1 ppp authentication chap
+Firewall(config)# vpdn group ISP1 request dialout pppoe
+Firewall(config)# ip address outside pppoe setroute
+验证接口
+Firewall# show ip
+IPv6地址配置（7.x新特性）
+暂略
+ARP配置
+配置一个静态的ARP条目：Firewall(config)# arp if_name ip_address mac_address [alias]
+配置timeout时间：Firewall(config)# arp timeout seconds 缺省为4小时
+注：一般情况下使用clear arp会清除所有的ARP缓存，不能针对单个的条目，但是可以通过以下变通方法：配置一个静态的条目，映射有问题的ip为一个假的mac地址，然后no掉该命令就会重新建立一个arp条目。
+MTU和分段
+配置MTU：Firewall(config)# mtu if_name bytes 使用show mtu (6.3) 或者show running-config mtu (7.x)来验证
+分段（fragment）的几个命令：限制等待重组的分段数Firewall(config)# fragment size database-limit [if_name]
+限制每个包的分段数Firewall(config)# fragment chain chain-limit [if_name]
+限制一个数据包分段到达的时间Firewall(config)# fragment timeout seconds [if_name]
+配置接口的优先队列（7.x新特性）
+暂略
+2.2配置路由
+启用PRF防止地址欺骗 Firewall(config)# ip verify reverse-path interface if_name
+配置静态路由Firewall(config)# route if_name ip_address netmask gateway_ip [metric]
+配置RIP
+被动听RIP更新(v1，v2)Firewall(config)# rip if_name passive [version 1] （Firewall(config)# rip if_name passive version 2 [authentication [text | md5 key (key_id)]]）
+宣告该接口为缺省路由Firewall(config)# rip if_name default version [1 | 2 [authentication [text | md5 key key_id]]
+配置OSPF
+定义OSPF进程 Firewall(config)# router ospf pid
+指定相应网络到OSPF区域 Firewall(config-router)# network ip_address netmask area area_id
+可选：定义Router ID Firewall(config-router)# router-id ip_address
+记录OSPF邻居状态更新 Firewall(config-router)# log-adj-changes [detail]
+启用OSPF更新认证 Firewall(config-router)# area area_id authentication [message-digest]宣告缺省路由 Firewall(config-router)# default-information originate [always] [metric value] [metric-type {1 | 2}] [route-map name]调节OSPF参数 Firewall(config-router)# timers {spf spf_delay spf_holdtime |lsa-group-pacing seconds}
+2.3 DHCP
+配置成为DHCP Server：
+配置地址池 Firewall(config)# dhcpd address ip1[-ip2] if_name （最多256个客户端）
+配置DHCP参数 Firewall(config)# dhcpd dns dns1 [dns2] Firewall(config)# dhcpd wins wins1 [wins2] Firewall(config)# dhcpd domain domain_name Firewall(config)# dhcpd lease lease_length Firewall(config)# dhcpd ping_timeout timeout
+启用DHCP服务 Firewall(config)# dhcpd enable if_name
+验证：show dhcdp, show dhcpd bindings, show dhcpd statistics
+配置DHCP中继：
+定义真实DHCP Server Firewall(config)# dhcprelay server dhcp_server_ip server_ifc(最多4个)
+中继参数Firewall(config)# dhcprelay timeout seconds Firewall(config)# dhcprelay setroute client_ifc
+启用中继 Firewall(config)# dhcprelay enable client_ifc
+验证 show dhcprelay statistics
+2.4组播的支持
+暂略
+
