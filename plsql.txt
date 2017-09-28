@@ -1,0 +1,50 @@
+PLSQL Developer连接远程oracle配置
+
+在windows机器上不想安装oracle或者oracle的客户端，我们怎么使用PLSQL Developer工具呢？答案如下：
+
+1：在oracle官网上下载instantclient-basic-nt-11.2.0.3.0.zip该文件，
+
+下载地址为：http://download.oracle.com/otn/nt/instantclient/112030/instantclient-basic-nt-11.2.0.3.0.zip。
+
+下载完成后解压该文件。如：我将其解压在E:\oracleClient\instantclient_11_2该路径下。进入到instantclient_11_2下创建目录NETWORK，然后再NETWORK下建立目录ADMIN。在ADMIN目录下建立tnsnames.ora文件，在该tnsnames.ora文件中添加如下内容：
+
+
+ORACLR_CONNECTION_DATA =   
+  (DESCRIPTION =   
+    (ADDRESS_LIST =   
+      (ADDRESS = (PROTOCOL = IPC)(KEY = EXTPROC1521))   
+    )   
+    (CONNECT_DATA =   
+      (SID = CLRExtProc)   
+      (PRESENTATION = RO)   
+    )   
+  )   
+  
+TEST =                     
+  (DESCRIPTION =   
+    (ADDRESS = (PROTOCOL = TCP)(HOST = 192.168.2.175)(PORT = 1521))   
+    (CONNECT_DATA =   
+      (SERVER = DEDICATED)   
+      (SERVICE_NAME = orcl)   
+    )   
+  )  
+
+192.168.2.175--为数据库所在机器ip
+2：环境变量的配置
+
+打开环境变量设置添加TNS_ADMIN，值为tnsnames.ora所在路径。如本机为E:\oracleClient\instantclient_11_2\NETWORK\ADMIN\tnsnames.ora
+
+设置ORACLE的语言，添加环境变量NLS_LANG，值为AMERICAN_AMERICA.AL32UTF8  如果出现乱码可用SIMPLIFIED CHINESE_CHINA.ZHS16GBK
+  3：下载并安装PLSQL Developer
+
+安装完成后进入PLSQL Developer，选择tools->preferences->connection
+
+Oracle Home             
+
+E:\oracleClient\instantclient_11_2 
+
+OCI library
+
+E:\oracleClient\instantclient_11_2\oci.dll
+
+修改完毕后保存并重启PLSQL Developer就可以使用该工具了。
