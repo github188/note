@@ -1440,8 +1440,9 @@ scp -P 20022 admin@113.4.12.13:/home/admin/works/venueadmin/target/venueadmin.wa
 
 
 
-安卓运动管家二期最新版本测试下载地址：113.6.251.97:8016/sports/ydxgj_v2.0.00.apk
-
+安卓运动管家二期最新版本测试下载地址：http://221.208.170.176:8016/sport_download/ydxgj_v2.0.00.apk
+安卓赛事二期最新版本测试下载地址 : http://221.208.170.176:8016/sport_download/match.apk
+安卓场馆二期最新版本测试下载地址 : http://221.208.170.176:8016/sport_download/venue.apk
 
 参数文件：
    设定数据库的限制
@@ -1471,23 +1472,38 @@ Wcy123456
   京东web：http://113.4.12.12:8030/jdcqweb/
 
 
+ssh://git@113.4.12.13:20022/JDcaiyu/jdfbdata.git
+ssh://git@113.4.12.13:20022/JDcaiyu/jdcaiqiu.git
+
+ssh://git@113.4.12.13:20022/JDcaiyu/jcgamelogic.git
+ssh://git@113.4.12.13:20022/JDcaiyu/jdcqweb.git
+
 git  tag   -a  $Version_Number   -m "$Version_Number "
 git  push  --tags  
 
-git  tag   -a  v1.0.00_201708041830  -m "v1.0.00_201708041830"
+git  tag   -a  v1.0.00_201709081139 -m "v1.0.00_201709081139"
 git  push  --tags  
 
 rm  -rf  .git  .gitignore
 
-tar   -zcvf  jdfbdata_v1.0.00_201708041830.tar.gz   jdfbdata
+tar   -zcvf  jdfbdata_v1.0.00_201709051252.tar.gz   jdfbdata
 
-tar   -zcvf  jcgamelogic_v1.0.00_201708041830.tar.gz  jcgamelogic
+tar   -zcvf  jcgamelogic_v1.0.00_201709011734.tar.gz  jcgamelogic
 
-tar  -zcvf   jdcaiqiu_v1.0.00_201708041830.tar.gz  jdcaiqiu
+tar  -zcvf   jdcaiqiu_v1.0.00_201709081139.tar.gz  jdcaiqiu
 
-tar   -zcvf   jdcqweb_v1.0.00_201708041830.tar.gz  jdcqweb
+tar   -zcvf   jdcqweb_v1.0.00_201709051037.tar.gz  jdcqweb
 
 tc999888!@#11975app
+
+
+commit da264fd2a749d61e7a5b15e13f9d44f707af94f0
+Author: yangyang <yangyang@itengcai.com>
+Date:   Wed Aug 30 09:23:11 2017 +0800
+
+    修改去掉b表里的null
+
+
 
 
 #!/bin/bash
@@ -1538,3 +1554,417 @@ MySQL> exit
    mysqldump -uroot -proot --databases db1 db2 >/tmp/user.sql
 导出數據库為dbname某张表(test)结构及表數據（不加-d）
    mysqldump -uroot -pdbpasswd dbname test>db.sql;
+
+
+
+
+
+   create  table  t_part(id  int)   partition    by  range (id) (partition  p1  values   less  than (5),partition  p2 values less than (10)，partition  p3 values less  than (15));
+
+
+   http://118.190.60.100:8080/jdfbcpapi/
+
+   7480f4bdc6ea4c8fab3547275d8c2de2.html
+
+
+
+
+   44-00-10-8A-FC-BE  takaratakara  无名mac 删掉
+
+   v1.0.00.201706291327
+CREATE DATABASE  yundongguanjia_2_production
+ DEFAULT CHARACTER SET utf8
+ DEFAULT COLLATE utf8_general_ci ;
+
+GRANT ALL PRIVILEGES ON yundongguanjia_2_production.* to 'ydgjlt_pro'@'%'   identified by  'ydgjltmysqladmin_production';
+
+GRANT ALL PRIVILEGES ON yundongguanjia_2_production.* to 'ydgjlt_pro'@'localhost' identified by  'ydgjltmysqladmin_production' ;
+
+http://113.4.12.12:8027/venuesfiles/html/e53abdab629f4e6b85d6a4b2acfe90a3.html
+
+ REVOKE ALL PRIVILEGES ON yundongguanjia_2_production.* to 'ydgjlt'@'%' ;
+一·查看字符集 
+字符集在系统中体现形式是一个环境变量，以CentOS6.5为例,其查看当前终端使用字符集的方式可以有以下几种方式:
+
+第一种：	
+[root@Testa-www tmp]# echo $LANG
+zh_CN.UTF-8
+
+第二种：	
+[root@Testa-www ~]# env |grep LANG
+LANG=zh_CN.UTF-8
+
+第三种：	
+[root@Testa-www ~]# export |grep LANG
+declare -x LANG="zh_CN.UTF-8"
+
+第四种：	
+[root@Testa-www ~]# locale
+LANG=zh_CN.UTF-8
+LC_CTYPE="zh_CN.UTF-8"
+LC_NUMERIC="zh_CN.UTF-8"
+LC_TIME="zh_CN.UTF-8"
+LC_COLLATE="zh_CN.UTF-8"
+LC_MONETARY="zh_CN.UTF-8"
+LC_MESSAGES="zh_CN.UTF-8"
+LC_PAPER="zh_CN.UTF-8"
+LC_NAME="zh_CN.UTF-8"
+LC_ADDRESS="zh_CN.UTF-8"
+LC_TELEPHONE="zh_CN.UTF-8"
+LC_MEASUREMENT="zh_CN.UTF-8"
+LC_IDENTIFICATION="zh_CN.UTF-8"
+LC_ALL=
+
+二、修改字符集的方式 
+需注意的是：如果默认语言是en_US.UTF-8，在Linux的字符和图形界面下都是无法显示和输入中文的。如果默认语言是中文，比如zh_CN.GB18030 或者zh_CN.gb2312,字符界面无法显示和输入，图形界面可以。 
+
+修改的方式有如下两种：
+
+1、直接设置变量的方式修改
+export LANG=zh_CN.UTF-8
+
+2、修改文件方式，通过修改/etc/sysconfig/i18n文件控制
+	
+[root@Testa-www ~]# vim /etc/sysconfig/i18n
+LANG="zh_CN.UTF-8"
+[root@Testa-www ~]# source /etc/sysconfig/i18n　　
+update mysql.user set password=password('ydgjltmysqladmin_production') where User="ydgjlt" and Host="%";
+GRANT ALL PRIVILEGES ON yundongguanjia_2_production.* to 'ydgjlt'@'%'   identified by  'ydgjltmysqladmin_production';
+GRANT ALL PRIVILEGES ON yundongguanjia_2_production.* to 'ydgjlt'@'113.4.12.12'   identified by  'ydgjltmysqladmin_production1212';
+
+GRANT ALL PRIVILEGES ON yundongguanjia.* to 'ydgjlt'@'%'   identified by  'ydgjltmysqladmin';
+
+GRANT ALL PRIVILEGES ON yundongguanjia_prodouct.* to 'ydgjlt'@'%'   identified by  'ydgjltmysqladmin';
+
+GRANT ALL PRIVILEGES ON yundongguanjia_2_production.* to 'ydgjlt'@'113.4.12.12'   identified by  'ydgjltmysqladmin_production1212';
+GRANT ALL PRIVILEGES ON yundongguanjia_2_production.* to 'ydgjlt'@'113.4.12.12'   identified by  'ydgjltmysqladmin_production1212';
+GRANT ALL PRIVILEGES ON yundongguanjia_2_production.* to 'ydgjlt'@'113.4.12.12'   identified by  'ydgjltmysqladmin_production1212';
+
+REVOKE ALL PRIVILEGES ON yundongguanjia_2_production.* from   'ydgjlt'@'%' ;
+
+
+*************************************************************************************************************************************
+CREATE DATABASE  yundongguanjia_2_pro
+ DEFAULT CHARACTER SET utf8
+ DEFAULT COLLATE utf8_general_ci ;
+
+
+GRANT ALL PRIVILEGES ON yundongguanjia_2_pro.* to 'ydgjlt_pro'@'%'   identified by  'ydgjltmysqladmin_production';
+
+GRANT ALL PRIVILEGES ON yundongguanjia_2_pro.* to 'ydgjlt_pro'@'localhost' identified by  'ydgjltmysqladmin_production' ;
+
+
+watch cat /proc/net/dev
+
+wangchunyu508541
+
+iTengcai@20170821   root
+tc999888!@#app13186   app
+ALTER TABLE `T_INTEGRAL_CHANGE`   ADD COLUMN `VIR_INTEGRAL`  decimal(10,2) NOT NULL DEFAULT 1 AFTER `GOODS_INTEGRAL`,ADD COLUMN `CHA_INTEGRAL`  decimal(10,2) NOT NULL DEFAULT 1 AFTER `VIR_INTEGRAL`;
+
+
+
+113.6.251.98  113.6.251.95  113.6.251.97  113.6.251.94 帮我查一下这几个ip对应的mac地址
+
+
+
+
+阿里云后台管理：	hi34700540@aliyun.com	830512rt!
+aliyun-mysql
+
+useradd -g mysql -r -s /sbin/nologin -M -d /home/mydata/data mysql
+
+scripts/mysql_install_db --user=mysql --datadir=/home/mydata/data
+
+mysqladmin13186root
+
+
+mysqladmin -u root password mysqladmin13186root
+
+
+CREATE DATABASE  tcdata
+ DEFAULT CHARACTER SET utf8
+ DEFAULT COLLATE utf8_general_ci ;
+
+GRANT ALL PRIVILEGES ON tcdata.* to 'tcgwdata'@'%' IDENTIFIED BY 'mysqladmin13186tcgwdata';
+
+GRANT ALL PRIVILEGES ON tcdata.* to 'tcgwdata'@'localhost' IDENTIFIED BY 'mysqladmin13186tcgwdata';
+
+"windwos  
+server  2003"	221.208.170.183	"windwos  
+server  2003"	已升级	iis	7	1	是	是	80	竞彩网网站		否	否	否	否	每季度	是
+
+
+
+运动管家项目	221.208.170.162	 192.168.66.101	CentOs7	20022   app	tc999888!@#Sg@)!@2012
+运动管家项目		192.168.66.102	CentOs7	20022    app	tc999888!@
+运动管家项目	221.208.170.175	192.168.66.103	CentOs7	20022     app	tc999888!@
+
+  
+
+ http://exim.mirror.fr/pcre/
+
+
+
+
+
+
+
+积分商城_跳板机+ftp	113.6.251.97	192.168.88.109	CentOs7	20022  app	tc999888!@#app
+
+CREATE DATABASE  jdmatchplay_test
+ DEFAULT CHARACTER SET utf8
+ DEFAULT COLLATE utf8_general_ci ;
+
+GRANT ALL PRIVILEGES ON jdmatchplay_test.* to 'jdmatch'@'%'  ;
+
+GRANT ALL PRIVILEGES ON jdmatchplay_test.* to 'jdmatch'@'localhost'  ;
+
+2017年9月1日
+2017年9月4日
+2017年9月5日
+2017年9月6日
+2017年9月7日
+2017年9月8日
+2017年9月11日
+2017年9月12日
+2017年9月13日
+2017年9月14日
+2017年9月15日
+2017年9月18日
+2017年9月19日
+2017年9月20日
+2017年9月21日
+2017年9月22日
+2017年9月25日
+2017年9月26日
+2017年9月27日
+2017年9月28日
+2017年9月29日
+
+亚布力项目	113.4.12.12		CentOs7	20022	root	Hyc521125!@
+ 请把前端重新部署一下 ，把jdcqweb\src\main\webapp\js\recharge.js  替换一下
+
+
+jdcaiqiu	吴云涛	2017/8/10 15:45	"增加部分派奖接口日志； 删除一个无用引用类； 格式化vsresult字段；"	v1.0.00_201708101737
+jdfbdata	杨阳	2017/8/10 17:23	修改删除过期数据方法	                                                v1.0.00_201708101737
+jcgamelogic	杨阳	2017/8/10 9:48	修改我的记录，订单明细编号加密去掉	                                v1.0.00_201708101347
+jdcqweb	        杨阳   2017/8/9 16:23	修改记录少时拉取错误	                                                v1.0.00_201708091938
+
+
+
+JDBC Connection [jdbc:mysql://120.27.13.186:3306/tcdata?useUnicode=true&characterEncoding=UTF-8, UserName=tcgwdata@118.190.60.100, MySQL Connector Java] will not be ma
+naged by Spring
+==>  Preparing: select ? as lotoid,CONCAT(REPLACE(SALEDAY,'-',''), CASE LEFT(ALIASNUM,2) WHEN '周一' THEN '1' WHEN '周二' THEN '2' WHEN '周三' THEN '3' WHEN '周四' THE
+N '4' WHEN '周五' THEN '5' WHEN '周六' THEN '6' WHEN '周日' THEN '7' END , RIGHT(ALIASNUM,3)) as issue, a.startsaletime as starttime, DATE_FORMAT(date_add(a.MATCHTIME,
+ interval -10 minute),'%Y%m%d%H%i%s') as endtime, CASE WHEN r.CGHAD IS NULL OR r.CGHAD='' THEN '' ELSE CONCAT(r.HOMEFULLTIMERESULT,':',r.GUESTFULLTIMERESULT,'|',r.HOME
+HALFTIMERESULT,':',r.GUESTHALFTIMERESULT,'|',r.HOMEFULLTIMERESULT,':',r.GUESTFULLTIMERESULT,'|',CASE when r.HAD is null or r.HAD = '' THEN '0.00' else r.HAD END) END b
+onuscode, CASE WHEN r.matchresultstatus in ('Abandon') THEN '99' WHEN r.matchresultstatus in ('Conclude') THEN '2' WHEN r.homefulltimeresult <> '' and r.guestfulltimer
+esult <> '' THEN '3' ELSE '1' END `status`, h.poolstatus from MATCH_ALL as a INNER JOIN MATCH_RESULT as r on a.matchid=r.matchid INNER JOIN MATCH_HAD h on h.matchid=r.
+MATCHID where a.MATCHID in ( ? ) 
+==> Parameters: 301(String), 0(String)
+<==      Total: 0
+Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@1ee145f9]
+java.net.SocketTimeoutException: Read timed out
+        at java.net.SocketInputStream.socketRead0(Native Method)
+        at java.net.SocketInputStream.read(SocketInputStream.java:152)
+        at java.net.SocketInputStream.read(SocketInputStream.java:122)
+        at org.apache.coyote.http11.InternalInputBuffer.fill(InternalInputBuffer.java:535)
+        at org.apache.coyote.http11.InternalInputBuffer.fill(InternalInputBuffer.java:504)
+        at org.apache.coyote.http11.InternalInputBuffer$InputStreamInputBuffer.doRead(InternalInputBuffer.java:566)
+        at org.apache.coyote.http11.filters.IdentityInputFilter.doRead(IdentityInputFilter.java:137)
+        at org.apache.coyote.http11.AbstractInputBuffer.doRead(AbstractInputBuffer.java:341)
+        at org.apache.coyote.Request.doRead(Request.java:431)
+        at org.apache.catalina.connector.InputBuffer.realReadBytes(InputBuffer.java:290)
+        at org.apache.tomcat.util.buf.ByteChunk.substract(ByteChunk.java:449)
+        at org.apache.catalina.connector.InputBuffer.read(InputBuffer.java:315)
+        at org.apache.catalina.connector.CoyoteInputStream.read(CoyoteInputStream.java:200)
+        at sun.nio.cs.StreamDecoder.readBytes(StreamDecoder.java:283)
+         at sun.nio.cs.StreamDecoder.implRead(StreamDecoder.java:325)
+        at sun.nio.cs.StreamDecoder.read(StreamDecoder.java:177)
+        at java.io.InputStreamReader.read(InputStreamReader.java:184)
+        at java.io.Reader.read(Reader.java:140)
+        at org.apache.commons.io.IOUtils.copyLarge(IOUtils.java:1128)
+        at org.apache.commons.io.IOUtils.copy(IOUtils.java:1104)
+        at org.apache.commons.io.IOUtils.copy(IOUtils.java:1050)
+        at org.apache.commons.io.IOUtils.toString(IOUtils.java:359)
+        at com.tengcai.vims.controller.system.LOTO_Controller.loto(LOTO_Controller.java:150)
+        at sun.reflect.GeneratedMethodAccessor194.invoke(Unknown Source)
+        at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+        at java.lang.reflect.Method.invoke(Method.java:606)
+        at org.springframework.web.method.support.InvocableHandlerMethod.invoke(InvocableHandlerMethod.java:219)
+        at org.springframework.web.method.support.InvocableHandlerMethod.invokeForRequest(InvocableHandlerMethod.java:132)
+        at org.springframework.web.servlet.mvc.method.annotation.ServletInvocableHandlerMethod.invokeAndHandle(ServletInvocableHandlerMethod.java:104)
+        at org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter.invokeHandleMethod(RequestMappingHandlerAdapter.java:745)
+        at org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter.handleInternal(RequestMappingHandlerAdapter.java:686)
+        at org.springframework.web.servlet.mvc.method.AbstractHandlerMethodAdapter.handle(AbstractHandlerMethodAdapter.java:80)
+        at org.springframework.web.servlet.DispatcherServlet.doDispatch(DispatcherServlet.java:925)
+        at org.springframework.web.servlet.DispatcherServlet.doService(DispatcherServlet.java:856)
+        at org.springframework.web.servlet.FrameworkServlet.processRequest(FrameworkServlet.java:936)
+        at org.springframework.web.servlet.FrameworkServlet.doPost(FrameworkServlet.java:838)
+        at javax.servlet.http.HttpServlet.service(HttpServlet.java:650)
+        at org.springframework.web.servlet.FrameworkServlet.service(FrameworkServlet.java:812)
+        at javax.servlet.http.HttpServlet.service(HttpServlet.java:731)
+        at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:303)
+        at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:208)
+        at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:208)
+        at org.apache.tomcat.websocket.server.WsFilter.doFilter(WsFilter.java:52)
+        at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:241)
+        at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:208)
+        at org.springframework.web.filter.CharacterEncodingFilter.doFilterInternal(CharacterEncodingFilter.java:88)
+        at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:107)
+        at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:241)
+        at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:208)
+        at org.apache.catalina.core.StandardWrapperValve.invoke(StandardWrapperValve.java:220)
+        at org.apache.catalina.core.StandardContextValve.invoke(StandardContextValve.java:122)
+        at org.apache.catalina.authenticator.AuthenticatorBase.invoke(AuthenticatorBase.java:505)
+        at org.apache.catalina.core.StandardHostValve.invoke(StandardHostValve.java:170)
+        at org.apache.catalina.valves.ErrorReportValve.invoke(ErrorReportValve.java:103)
+        at org.apache.catalina.valves.AccessLogValve.invoke(AccessLogValve.java:950)
+        at org.apache.catalina.core.StandardEngineValve.invoke(StandardEngineValve.java:116)
+        at org.apache.catalina.connector.CoyoteAdapter.service(CoyoteAdapter.java:423)
+        at org.apache.coyote.http11.AbstractHttp11Processor.process(AbstractHttp11Processor.java:1079)
+        at org.apache.coyote.AbstractProtocol$AbstractConnectionHandler.process(AbstractProtocol.java:620)
+        at org.apache.tomcat.util.net.JIoEndpoint$SocketProcessor.run(JIoEndpoint.java:316)
+        at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1145)
+        at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:615)
+        at org.apache.tomcat.util.threads.TaskThread$WrappingRunnable.run(TaskThread.java:61)
+        at java.lang.Thread.run(Thread.java:745)
+org.dom4j.DocumentException: Error on line -1 of document  : Premature end of file. Nested exception: Premature end of file.
+        at org.dom4j.io.SAXReader.read(SAXReader.java:482)
+        at org.dom4j.io.SAXReader.read(SAXReader.java:343)
+        org.dom4j.DocumentException: Error on line -1 of document  : Premature end of file. Nested exception: Premature end of file.
+        at org.dom4j.io.SAXReader.read(SAXReader.java:482)
+        at org.dom4j.io.SAXReader.read(SAXReader.java:343)
+        at com.tengcai.vims.controller.system.LOTO_Controller.loto(LOTO_Controller.java:161)
+        at sun.reflect.GeneratedMethodAccessor194.invoke(Unknown Source)
+        at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+        at java.lang.reflect.Method.invoke(Method.java:606)
+        at org.springframework.web.method.support.InvocableHandlerMethod.invoke(InvocableHandlerMethod.java:219)
+        at org.springframework.web.method.support.InvocableHandlerMethod.invokeForRequest(InvocableHandlerMethod.java:132)
+        at org.springframework.web.servlet.mvc.method.annotation.ServletInvocableHandlerMethod.invokeAndHandle(ServletInvocableHandlerMethod.java:104)
+        at org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter.invokeHandleMethod(RequestMappingHandlerAdapter.java:745)
+        at org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter.handleInternal(RequestMappingHandlerAdapter.java:686)
+        at org.springframework.web.servlet.mvc.method.AbstractHandlerMethodAdapter.handle(AbstractHandlerMethodAdapter.java:80)
+        at org.springframework.web.servlet.DispatcherServlet.doDispatch(DispatcherServlet.java:925)
+        at org.springframework.web.servlet.DispatcherServlet.doService(DispatcherServlet.java:856)
+        at org.springframework.web.servlet.FrameworkServlet.processRequest(FrameworkServlet.java:936)
+        at org.springframework.web.servlet.FrameworkServlet.doPost(FrameworkServlet.java:838)
+        at javax.servlet.http.HttpServlet.service(HttpServlet.java:650)
+        at org.springframework.web.servlet.FrameworkServlet.service(FrameworkServlet.java:812)
+        at javax.servlet.http.HttpServlet.service(HttpServlet.java:731)
+        at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:303)
+        at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:208)
+        at org.apache.tomcat.websocket.server.WsFilter.doFilter(WsFilter.java:52)
+        at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:241)
+        at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:208)
+        at org.springframework.web.filter.CharacterEncodingFilter.doFilterInternal(CharacterEncodingFilter.java:88)
+        at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:107)
+        at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:241)
+        at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:208)
+        at org.apache.catalina.core.StandardWrapperValve.invoke(StandardWrapperValve.java:220)
+        at org.apache.catalina.core.StandardContextValve.invoke(StandardContextValve.java:122)
+        at org.apache.catalina.authenticator.AuthenticatorBase.invoke(AuthenticatorBase.java:505)
+        at org.apache.catalina.core.StandardHostValve.invoke(StandardHostValve.java:170)
+        at org.apache.catalina.valves.ErrorReportValve.invoke(ErrorReportValve.java:103)
+        at org.apache.catalina.valves.AccessLogValve.invoke(AccessLogValve.java:950)
+        at org.apache.catalina.core.StandardEngineValve.invoke(StandardEngineValve.java:116)
+        at org.apache.catalina.connector.CoyoteAdapter.service(CoyoteAdapter.java:423)
+        at org.apache.coyote.http11.AbstractHttp11Processor.process(AbstractHttp11Processor.java:1079)
+        at org.apache.coyote.AbstractProtocol$AbstractConnectionHandler.process(AbstractProtocol.java:620)
+        at org.apache.tomcat.util.net.JIoEndpoint$SocketProcessor.run(JIoEndpoint.java:316)
+        at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1145)
+        at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:615)
+        at org.apache.tomcat.util.threads.TaskThread$WrappingRunnable.run(TaskThread.java:61)
+        at java.lang.Thread.run(Thread.java:745)
+Nested exception:
+org.xml.sax.SAXParseException; Premature end of file.
+        at org.apache.xerces.util.ErrorHandlerWrapper.createSAXParseException(Unknown Source)
+        at org.apache.xerces.util.ErrorHandlerWrapper.fatalError(Unknown Source)
+        at org.apache.xerces.impl.XMLErrorReporter.reportError(Unknown Source)
+        at org.apache.xerces.impl.XMLErrorReporter.reportError(Unknown Source)
+        at org.apache.xerces.impl.XMLVersionDetector.determineDocVersion(Unknown Source)
+        at org.apache.xerces.parsers.XML11Configuration.parse(Unknown Source)
+        at org.apache.xerces.parsers.XML11Configuration.parse(Unknown Source)
+        at org.apache.xerces.parsers.XMLParser.parse(Unknown Source)
+        at org.apache.xerces.parsers.AbstractSAXParser.parse(Unknown Source)
+        at org.dom4j.io.SAXReader.read(SAXReader.java:465)
+        at org.dom4j.io.SAXReader.read(SAXReader.java:343)
+        at com.tengcai.vims.controller.system.LOTO_Controller.loto(LOTO_Controller.java:161)
+        at sun.reflect.GeneratedMethodAccessor194.invoke(Unknown Source)
+        at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+        at java.lang.reflect.Method.invoke(Method.java:606)
+        at org.springframework.web.method.support.InvocableHandlerMethod.invoke(InvocableHandlerMethod.java:219)
+        at org.springframework.web.method.support.InvocableHandlerMethod.invokeForRequest(InvocableHandlerMethod.java:132)
+        at org.springframework.web.servlet.mvc.method.annotation.ServletInvocableHandlerMethod.invokeAndHandle(ServletInvocableHandlerMethod.java:104)
+        at org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter.invokeHandleMethod(RequestMappingHandlerAdapter.java:745)
+        at org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter.handleInternal(RequestMappingHandlerAdapter.java:686)
+        at org.springframework.web.servlet.mvc.method.AbstractHandlerMethodAdapter.handle(AbstractHandlerMethodAdapter.java:80)
+        at org.springframework.web.servlet.DispatcherServlet.doDispatch(DispatcherServlet.java:925)
+        at org.springframework.web.servlet.DispatcherServlet.doService(DispatcherServlet.java:856)
+        at org.springframework.web.servlet.FrameworkServlet.processRequest(FrameworkServlet.java:936)
+        at org.springframework.web.servlet.FrameworkServlet.doPost(FrameworkServlet.java:838)
+        at javax.servlet.http.HttpServlet.service(HttpServlet.java:650)
+        at org.springframework.web.servlet.FrameworkServlet.service(FrameworkServlet.java:812)
+        at javax.servlet.http.HttpServlet.service(HttpServlet.java:731)
+        at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:303)
+        at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:208)
+        at org.apache.tomcat.websocket.server.WsFilter.doFilter(WsFilter.java:52)
+        at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:241)
+        at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:208)
+        at org.springframework.web.filter.CharacterEncodingFilter.doFilterInternal(CharacterEncodingFilter.java:88)
+        at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:107)
+        at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:241)
+        at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:208)
+        at org.apache.catalina.core.StandardWrapperValve.invoke(StandardWrapperValve.java:220)
+        at org.apache.catalina.core.StandardContextValve.invoke(StandardContextValve.java:122)
+        at org.apache.catalina.authenticator.AuthenticatorBase.invoke(AuthenticatorBase.java:505)
+        at org.apache.catalina.core.StandardHostValve.invoke(StandardHostValve.java:170)
+        at org.apache.catalina.valves.ErrorReportValve.invoke(ErrorReportValve.java:103)
+        at org.apache.catalina.valves.AccessLogValve.invoke(AccessLogValve.java:950)
+        at org.apache.catalina.core.StandardEngineValve.invoke(StandardEngineValve.java:116)
+        at org.apache.catalina.connector.CoyoteAdapter.service(CoyoteAdapter.java:423)
+        at org.apache.coyote.http11.AbstractHttp11Processor.process(AbstractHttp11Processor.java:1079)
+        at org.apache.coyote.AbstractProtocol$AbstractConnectionHandler.process(AbstractProtocol.java:620)
+        at org.apache.tomcat.util.net.JIoEndpoint$SocketProcessor.run(JIoEndpoint.java:316)
+        at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1145)
+        at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:615)
+        at org.apache.tomcat.util.threads.TaskThread$WrappingRunnable.run(TaskThread.java:61)
+        at java.lang.Thread.run(Thread.java:745)
+Nested exception: org.xml.sax.SAXParseException; Premature end of file.
+        at org.apache.xerces.util.ErrorHandlerWrapper.createSAXParseException(Unknown Source)
+        at org.apache.xerces.util.ErrorHandlerWrapper.fatalError(Unknown Source)
+        at org.apache.xerces.impl.XMLErrorReporter.reportError(Unknown Source)
+        at org.apache.xerces.impl.XMLErrorReporter.reportError(Unknown Source)
+        at org.apache.xerces.impl.XMLVersionDetector.determineDocVersion(Unknown Source)
+        at org.apache.xerces.parsers.XML11Configuration.parse(Unknown Source)
+        at org.apache.xerces.parsers.XML11Configuration.parse(Unknown Source)
+        at org.apache.xerces.parsers.XMLParser.parse(Unknown Source)
+        at org.apache.xerces.parsers.AbstractSAXParser.parse(Unknown Source)
+        at org.dom4j.io.SAXReader.read(SAXReader.java:465)
+        at org.dom4j.io.SAXReader.read(SAXReader.java:343)
+        at com.tengcai.vims.controller.system.LOTO_Controller.loto(LOTO_Controller.java:161)
+        at sun.reflect.GeneratedMethodAccessor194.invoke(Unknown Source)
+        at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+        at java.lang.reflect.Method.invoke(Method.java:606)
+        at org.springframework.web.method.support.InvocableHandlerMethod.invoke(InvocableHandlerMethod.java:219)
+        at org.springframework.web.method.support.InvocableHandlerMethod.invokeForRequest(InvocableHandlerMethod.java:132)
+        at org.springframework.web.servlet.mvc.method.annotation.ServletInvocableHandlerMethod.invokeAndHandle(ServletInvocableHandlerMethod.java:104)
+        at org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter.invokeHandleMethod(RequestMappingHandlerAdapter.java:745)
+        at org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter.handleInternal(RequestMappingHandlerAdapter.java:686)
+
+
+
+	 mvn deploy:deploy-file -DgroupId=org.csource -DartifactId=fastdfs-client-java -Dversion=1.27-SNAPSHOT -Dpackaging=jar -Dfile=C:/Users/wangchunyu/Desktop/MavenDeploy/fastdfa/fastdfs-client-java-1.27-SNAPSHOT.jar -Durl=http://113.4.12.13:8081/nexus/content/repositories/snapshots/ -DrepositoryId=snapshots
+
+
+	 and {log_monitor:log[/home/hljmatch/tomcat_hljmatch/logs/catalina.out,ERROR,,,skip,].str(error)}=1
+
+	 {log_monitor:log[/home/hljmatch/tomcat_hljmatch/logs/catalina.out,ERROR,,,skip,].nodata(60)}=0
+
+
+积分商城测试包下载 :221.208.170.176:8016/hljtcp_download/hljtcp_v1.0.02.apk
+
+max_allowed_packet       | 4194304
+
+黑
