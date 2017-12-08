@@ -1,0 +1,43 @@
+建立脚本
+
+[oracle@localhost ~]$ vi logicbackup.sh
+#!/bin/sh
+# 
+# Oracle Environment settings 
+ORACLE_BASE=/usr/local/oracle; export ORACLE_BASE
+ORACLE_HOME=$ORACLE_BASE/product/11.2.0/dbhome_1;  export ORACLE_HOME 
+PATH=$ORACLE_HOME/bin:/usr/local/bin:/usr/ccs/bin:$PATH:/usr/sbin
+export PATH
+CLASSPATH=$ORACLE_HOME/jlib:$ORACLE_HOME/product/jlib ; export CLASSPATH
+backup_dir=$ORACLE_BASE/admin/orcl/dpdump
+#可以创建数据泵目录directory，这里指定默认的目录
+#SQL>CREATE DIRECTORY dump_backup_dir as '/u01/oradata/dump_backup_dir';
+#SQL>grant read,write on directory dump_backup_dir to user;  
+DMP_FILE=PH_$(date +%Y%m%d_%H%M%S).dmp
+LOG_FILE=PH_$(date +%Y%m%d_%H%M%S).log
+#
+#  Let's start with an export of the database 
+expdp user/pwd@orcl schemas=schema_name DUMPFILE=$DMP_FILE logfile=$LOG_FILE compression=all;
+#expdp user/pwd@orcl schemas=schema_name DIRECTORY=$dump_backup_dir DUMPFILE=$DMP_FILE logfile=$LOG_FILE compression=all parallel=3;
+
+# Let's delete the backups and logs that are more than 1 days old
+# 删除2天前PH_开头的dmp文件
+cd $backup_dir
+find $backup_dir -mtime +2 -name "PH_*"  -exec rm -f {} \;
+# That's all
+
+设置权限
+
+[oracle@localhost ~]$ chmod 777 ./logicbackup.sh 
+
+
+[oracle@localhost ~]$ crontab -e
+#每6小时执行一次 错误信息将输出到 tmp/expdp.log 文件中
+* */6 * * * /home/oracle/logicbackup.sh > /tmp/expdp.log 2>&1
+
+查看任务
+
+[oracle@localhost ~]$ crontab -l
+* */6 * * * /home/oracle/logicbackup.sh > /tmp/expdp.log 2>&1
+[oracle@localhost ~]$ 
+

@@ -1,0 +1,120 @@
+1.首先sysdba的身份登录oracle.
+      conn  as sysdba  
+2.然后创建用户
+      create user sams identified by 123456;  
+
+3.创建好用户修改用户的密码.
+      alter user sams identified by 123456; 
+4.给用户授权  
+      grant connect,resource to sams;
+
+      详细授予权限
+　　  grant create session to sams;//授予sams用户创建session的权限，即登陆权限
+　　  grant unlimited tablespace to sams;//授予sams用户使用表空间的权限
+　　  grant create table to sams;//授予创建表的权限
+　　  grante drop table to sams;//授予删除表的权限
+　　  grant insert table to sams;//插入表的权限
+　　  grant update table to sams;//修改表的权限
+　　  grant all to public;//这条比较重要，授予所有权限(all)给所有用户(public)
+
+　　  oralce对权限管理比较严谨，普通用户之间也是默认不能互相访问的，需要互相授权
+　　  grant select on tablename to sams;//授予sams用户查看指定表的权限
+　    grant drop on tablename to sams;//授予删除表的权限
+　　  grant insert on tablename to sams;//授予插入的权限
+　  　grant update on tablename to sams;//授予修改表的权限
+　    grant insert(id) on tablename to sams;
+　　  grant update(id) on tablename to sams;//授予对指定表特定字段的插入和修改权限，注意，只能是insert和update
+　　  grant alert all table to sams;//授予sams用户alert任意表的权限
+
+　　  撤销权限
+　　  基本语法同grant,关键字为revoke
+
+　    查看权限
+　　  select * from user_sys_privs;//查看当前用户所有权限
+　    select * from user_tab_privs;//查看所用用户对表的权限
+
+4.默认情况下用户创建好后系统会默认给该用户分配一个表空间（users）;
+      查看一下所有用户所在的表空间.
+      select username,default_tablespace from dba_users; 
+      select username,default_tablespace from user_users;
+5.一般在开发情况下，我们当然不会使用用户的默认表空间,所以这时我们需要创建一个表空间.
+      create tablespace SAMA_DATA  datafile '/usr/oracle/app/oradata/samsdata01.dbf' size 500M; 
+
+      create tablespace LJSAMSDATA  datafile '/usr/oracle/app/oradata/samsdata01.dbf' size 500M; 
+      增加表空间数据文件
+      alter tablespace LJSAMSDATA add datafile '/usr/oracle/oradata/data/ljtamssdata02.dbf ' size 100M; 
+
+	第一:CREATE TABLESPACE"SAMPLE" 创建一个名为 "SAMPLE"的表空间。对表空间的命名，遵守Oracle 的命名规范就可了。
+	     Oracle可以创建的表空间有三种类型:
+	    (1)TEMPORARY: 临时表空间，用于临时数据的存放;创建临时表空间的语法如下:CREATE TEMPORARY TABLESPACE "SAMPLE"。。。。。。
+	    (2)UNDO : 还原表空间。用于存入重做日志文件。创建还原表空间的语法如下:CREATE UNDOTABLESPACE "SAMPLE"。。。。。。
+	    (3)用户表空间: 最重要，也是用于存放用户数据表空间可以直接写成: CREATE TABLESPACE"SAMPLE"TEMPORARY 和 UNDO 表空间是Oracle 管理的特殊的表空间。只用于存放系统相关数据。
+	第二: LOGGING
+	    有 NOLOGGING和 LOGGING两个选项，NOLOGGING:创建表空间时，不创建重做日志。LOGGING 和NOLOGGING正好相反， 就是在创建表空间时生成重做日志。用NOLOGGING时，好处在于创建时不用生成日志，这样表空间的创建较快，但是没能日志，数据丢失后，不能恢复，但是一般我们在创建表空间时，是没有数据的，按通常的做法，是建完表空间，并导入数据后，是要对数据做备份的，所以通常不需要表空间的创建日志，因此，在创建表空间时，选择NOLOGGING，以加快表空间的创建速度。
+	第三: DATAFILE 用于指定数据文件的具体位置和大小。
+	如: datafile '/usr/oracle/app/oradata/samsdata01.dbf' size 500M;说明文件的存放位置是'/usr/oracle/app/oradata/samsdata01.dbf'文件的大小为500M。如果有多个文件，可以用逗号隔开:
+	    datafile '/usr/oracle/app/oradata/samsdata01.dbf' size 500M,'/usr/oracle/app/oradata/samsdata02.dbf' size 500M;  
+	    但是每个文件都需要指明大小。单位以指定的单位为准如 5M 或 500K。对具体的文件，可以根据不同的需要，存放大不同的介质上，如磁盘阵列，以减少IO竟争。指定文件名时，必须为绝对地址，不能使用相对地址。
+	第四: EXTENTMANAGEMENT LOCAL存储区管理方法
+            注:datafile后面是表空间的物理存储路径，文件名的后缀可以随便
+6.创建好表空间,还需要将表空间分配给用户.
+      alter user sams default tablespace LJSAMSDATA;  
+7.我们可以通过步骤4来查询用户所在的表空间.
+      select username,default_tablespace from user_users;
+8.给用户分配了表空间,用户还不能登陆（没有登录权限）,因此还需要为用户分配权限
+      grant create session,create table,create view,create sequence,unlimited tablespace to zzg;  
+9.给用户分配了权限之后我们就可以用zzg用户来登录了.
+      conn zzg/unis;  
+10.登录之后我们也可以来查询用户所具有的权限
+      select *from session_privs;  
+11.最后我们也可以删除用户及其相关对象
+      drop user zzg cascade;  
+
+
+
+
+expdp和impdp
+
+1.创建逻辑目录，该命令不会在操作系统创建真正的目录，最好以system等管理员创建。
+     create directory samsdpdata1 as '/usr/oracle/oradata/dump';
+2.查看管理理员目录（同时查看操作系统是否存在，因为Oracle并不关心该目录是否存在，如果不存在，则出错）
+     select * from dba_directories;
+3.给sams用户赋予在指定目录的操作权限，最好以system等管理员赋予
+     grant read,write on directory samsdpdata1 to sams;
+4.按用户导
+     expdp sams/123456 schemas=sams  LOGFILE=sams2017120803.log   dumpfile=sams2017120803.dmp  DIRECTORY=samsdpdata1
+     expdp sams/123456 schemas=sams  LOGFILE=sams2017120803.log   dumpfile=sams2017120803.dmp  DIRECTORY=samsdpdata1 EXCLUDE=TABLE:\"IN \(\'ADDRESS_DATA_T\',\'CABLE_MODEM_MAC_T\'\)\" ;
+     expdp sams/123456 schemas=sams  LOGFILE=sams2017120804.log   dumpfile=sams2017120804.dmp  DIRECTORY=samsdpdata1 INCLUDE=TABLE:\"IN \(\'ADDRESS_DATA_T\',\'CABLE_MODEM_MAC_T\'\)\" ;
+
+    EXCLUDE=SEQUENCE,VIEW                          --过滤所有的SEQUENCE,VIEW
+    EXCLUDE=TABLE:"IN ('EMP','DEPT')"               --过滤表对象EMP,DEPT
+    EXCLUDE=SEQUENCE,VIEW,TABLE:"IN ('EMP','DEPT')" --过滤所有的SEQUENCE,VIEW以及表对象EMP,DEPT
+    EXCLUDE=INDEX:"= 'INDX_NAME'"                   --过滤指定的索引对象INDX_NAME
+    INCLUDE=PROCEDURE:"LIKE 'PROC_U%'"              --包含以PROC_U开头的所有存储过程(_ 符号代表任意单个字符)
+    INCLUDE=TABLE:"> 'E' "                          --包含大于字符E的所有表对象
+
+    其它常用操作符 NOT IN, NOT LIKE, <, != 等等
+    在Windows平台下，需要对象双引号进行转义，使用转义符\
+     Unix平台:
+    在未使用parfile文件的情形下，所有的符号都需要进行转义，包括括号，双引号，单引号等
+  按表名导
+     expdp  sams/123456  DIRECTORY=samsdpdata1 DUMPFILE=sams2017120801.dmp LOGFILE=sams2017120801.log    tables=BLACKLIST_T,BLACK_ITEM_T,CABLEMAC_T,CABLE_MODEM_GIADDR_T,CABLE_MODEM_GROUP_T,CABLE_MODEM_MAC_T,CM_ACCOUNT_BIND_MAC_T,CM_MAC_BIND_USER_T,OPTION43_T,DATATEM_FOR_OPTION43_T,DHCPOPTION_BINDMAC_DATA_T,DHCP_CABLEMAC_T,DNS_GROUP_T,ENUS_PROP_T,FAMILY_GATEWAY_MAC_GROUP_T,FAMILY_GATEWAY_MAC_T,INTERFACE_BIND_STRATEGY_T,INTERFACE_DHCP_PARAMS_T,INTERFACE_MAC_VALIDATION_T,INTERFACE_VALIDATED_MACS_T,IP_POOL_PROGRAM_T,ROUTER_T,ROUTER_INTERFACE_T,IP_POOL_T,LINCESE_HISTORY_T,LINCESE_REAL_T,LIN_SHI_CMDES,MACADDRESS_ENTRY_T,MACGROUP_PARAMS_T,MAC_GROUP_T,MAC_LOG,MAC_TEMP,NOT_ROAM_RELAYIP_T,OPTION120_T,OPTION60_BIND_120_T,OPTION60_BIND_43_T,OPTION60_SERVICEINFO_DATA_T,OPTION60_T,OPTION66_BAND_66AND67_T,PERMISSION_DATA_T,POOLIP_RATIO_T,SERVICE_ENUS_MAC_ADDR_NEW_T,SERVICE_T,SERVICE_TYPE_T,SERVICE_TYPE_DHCP_PARAMS_T,SERVICE_TYPE_VALIDATED_MAC_T,SESSION_COUNTER_T,SESSION_DHCP_SESSION_DATA_T,STATIC_IP_T,SUBOPT120_T,TFTP_FILE_T,TFTP_SERVER_T,TOD_SERVER_T,USER_INFO_T,VALIDATIED_MAC_SET_T,WHITELIST_T,SYS_AREA,CABLE_MODEM_USERINFO_T,CMGROUP_BIND_BOSSID_T,CABLE_MODEM_MAC_T_2015,CABLE_MODEM_MAC_T_2016512,TEMPQY,CABLE_MODEM_MAC_T_2017,IP_POOL_T_201774,ADDRESS_DATA_T
+  按查询条件导
+     expdp sams/123456   directory=samsdpdata1  dumpfile=sams2017120802.dmp LOGFILE=sams2017120802.log Tables= ADDRESS_DATA_T query="WHERE MACADDRESS="'30:44:87:9C:FD:74'"";
+     expdp sams/123456   directory=samsdpdata1  dumpfile=sams2017120802.dmp LOGFILE=sams2017120802.log Tables=IP_POOL_T query=IP_POOL_T:"WHERE INTERFACE_ID=755";
+  按表空间导
+     expdp sams/123456    DIRECTORY=samsdpdata1   DUMPFILE=sams2017120802.dmp TABLESPACES=LJSAMSDATA;
+  导出整个数据库
+     expdp system/123456  DIRECTORY=samsdpdata1   DUMPFILE=sams2017120802.dmp FULL=y;
+impdp
+
+  按用户导入
+     impdp sams/123456  DIRECTORY=samsdpdata1  DUMPFILE=sams201702.dmp SCHEMAS=sams;
+  导入表空间
+     impdp sams/123456  DIRECTORY=samsdpdata1  DUMPFILE=sams201702.dmp TABLESPACES=LJSAMSDATA;
+  导入数据库
+     impdb system/123456  DIRECTORY=samsdpdata1 DUMPFILE=sams2017120802.dmp  FULL=y;
+  追加数据
+     impdp system/manager DIRECTORY=dpdata1 DUMPFILE=expdp.dmp SCHEMAS=system TABLE_EXISTS_ACTION
+    
+   
