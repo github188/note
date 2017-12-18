@@ -120,11 +120,14 @@ MS_Webdrbd的Master节点即为drbd服务web资源的Primary节点，此节点�
 
 # crm
 crm(live)# configure
-crm(live)configure# primitive WebFS ocf:heartbeat:Filesystem params device="/dev/drbd0" directory="/www" fstype="ext3"
+crm(live)configure# primitive WebFS ocf:heartbeat:Filesystem params  device="/dev/drbd0" directory="/mnt/drbd" fstype="ext3"  op  start  timeout=100 op stop  timeout=100
 crm(live)configure# colocation WebFS_on_MS_webdrbd inf: WebFS MS_Webdrbd:Master
 crm(live)configure# order WebFS_after_MS_Webdrbd inf: MS_Webdrbd:promote WebFS:start
 crm(live)configure# verify
 crm(live)configure# commit
+
+
+
 
 查看集群中资源的运行状态：
  crm status

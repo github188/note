@@ -41,6 +41,9 @@
       create tablespace SAMA_DATA  datafile '/usr/oracle/app/oradata/samsdata01.dbf' size 500M; 
 
       create tablespace LJSAMSDATA  datafile '/usr/oracle/app/oradata/samsdata01.dbf' size 500M; 
+      create tablespace LJSAMSDATA  datafile '/home/oracle/app/oradata/HLJDB/samsdata01.dbf' size 100M; 
+
+
       增加表空间数据文件
       alter tablespace LJSAMSDATA add datafile '/usr/oracle/oradata/data/ljtamssdata02.dbf ' size 100M; 
 
@@ -116,5 +119,15 @@ impdp
      impdb system/123456  DIRECTORY=samsdpdata1 DUMPFILE=sams2017120802.dmp  FULL=y;
   追加数据
      impdp system/manager DIRECTORY=dpdata1 DUMPFILE=expdp.dmp SCHEMAS=system TABLE_EXISTS_ACTION
-    
+
+查看最大连接数：
+   select count(*) from v$session where username is not null;   查看当前连接数
+   select value from v$parameter where name ='processes';   查看最大连接数
+更改最大连接数
+   修改processes和sessions值
+　 SQL> alter system set processes=300 scope=spfile;
+　 SQL> alter system set sessions=335 scope=spfile;
+   重启生效
+   ORACLE的连接数(sessions)与其参数文件中的进程数(process)有关，它们的关系如下：
+　 sessions=(1.1*process+5) 
    

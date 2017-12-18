@@ -1,0 +1,232 @@
+一、 基本环境介绍及基本环境配置
+节点1： t1      192.168.113.120     centos6.5_64    添加1G新硬盘
+节点2： t2     192.168.113.121     centos6.5_64    添加1G新硬盘
+节点1与节点2均需配置
+修改主机名：
+    vim /etc/sysconfig/network  
+    HOSTNAME=node1.hulala.com  
+配置hosts解析：
+    vim /etc/hosts  
+    192.168.1.35    node1.hulala.com node1  
+    192.168.1.36    node2.hulala.com node2    
+同步系统时间:
+    ntpdate cn.pool.ntp.org 
+    
+关闭防火墙与SELINUX
+    service iptables stop  
+    chkconfig iptables off  
+    cat /etc/sysconfig/selinux  
+    SELINUX=disabled  
+以上配置在两个节点都需要配置，配置完成之后重启两个节点 
+**********************************************************************
+二:配置ssh互信
+    [root@node1～]#ssh-keygen -t rsa -b 1024  
+    [root@node1～]#ssh-copy-id root@192.168.113.121  
+    [root@node2～]#ssh-keygen -t rsa -b 1024  
+    [root@node2～]#ssh-copy-id root@192.168.113.120  
+**********************************************************************
+三：DRBD的安装与配置（node1和node2执行相同操作）
+    [root@node1～]#wget -c http://elrepo.org/linux/elrepo/el6/x86_64/RPMS/drbd84-utils-8.4.2-1.el6.elrepo.x86_64.rpm  
+    [root@node1～]#wget -c http://elrepo.org/linux/elrepo/el6/x86_64/RPMS/kmod-drbd84-8.4.2-1.el6_3.elrepo.x86_64.rpm  
+    [root@node1～]#rpm -ivh *.rpm  
+    -----------------------------------------------------------------------------------------------------------------
+    centos6 
+    #rpm -Uvh http://www.elrepo.org/elrepo-release-6-8.el6.elrepo.noarch.rpm 
+    #yum -y install drbd84-utils kmod-drbd84
+    centos7
+    # rpm --import http://elrepo.org/RPM-GPG-KEY-elrepo.org
+    # rpm -Uvh http://www.elrepo.org/elrepo-release-7.0-2.el7.elrepo.noarch.rpm
+    # yum -y install drbd84-utils kmod-drbd84
+    -----------------------------------------------------------------------------------------------------------------
+    获取一个sha1值做为shared-secret
+    [root@node1～]#sha1sum /etc/drbd.conf  
+    8a6c5f3c21b84c66049456d34b4c4980468bcfb3  /etc/drbd.conf 
+    -----------------------------------------------------------------------------------------------------------------
+    配置/etc/drbd.d/global-common.conf
+global {
+        usage-count no;
+        # minor-count dialog-refresh disable-ip-verification
+}
+
+common {
+        protocol C;
+
+        handlers {
+                pri-on-incon-degr "/usr/lib/drbd/notify-pri-on-incon-degr.sh; /usr/lib/drbd/notify-emergency-reboot.sh; echo b > /proc/sysrq-trigger ; reboot -f";
+                pri-lost-after-sb "/usr/lib/drbd/notify-pri-lost-after-sb.sh; /usr/lib/drbd/notify-emergency-reboot.sh; echo b > /proc/sysrq-trigger ; reboot -f";
+                local-io-error "/usr/lib/drbd/notify-io-error.sh; /usr/lib/drbd/notify-emergency-shutdown.sh; echo o > /proc/sysrq-trigger ; halt -f";
+                # fence-peer "/usr/lib/drbd/crm-fence-peer.sh";
+                # split-brain "/usr/lib/drbd/notify-split-brain.sh root";
+                # out-of-sync "/usr/lib/drbd/notify-out-of-sync.sh root";
+                # before-resync-target "/usr/lib/drbd/snapshot-resync-target-lvm.sh -p 15 -- -c 16k";
+                # after-resync-target /usr/lib/drbd/unsnapshot-resync-target-lvm.sh;
+        }
+
+        startup {
+                #wfc-timeout 120;
+                #degr-wfc-timeout 120;
+        }
+
+        disk {
+                on-io-error detach;
+                #fencing resource-only;
+        }
+
+        net {
+                cram-hmac-alg "sha1";
+                shared-secret "8a6c5f3c21b84c66049456d34b4c4980468bcfb3";
+        }
+
+        syncer {
+                rate 1000M;
+        }
+}
+        -----------------------------------------------------------------------------------------------------------------
+	2、定义一个资源/etc/drbd.d/web.res，内容如下：
+resource mydrbd {
+  on node1.magedu.com {
+    device    /dev/drbd0;
+    disk      /dev/sda5;
+    address   172.16.100.7:7789;
+    meta-disk internal;
+  }
+  on node2.magedu.com {
+    device    /dev/drbd0;
+    disk      /dev/sda5;
+    address   172.16.100.8:7789;
+    meta-disk internal;
+  }
+} 
+        以上文件在两个节点上必须相同，因此，可以基于ssh将刚才配置的文件全部同步至另外一个节点。
+	--------------------------------------------------------------------------------------
+	创建资源及文件系统:
+        创建分区(未格式化过)
+	在node1和node2
+	[#root@node1～] fdisk /dev/sdb  
+	在node1和node2上给资源(dbcluster)创建meta data：
+        [root@node1～drbd]# drbdadm create-md dbcluster
+
+        首先确保drbd module已经加载
+        查看是否加载:
+        # lsmod | grep drbd  
+        若未加载,则需加载:
+        # modprobe drbd  
+        # lsmod | grep drbd  
+        drbd                  317261  0  
+        libcrc32c               1246  1 drbd  
+
+	启动drbd后台进程:
+	service   drbd   start    
+	或者
+	[root@node1 drbd]# drbdadm up dbcluster  
+        [root@node2 drbd]# drbdadm up dbcluster
+	查看启动状态：
+        [root@node2 drbd]#cat /proc/drbd
+	也可以使用drbd-overview命令来查看
+	设置主节点
+	从上面的信息中可以看出此时两个节点均处于Secondary状态。于是，我们接下来需要将其中一个节点设置为Primary。在要设置为Primary的节点上执行如下命令：
+	# drbdadm primary --force mydrbd
+	#drbdadm primary  mydrbd
+        也可以在要设置为Primary的节点上使用如下命令来设置主节点：
+	# drbdadm -- --overwrite-data-of-peer primary mydrbd
+	而后再次查看状态，可以发现数据同步过程已经开始：
+	# drbd-overview 
+	  0:web  SyncSource Primary/Secondary UpToDate/Inconsistent C r---- 
+        [============>.......] sync'ed: 66.2% (172140/505964)K delay_probe: 35
+	--------------------------------------------------------------------------------
+	创建文件系统
+        文件系统的挂载只能在Primary节点进行，因此，也只有在设置了主节点后才能对drbd设备进行格式化：
+	# mke2fs -j -L DRBD /dev/drbd0
+	# mkdir /mnt/drbd 
+	# mount /dev/drbd0 /mnt/drbd
+	---------------------------------------------------------------------------------
+	切换Primary和Secondary节点
+
+	对主Primary/Secondary模型的drbd服务来讲，在某个时刻只能有一个节点为Primary，因此，要切换两个节点的角色，只能在先将原有的Primary节点设置为Secondary后，才能原来的Secondary节点设置为Primary:
+
+	Node1:
+	# cp -r /etc/drbd.* /mnt/drbd  
+	# umount /mnt/drbd
+	# drbdadm secondary web    --将节点设置为从节点
+	查看状态：
+	# drbd-overview 
+	  0:web  Connected Secondary/Secondary UpToDate/UpToDate C r---- 
+
+	Node2:
+	# drbdadm primary web
+	# drbd-overview 
+	  0:web  Connected Primary/Secondary UpToDate/UpToDate C r---- 
+	# mkdir /mnt/drbd
+	# mount /dev/drbd0 /mnt/drbd
+
+	使用下面的命令查看在此前在主节点上复制至此设备的文件是否存在：
+	# ls /mnt/drbd
+        drbd  配置完成
+四：mysql的安装
+
+	1.在node1和node2节点安装mysql:
+	    yum install -y   mysql   mysql-devel  mysql-server 
+	2.node1和node2都操作停止mysql服务
+	    [root@node1～]# service mysql stop  
+	    Shutting down MySQL.        [  OK  ]  
+	3.node1和node2都操作创建数据库目录并将该目录权限属主修改为mysql
+	   [root@host1 /]# mkdir -p /mnt/drbd/mysql  
+	   [root@host1 /]# chown -R mysql:mysql /mysql  
+
+	4，关闭mysql临时挂载DRBD文件系统到主节点(Node1)
+	    [root@node1 ~]# mount /dev/drbd0  /mnt  
+	5.node1和node2都操作修改my.cnf文件修改
+	在[mysqld]下添加新的数据存放路径
+
+	[plain] view plain copy
+
+	    datadir=/mysql/data  
+
+	6.将默认的数据路径下的所有文件和目录cp到新的目录下（node2不用操作）
+	[plain] view plain copy
+
+	    [root@host1 mysql]#cd /var/lib/mysql  
+	    [root@host1 mysql]#cp -R * /mysql/data/  
+
+	node1和node2都操作这里注意copy过去的目录权限属主需要修改为mysql,这里直接修改mysql目录即可.
+	[plain] view plain copy
+
+	    [root@host1 mysql]# chown -R mysql:mysql /mysql  
+
+	7.启动node1上的mysql进行登陆测试
+	[plain] view plain copy
+
+	    [root@host1 mysql]# mysql  
+
+	8.在节点Node1卸载DRBD文件系统
+	[plain] view plain copy
+
+	    [root@node1 ~]# umount /var/lib/mysql_drbd  
+	    [root@node1 ~]# drbdadm secondary dbcluster  
+
+	9.将DRBD文件系统挂载节点Node2
+	[plain] view plain copy
+
+	    [root@node2 ~]# drbdadm primary dbcluster  
+	    [root@node2 ~]# mount /dev/drbd0 /mysql/  
+
+	10.节点Node2上配置MySQL并测试
+	[plain] view plain copy
+
+	    [root@node1 ~]# scp node2:/etc/my.cnf /etc/my.cnf  
+	    [root@node2 ~]# chown mysql /etc/my.cnf  
+	    [root@node2 ~]# chmod 644 /etc/my.cnf  
+
+	11. node2上做mysql登陆测试
+	[plain] view plain copy
+
+	    [root@node2 ~]# mysql  
+
+	12.在Node2上卸载DRBD文件系统,交由集群管理软件Pacemaker来管理
+	[plain] view plain copy
+
+	    [root@node2～]# umount /var/lib/mysql_drbd  
+	    [root@node2～]# drbdadm secondary dbcluster  
+	    [root@node2～]# drbd-overview  
+	      0:dbcluster/0  Connected Secondary/Secondary UpToDate/UpToDate C r—–  
+	    [root@node2～]#  

@@ -11,9 +11,15 @@ make KDIR=/usr/src/kernels/$(uname -r)/
 #make install  
 
 
+http://ftp.colocall.net/pub/elrepo/elrepo/el6/x86_64/RPMS/    下载修改内核的地址
+
+rpm -Uvh http://www.elrepo.org/elrepo-release-6-8.el6.elrepo.noarch.rpm (external link)
 
 
+yum -y install drbd84-utils kmod-drbd84
 
+
+modprobe drbd
 前提：
 1）本配置共有两个测试节点，分别node1.magedu.com和node2.magedu.com，相的IP地址分别为172.16.100.7和172.16.100.8；
 2）node1和node2两个节点上各提供了一个大小相同的分区作为drbd设备；我们这里为在两个节点上均为/dev/sda5，大小为512M；
@@ -138,6 +144,7 @@ GIT-hash: d78846e52224fd00562f7c225bcc25b2d422321d build by mockbuild@builder10.
 
 从上面的信息中可以看出此时两个节点均处于Secondary状态。于是，我们接下来需要将其中一个节点设置为Primary。在要设置为Primary的节点上执行如下命令：
 # drbdadm primary --force resource
+drbdadm primary  mydrbd
 
   注： 也可以在要设置为Primary的节点上使用如下命令来设置主节点：
      # drbdadm -- --overwrite-data-of-peer primary web

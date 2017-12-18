@@ -1,0 +1,43 @@
+1. 安装TFTP服务：
+    #yum install tftp-server
+2. 安装Xinetd服务，TFTP服务是通过xintd运行的，所以需要安装Xinetd
+    #yum install xinetd
+3. 配置
+     编辑vim /etc/xinetd.d/tftp文件，
+
+     修改下表中的两个地方：server_args为你自己的TFTPBOOT目录，即FTP文件的根目录；缺省情况下，是禁用TFTP服务的，所以把disable的值改为no。
+
+# default: off
+# description: The tftp server serves files using the trivial file transfer \
+#   protocol.  The tftp protocol is often used to boot diskless \
+#   workstations, download configuration files to network-aware printers, \
+#   and to start the installation process for some operating systems.
+service tftp
+{
+    socket_type     = dgram
+    protocol            = udp 
+    wait                   = yes 
+    user                   = root
+    server                = /usr/sbin/in.tftpd
+    server_args      = -s /var/lib/tftpboot
+    disable              = no
+    per_source       = 11
+    cps                     = 100 2
+    flags                   = IPv4
+}
+
+4.
+设置TFTPBOOT的访问权限：
+    #chmod 777 /tftpboot
+
+5. 激活Xinetd和Xinetd
+    #chkconfig tftp on
+
+    #chkconfig xinetd on
+
+    # service xinetd start
+
+6. 测试一下
+    #tftp -v 192.168.122.180 -c put mytestfile
+
+    #tftp   -v  t1  -c   get   a.txt
