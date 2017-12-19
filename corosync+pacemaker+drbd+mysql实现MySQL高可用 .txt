@@ -168,65 +168,152 @@ resource mydrbd {
 	    yum install -y   mysql   mysql-devel  mysql-server 
 	2.node1和node2都操作停止mysql服务
 	    [root@node1～]# service mysql stop  
-	    Shutting down MySQL.        [  OK  ]  
-	3.node1和node2都操作创建数据库目录并将该目录权限属主修改为mysql
-	   [root@host1 /]# mkdir -p /mnt/drbd/mysql  
-	   [root@host1 /]# chown -R mysql:mysql /mysql  
-
-	4，关闭mysql临时挂载DRBD文件系统到主节点(Node1)
-	    [root@node1 ~]# mount /dev/drbd0  /mnt  
-	5.node1和node2都操作修改my.cnf文件修改
-	在[mysqld]下添加新的数据存放路径
-
-	[plain] view plain copy
-
-	    datadir=/mysql/data  
-
-	6.将默认的数据路径下的所有文件和目录cp到新的目录下（node2不用操作）
-	[plain] view plain copy
-
-	    [root@host1 mysql]#cd /var/lib/mysql  
-	    [root@host1 mysql]#cp -R * /mysql/data/  
-
-	node1和node2都操作这里注意copy过去的目录权限属主需要修改为mysql,这里直接修改mysql目录即可.
-	[plain] view plain copy
-
+	    Shutting down MySQL.        [  OK  ] 
+	3.关闭mysql临时挂载DRBD文件系统到主节点(Node1)
+	    [root@node1 ~]# mount /dev/drbd0  /mnt/drbd/  
+	4.node1和node2都操作修改my.cnf文件修改
+	    在[mysqld]下添加新的数据存放路径
+            datadir=/mysql/data  
+	5.将默认的数据路径下的所有文件和目录cp到新的目录下（node2不用操作）
+	    [root@host1 mysql]#cd /var/lib/  
+	    [root@host1 mysql]#cp -rf mysql    /mnt/drbd/ 
+	   node1和node2都操作这里注意copy过去的目录权限属主需要修改为mysql,这里直接修改mysql目录即可.
 	    [root@host1 mysql]# chown -R mysql:mysql /mysql  
-
-	7.启动node1上的mysql进行登陆测试
-	[plain] view plain copy
-
-	    [root@host1 mysql]# mysql  
-
-	8.在节点Node1卸载DRBD文件系统
-	[plain] view plain copy
-
+	6.启动node1上的mysql进行登陆测试
+            [root@host1 mysql]# mysql  
+	7.在节点Node1卸载DRBD文件系统
 	    [root@node1 ~]# umount /var/lib/mysql_drbd  
-	    [root@node1 ~]# drbdadm secondary dbcluster  
+	    [root@node1 ~]# drbdadm secondary mydrbd 
+	8.将DRBD文件系统挂载节点Node2
+	    [root@node2 ~]# drbdadm primary mydrbd 
+	    [root@node2 ~]# mount /dev/drbd0  /mnt/drbd/
+五：Corosync和Pacemaker的安装配置（node1和node2都需安装）
+        1.安装 
+	    yum  -y install  cluster-glue*  corosync  corosynclib   heartbeat   heartbeatlib  libesmtp pacemaker   packmaker-lib  pacemaker-cts resource-agents
+        2、配置corosync，（以下命令在node1.magedu.com上执行）
+           # cd /etc/corosync
+           # cp corosync.conf.example corosync.conf
+	   [root@node1 coorosync]# grep -vE "^([[:space:]]*#)|^$" /etc/corosync/corosync.conf
+compatibility: whitetank    #表示是否支持0.8之前的版本
+totem {    #图腾，这是用来定义集群中各节点中是怎么通信的
+        version: 2    #各节点互相通信的协议的版本
+        secauth: on    #各节点间通信是否需要认证
+        threads: 0    #使用多少线程进行加密和发送多播信息
+        interface {
+                ringnumber: 0    #环号码，避免消息环路产生
+                bindnetaddr: 192.168.220.0    #绑定的网络地址
+                mcastaddr: 239.255.1.1    #多播地址
+                mcastport: 5405    #多播端口
+                ttl: 1    
+        }
+}
+logging {    #日志相关
+        fileline: off
+        to_stderr: no
+        to_logfile: yes
+        logfile: /var/log/cluster/corosync.log
+        to_syslog: no
+        debug: off
+        timestamp: on
+        logger_subsys {
+                subsys: AMF
+                debug: off
+        }
+}
+service {    #定义启动corosync时启动pacemaker
+        ver: 0
+        name: pacemaker
+}
+aisexec {    #定义以哪个用户和组启动corosync
+        user: root
+        group: root
+}
 
-	9.将DRBD文件系统挂载节点Node2
-	[plain] view plain copy
+接着编辑corosync.conf，添加如下内容：
+service {
+  ver:  0
+  name: pacemaker
+  
+}
 
-	    [root@node2 ~]# drbdadm primary dbcluster  
-	    [root@node2 ~]# mount /dev/drbd0 /mysql/  
+aisexec {
+  user: root
+  group:  root
+}
+--------------------------------------------------------------------------------------------
+         3.生成节点间通信时用到的认证密钥文件：
+           # corosync-keygen
+           将corosync和authkey复制至node2:
+           # scp -p corosync authkey  node2:/etc/corosync/
+	 4.安装crm
+	 5.启动corosync（以下命令在node1上执行）：
+           # /etc/init.d/corosync start
+	 6.查看corosync引擎是否正常启动：
+		# grep -e "Corosync Cluster Engine" -e "configuration file" /var/log/cluster/corosync.log 
+		Sep 15 11:37:39 corosync [MAIN  ] Corosync Cluster Engine ('1.4.1'): started and ready to provide service.
+		Sep 15 11:37:39 corosync [MAIN  ] Successfully read main configuration file '/etc/corosync/corosync.conf'.
 
-	10.节点Node2上配置MySQL并测试
-	[plain] view plain copy
+		查看初始化成员节点通知是否正常发出：
+		# grep  TOTEM  /var/log/cluster/corosync.log
+		Sep 15 11:37:39 corosync [TOTEM ] Initializing transport (UDP/IP Multicast).
+		Sep 15 11:37:39 corosync [TOTEM ] Initializing transmit/receive security: libtomcrypt SOBER128/SHA1HMAC (mode 0).
+		Sep 15 11:37:39 corosync [TOTEM ] The network interface [172.16.100.15] is now up.
+		Sep 15 11:37:39 corosync [TOTEM ] A processor joined or left the membership and a new membership was formed.
+		Sep 15 11:37:39 corosync [TOTEM ] A processor joined or left the membership and a new membership was formed.
 
-	    [root@node1 ~]# scp node2:/etc/my.cnf /etc/my.cnf  
-	    [root@node2 ~]# chown mysql /etc/my.cnf  
-	    [root@node2 ~]# chmod 644 /etc/my.cnf  
+		检查启动过程中是否有错误产生。下面的错误信息表示packmaker不久之后将不再作为corosync的插件运行，因此，建议使用cman作为集群基础架构服务；此处可安全忽略。
+		# grep ERROR: /var/log/cluster/corosync.log | grep -v unpack_resources
+		Sep 15 11:37:39 corosync [pcmk  ] ERROR: process_ais_conf: You have configured a cluster using the Pacemaker plugin for Corosync. The plugin is not supported in this environment and will be removed very soon.
+		Sep 15 11:37:39 corosync [pcmk  ] ERROR: process_ais_conf:  Please see Chapter 8 of 'Clusters from Scratch' (http://www.clusterlabs.org/doc) for details on using Pacemaker with CMAN
+		Sep 15 11:37:40 corosync [pcmk  ] ERROR: pcmk_wait_dispatch: Child process mgmtd exited (pid=2375, rc=100)
 
-	11. node2上做mysql登陆测试
-	[plain] view plain copy
+		查看pacemaker是否正常启动：
+		# grep pcmk_startup /var/log/cluster/corosync.log 
+		Sep 15 11:37:39 corosync [pcmk  ] info: pcmk_startup: CRM: Initialized
+		Sep 15 11:37:39 corosync [pcmk  ] Logging: Initialized pcmk_startup
+		Sep 15 11:37:39 corosync [pcmk  ] info: pcmk_startup: Maximum core file size is: 18446744073709551615
+		Sep 15 11:37:39 corosync [pcmk  ] info: pcmk_startup: Service: 9
+		Sep 15 11:37:39 corosync [pcmk  ] info: pcmk_startup: Local hostname: node1.magedu.com
 
-	    [root@node2 ~]# mysql  
-
-	12.在Node2上卸载DRBD文件系统,交由集群管理软件Pacemaker来管理
-	[plain] view plain copy
-
-	    [root@node2～]# umount /var/lib/mysql_drbd  
-	    [root@node2～]# drbdadm secondary dbcluster  
-	    [root@node2～]# drbd-overview  
-	      0:dbcluster/0  Connected Secondary/Secondary UpToDate/UpToDate C r—–  
-	    [root@node2～]#  
+		如果上面命令执行均没有问题，接着可以执行如下命令启动node2上的corosync
+		# ssh node2 -- /etc/init.d/corosync start	
+		如果安装了crmsh，可使用如下命令查看集群节点的启动状态：
+		# crm status
+六、资源配置
+          1.配置资源及约束                 
+            配置默认属性
+	    禁止STONITH错误:
+	    [root@node1 ~]# crm configure property stonith-enabled=false  
+	    [root@node1 ~]# crm_verify -L  
+           让集群忽略Quorum:
+            [root@node1~]# crm configure property no-quorum-policy=ignore
+	    防止资源在恢复之后移动:
+            [root@node1~]# crm configure rsc_defaults resource-stickiness=100 
+	    设置操作的默认超时:
+            设置默认的启动失败是否为致命的:
+            [root@node1~]# crm configure property start-failure-is-fatal="false" 
+	    [root@node1~]# crm configure property default-action-timeout="180s"
+	   2.配置drbd
+	     配置DRBD资源:
+	     primitive mydrbd ocf:linbit:drbd params drbd_resource=mydrbd op  start  timeout=240 op stop  timeout=100  op monitor role=Master interval=10s timeout=30s op monitor role=Slave interval=20s timeout=30s
+	     配置DRBD资源主从关系(定义只有一个Master节点):
+	     master MS_drbd mydrbd meta master-max="1" master-node-max="1" clone-max="2" clone-node-max="1" notify="true"
+             配置文件系统资源,定义挂载点(mount point):
+	     crm(live)configure# primitive fs_drbd ocf:heartbeat:Filesystem params device="/dev/drbd0" directory="/mnt/drbd" fstype="ext3" op  start  timeout=100 op stop  timeout=100
+	    3.配置VIP资源
+	     crm(live)configure# primitive vip ocf:heartbeat:IPaddr2 params ip="192.168.113.110" cidr_netmask="24"
+	    4.配置MySQL资源
+	     crm(live)configure# primitive mysqld lsb:mysqld op monitor interval="20s" timeout="30s" op start interval="0" timeout="180s" op stop interval="0" timeout="240s" 
+七、组资源和约束
+            通过”组”确保DRBD,MySQL和VIP是在同一个节点(Master)并且确定资源的启动/停止顺序.
+	        启动: p_fs_mysql–>p_ip_mysql->p_mysql  
+		停止: p_mysql–>p_ip_mysql–>p_fs_mysql 
+	    crm(live)configure# group group_mysql fs_drbd vip mysqld 
+	    组group_mysql永远只在Master节点:
+	    crm(live)configure# colocation c_mysql_on_drbd inf: group_mysql MS_drbd:Master
+	    MySQL的启动永远是在DRBD Master之后:
+	    crm(live)configure# order drbd_before_mysql inf: MS_drbd:promote group_mysql:start
+	    配置检查和提交
+	    crm(live)configure# verify  
+	    crm(live)configure# commit  
+	    crm(live)configure# quit  
