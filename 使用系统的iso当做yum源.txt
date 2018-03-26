@@ -1,0 +1,18 @@
+不能上网的机器
+使用系统的镜像做yum源
+1.上传镜像到系统。
+2.挂载镜像  mount CentOS-6.5-x86_64-bin-DVD1.iso /mnt -o loop
+3.重命名 mv  CentOS-Base.repo  CentOS-Base.repo.bak
+4.vim     CentOS-Media.repo
+更改成以下模式
+[c6-media]
+name=CentOS-$releasever - Media
+baseurl=file:///mnt/
+        file:///media/cdrom/
+        file:///media/cdrecorder/
+gpgcheck=0
+enabled=1
+gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-CentOS-6
+
+保存
+5.即可使用yum安装软件了
